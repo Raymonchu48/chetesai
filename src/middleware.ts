@@ -11,6 +11,12 @@ const publicRoutes = [
   "/privacy-policy",
   "/terms-of-service",
 
+  // App routes (public since no auth is implemented)
+  "/dashboard",
+  "/clientes",
+  "/sesiones",
+  "/pagos",
+  "/ejercicios",
 
   //stripe routes here
   "/stripe/demo",
