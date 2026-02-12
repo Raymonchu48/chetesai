@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import {
-  Zap,
   Users,
   CalendarDays,
   CreditCard,
@@ -60,10 +59,12 @@ export default function Main() {
         <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/80" />
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 py-20 md:py-32">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
-              <Zap className="w-7 h-7 text-primary-foreground" />
-            </div>
+          <div className="flex items-center gap-4 mb-6">
+            <img
+              src={files.logo.url}
+              alt="ChetesAI Logo"
+              className="w-14 h-14 rounded-xl object-contain bg-white/10 backdrop-blur-sm p-1"
+            />
             <span className="text-white/60 text-sm font-medium tracking-widest uppercase">
               Centro de Entrenamiento
             </span>
@@ -153,7 +154,7 @@ export default function Main() {
       <footer className="border-t border-border bg-card">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-primary" />
+            <img src={files.logo.url} alt="ChetesAI Logo" className="w-7 h-7 rounded object-contain" />
             <span className="font-bold">ChetesAI</span>
           </div>
           <p className="text-muted-foreground text-sm">

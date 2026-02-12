@@ -1,6 +1,10 @@
 
 // all files (images, logos, documents)
 export const files: {[fileName: string]: {description: string, url: string}} = {
+  logo: {
+    description: "Logotipo CF+ de ChetesAI - Centro de Entrenamiento Personal",
+    url: "https://storage.googleapis.com/totalum-live-bucket/chetesai/files/1.jpg?GoogleAccessId=totalum-live%40totalum-live.iam.gserviceaccount.com&Expires=2086258883&Signature=2rfDUXzKEU0G4LdTdbiHTPhOgC1XDSUk8XXtHOTLvS6dxxzx6Ov3CTJmRXAZr8lUgy9DFDQwQX0WcDaroDZi60czG7O%2Bst07frsXUiaTaomKqLwfVpNH4A%2Bk7gnT9LZZSnQCzPRnVc97LXoyr%2FCJcMlZlpYn9uNv70dSa%2BqiI9xIDCPM%2F7wC7MizvusPrsjF58k2Y7bCOJtpHEAyEaiGjWwg5%2B1sDzf9HRig9eUom%2BHdrWaOm0wgn57YBwidw6cw9F9va%2BQNejxcQ8epai5GXpv0tZeUylT7ukTyldMo8t3PM58ZVpv4xZZP%2B%2Fotq1zwwfwaTNyEs4R2vAOUoxtXvw%3D%3D"
+  },
   plan_negocio: {
     description: "Plan de negocio ChetesAI - Centro de Entrenamiento Personal",
     url: "https://storage.googleapis.com/totalum-live-bucket/chetesai/files/plan_negocio_chetesai.pdf"
