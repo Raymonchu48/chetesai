@@ -39,7 +39,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
           <img
             src={files.logo.url}
             alt="ChetesaíFitness+ Logo"
-            className="w-9 h-9 rounded-lg object-contain shrink-0"
+            className="w-10 h-10 rounded-lg object-contain shrink-0 bg-white p-0.5"
           />
           {!collapsed && (
             <div className="overflow-hidden">
