@@ -62,7 +62,7 @@ export default function Main() {
           <div className="flex items-center gap-4 mb-6">
             <img
               src={files.logo.url}
-              alt="ChetesAI Logo"
+              alt="ChetesaíFitness+ Logo"
               className="w-14 h-14 rounded-xl object-contain bg-white/10 backdrop-blur-sm p-1"
             />
             <span className="text-white/60 text-sm font-medium tracking-widest uppercase">
@@ -71,7 +71,7 @@ export default function Main() {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-black text-white leading-[0.95] tracking-tight mb-6">
-            Chetes<span className="text-primary">AI</span>
+            Chetesaí<span className="text-primary">Fitness+</span>
           </h1>
           <p className="text-lg md:text-xl text-white/70 max-w-xl mb-10 leading-relaxed">
             Plataforma integral para gestionar tu centro de entrenamiento personal.
@@ -154,8 +154,8 @@ export default function Main() {
       <footer className="border-t border-border bg-card">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <img src={files.logo.url} alt="ChetesAI Logo" className="w-7 h-7 rounded object-contain" />
-            <span className="font-bold">ChetesAI</span>
+            <img src={files.logo.url} alt="ChetesaíFitness+ Logo" className="w-7 h-7 rounded object-contain" />
+            <span className="font-bold">ChetesaíFitness+</span>
           </div>
           <p className="text-muted-foreground text-sm">
             Centro de Entrenamiento Personal - Cuota mensual 180 EUR

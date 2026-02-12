@@ -38,12 +38,12 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
         <Link href="/" className="p-4 flex items-center gap-3 border-b border-sidebar-border min-h-[65px] hover:bg-sidebar-accent/50 transition-colors">
           <img
             src={files.logo.url}
-            alt="ChetesAI Logo"
+            alt="ChetesaíFitness+ Logo"
             className="w-9 h-9 rounded-lg object-contain shrink-0"
           />
           {!collapsed && (
             <div className="overflow-hidden">
-              <h1 className="font-bold text-lg tracking-tight leading-tight">ChetesAI</h1>
+              <h1 className="font-bold text-lg tracking-tight leading-tight">ChetesaíFitness+</h1>
               <p className="text-[11px] text-sidebar-foreground/60 leading-tight">Entrenamiento Personal</p>
             </div>
           )}
