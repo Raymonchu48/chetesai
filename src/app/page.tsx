@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState, useCallback } from "react";
 import {
   Users,
   CalendarDays,
@@ -12,7 +13,7 @@ import {
   Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { files } from "@/assets/files";
+import { files, heroSlideshow } from "@/assets/files";
 
 const features = [
   {
@@ -48,26 +49,53 @@ const stats = [
 ];
 
 export default function Main() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % heroSlideshow.length);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(nextSlide, 5000);
+    return () => clearInterval(interval);
+  }, [nextSlide]);
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${files.hero_gym.url})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/80" />
+      {/* Hero Section with Slideshow */}
+      <div className="relative overflow-hidden min-h-[600px] md:min-h-[700px]">
+        {/* Slideshow background images */}
+        {heroSlideshow.map((slide, index) => (
+          <div
+            key={index}
+            className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out"
+            style={{
+              backgroundImage: `url(${slide.url})`,
+              opacity: currentSlide === index ? 1 : 0,
+              zIndex: currentSlide === index ? 1 : 0,
+            }}
+          />
+        ))}
 
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/75 via-black/55 to-black/75 z-[2]" />
+
+        {/* Content */}
         <div className="relative z-10 max-w-6xl mx-auto px-6 py-20 md:py-32">
           <div className="flex items-center gap-4 mb-6">
             <img
               src={files.logo.url}
               alt="ChetesaíFitness+ Logo"
-              className="w-14 h-14 rounded-xl object-contain bg-white/10 backdrop-blur-sm p-1"
+              className="w-16 h-16 md:w-20 md:h-20 rounded-xl object-contain bg-white/90 backdrop-blur-sm p-1.5 shadow-lg"
             />
-            <span className="text-white/60 text-sm font-medium tracking-widest uppercase">
-              Centro de Entrenamiento
-            </span>
+            <div>
+              <span className="text-white/60 text-sm font-medium tracking-widest uppercase block">
+                Centro de Entrenamiento
+              </span>
+              <span className="text-yellow-400 text-xs font-medium tracking-wide">
+                Carga tus energias
+              </span>
+            </div>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-black text-white leading-[0.95] tracking-tight mb-6">
@@ -116,6 +144,21 @@ export default function Main() {
               );
             })}
           </div>
+
+          {/* Slide indicators */}
+          <div className="mt-8 flex items-center gap-2">
+            {heroSlideshow.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`h-1.5 rounded-full transition-all duration-500 ${
+                  currentSlide === index
+                    ? "w-8 bg-primary"
+                    : "w-3 bg-white/30 hover:bg-white/50"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -153,8 +196,8 @@ export default function Main() {
       {/* Footer */}
       <footer className="border-t border-border bg-card">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <img src={files.logo.url} alt="ChetesaíFitness+ Logo" className="w-7 h-7 rounded object-contain" />
+          <div className="flex items-center gap-3">
+            <img src={files.logo.url} alt="ChetesaíFitness+ Logo" className="w-9 h-9 rounded-lg object-contain bg-white p-0.5" />
             <span className="font-bold">ChetesaíFitness+</span>
           </div>
           <p className="text-muted-foreground text-sm">
