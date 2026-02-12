@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import {
-  Zap,
   Users,
   CalendarDays,
   CreditCard,
@@ -60,17 +59,19 @@ export default function Main() {
         <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/80" />
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 py-20 md:py-32">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
-              <Zap className="w-7 h-7 text-primary-foreground" />
-            </div>
+          <div className="flex items-center gap-4 mb-6">
+            <img
+              src={files.logo.url}
+              alt="ChetesaíFitness+ Logo"
+              className="w-14 h-14 rounded-xl object-contain bg-white/10 backdrop-blur-sm p-1"
+            />
             <span className="text-white/60 text-sm font-medium tracking-widest uppercase">
               Centro de Entrenamiento
             </span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-black text-white leading-[0.95] tracking-tight mb-6">
-            Chetes<span className="text-primary">AI</span>
+            Chetesaí<span className="text-primary">Fitness+</span>
           </h1>
           <p className="text-lg md:text-xl text-white/70 max-w-xl mb-10 leading-relaxed">
             Plataforma integral para gestionar tu centro de entrenamiento personal.
@@ -153,8 +154,8 @@ export default function Main() {
       <footer className="border-t border-border bg-card">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-primary" />
-            <span className="font-bold">ChetesAI</span>
+            <img src={files.logo.url} alt="ChetesaíFitness+ Logo" className="w-7 h-7 rounded object-contain" />
+            <span className="font-bold">ChetesaíFitness+</span>
           </div>
           <p className="text-muted-foreground text-sm">
             Centro de Entrenamiento Personal - Cuota mensual 180 EUR

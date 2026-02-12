@@ -12,7 +12,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ChetesAI - Centro de Entrenamiento Personal",
+  title: "ChetesaíFitness+ - Centro de Entrenamiento Personal",
   description: "Gestiona tu centro de entrenamiento personal: clientes, sesiones, pagos y ejercicios",
 };
 

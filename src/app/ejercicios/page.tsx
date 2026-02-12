@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Dumbbell, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Dumbbell, Pencil, Trash2, Search, Play } from "lucide-react";
 import { toast } from "sonner";
 
 interface Ejercicio {
@@ -31,6 +31,7 @@ interface Ejercicio {
   grupo_muscular: string;
   dificultad: string;
   descripcion: string;
+  video_url: string;
 }
 
 const grupoLabels: Record<string, string> = {
@@ -70,6 +71,7 @@ const emptyForm = {
   grupo_muscular: "pecho",
   dificultad: "principiante",
   descripcion: "",
+  video_url: "",
 };
 
 export default function EjerciciosPage() {
@@ -131,6 +133,7 @@ export default function EjerciciosPage() {
       grupo_muscular: e.grupo_muscular || "pecho",
       dificultad: e.dificultad || "principiante",
       descripcion: e.descripcion || "",
+      video_url: e.video_url || "",
     });
     setDialogOpen(true);
   };
@@ -232,6 +235,14 @@ export default function EjerciciosPage() {
                     rows={4}
                   />
                 </div>
+                <div>
+                  <Label>Video YouTube (URL)</Label>
+                  <Input
+                    value={form.video_url}
+                    onChange={(e) => setForm({ ...form, video_url: e.target.value })}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                  />
+                </div>
                 <Button onClick={handleSubmit} className="w-full">
                   {editingId ? "Guardar Cambios" : "Crear Ejercicio"}
                 </Button>
@@ -310,6 +321,18 @@ export default function EjerciciosPage() {
 
                   {e.descripcion && (
                     <p className="text-sm text-muted-foreground line-clamp-2">{e.descripcion}</p>
+                  )}
+
+                  {e.video_url && (
+                    <a
+                      href={e.video_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors text-sm font-medium"
+                    >
+                      <Play className="w-4 h-4 fill-red-600" />
+                      Ver Video en YouTube
+                    </a>
                   )}
                 </CardContent>
               </Card>

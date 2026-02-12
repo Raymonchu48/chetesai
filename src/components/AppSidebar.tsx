@@ -10,9 +10,9 @@ import {
   Dumbbell,
   ChevronLeft,
   ChevronRight,
-  Zap,
 } from "lucide-react";
 import { useState } from "react";
+import { files } from "@/assets/files";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -35,17 +35,19 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
         } bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col transition-all duration-300 shrink-0`}
       >
         {/* Logo */}
-        <div className="p-4 flex items-center gap-3 border-b border-sidebar-border min-h-[65px]">
-          <div className="w-9 h-9 rounded-lg bg-sidebar-primary flex items-center justify-center shrink-0">
-            <Zap className="w-5 h-5 text-sidebar-primary-foreground" />
-          </div>
+        <Link href="/" className="p-4 flex items-center gap-3 border-b border-sidebar-border min-h-[65px] hover:bg-sidebar-accent/50 transition-colors">
+          <img
+            src={files.logo.url}
+            alt="ChetesaíFitness+ Logo"
+            className="w-9 h-9 rounded-lg object-contain shrink-0"
+          />
           {!collapsed && (
             <div className="overflow-hidden">
-              <h1 className="font-bold text-lg tracking-tight leading-tight">ChetesAI</h1>
+              <h1 className="font-bold text-lg tracking-tight leading-tight">ChetesaíFitness+</h1>
               <p className="text-[11px] text-sidebar-foreground/60 leading-tight">Entrenamiento Personal</p>
             </div>
           )}
-        </div>
+        </Link>
 
         {/* Navigation */}
         <nav className="flex-1 p-3 space-y-1">
