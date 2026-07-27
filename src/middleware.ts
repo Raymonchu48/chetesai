@@ -1,120 +1,173 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-const isProduction = process.env.NODE_ENV === "production";
+type AppRole = "administrador" | "profesional" | "cliente";
 
-// Public routes that don't require authentication
-const publicRoutes = [
-  "/",
-  "/login",
-  "/register",
-  "/privacy-policy",
-  "/terms-of-service",
+type SessionResult = {
+  valid: boolean;
+  role?: AppRole;
+  accessToken?: string;
+  refreshToken?: string;
+  expiresIn?: number;
+};
 
-  // App routes (public since no auth is implemented)
-  "/dashboard",
-  "/clientes",
-  "/sesiones",
-  "/pagos",
-  "/ejercicios",
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
+const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  //stripe routes here
-  "/stripe/demo",
-  "/stripe/success",
-  "/stripe/cancel",
+async function getProfileRole(accessToken: string): Promise<AppRole | null> {
+  if (!supabaseUrl || !anonKey) return null;
 
-];
+  const userResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
+    headers: { apikey: anonKey, Authorization: `Bearer ${accessToken}` },
+    cache: "no-store",
+  });
+  if (!userResponse.ok) return null;
 
-// Helper to add CORS headers for non-production environments
-function addCorsHeaders(response: NextResponse, request: NextRequest) {
-  if (!isProduction) {
-    const origin = request.headers.get("origin") || "*";
-    response.headers.set("Access-Control-Allow-Origin", origin);
-    response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
-    response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-    response.headers.set("Access-Control-Allow-Credentials", "true");
-    response.headers.set("Access-Control-Max-Age", "86400");
+  const user = (await userResponse.json()) as { id?: string };
+  if (!user.id) return null;
+
+  const profileResponse = await fetch(
+    `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=role,activo`,
+    {
+      headers: { apikey: anonKey, Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    }
+  );
+  if (!profileResponse.ok) return null;
+
+  const profiles = (await profileResponse.json()) as Array<{ role?: AppRole; activo?: boolean }>;
+  const profile = profiles[0];
+  if (!profile || profile.activo === false) return null;
+  return profile.role ?? "cliente";
+}
+
+async function validateSession(request: NextRequest): Promise<SessionResult> {
+  if (!supabaseUrl || !anonKey) return { valid: false };
+
+  const accessToken = request.cookies.get("chetesai_access_token")?.value;
+  const refreshToken = request.cookies.get("chetesai_refresh_token")?.value;
+
+  if (accessToken) {
+    const role = await getProfileRole(accessToken);
+    if (role) return { valid: true, role, accessToken };
   }
-  return response;
+
+  if (!refreshToken) return { valid: false };
+
+  const refreshResponse = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
+    method: "POST",
+    headers: { apikey: anonKey, "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh_token: refreshToken }),
+    cache: "no-store",
+  });
+  if (!refreshResponse.ok) return { valid: false };
+
+  const refreshed = (await refreshResponse.json()) as {
+    access_token?: string;
+    refresh_token?: string;
+    expires_in?: number;
+  };
+  if (!refreshed.access_token) return { valid: false };
+
+  const role = await getProfileRole(refreshed.access_token);
+  if (!role) return { valid: false };
+
+  return {
+    valid: true,
+    role,
+    accessToken: refreshed.access_token,
+    refreshToken: refreshed.refresh_token ?? refreshToken,
+    expiresIn: refreshed.expires_in ?? 3600,
+  };
+}
+
+function clearSessionCookies(response: NextResponse) {
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: 0,
+  };
+  response.cookies.set("chetesai_access_token", "", cookieOptions);
+  response.cookies.set("chetesai_refresh_token", "", cookieOptions);
+}
+
+function persistRefreshedSession(response: NextResponse, session: SessionResult) {
+  if (!session.accessToken || !session.refreshToken) return;
+  const secure = process.env.NODE_ENV === "production";
+  response.cookies.set("chetesai_access_token", session.accessToken, {
+    httpOnly: true,
+    secure,
+    sameSite: "lax",
+    path: "/",
+    maxAge: session.expiresIn ?? 3600,
+  });
+  response.cookies.set("chetesai_refresh_token", session.refreshToken, {
+    httpOnly: true,
+    secure,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30,
+  });
 }
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const session = await validateSession(request);
+  const isExerciseApi = pathname.startsWith("/api/ejercicios");
 
-  // Handle CORS preflight requests in non-production
-  if (!isProduction && request.method === "OPTIONS") {
-    const response = new NextResponse(null, { status: 204 });
-    return addCorsHeaders(response, request);
-  }
-
-  // Create response
-  const response = NextResponse.next();
-
-  // Add CORS headers for non-production
-  addCorsHeaders(response, request);
-
-  // Set CSP headers to allow iframe embedding
-  // In non-production: allow all frame ancestors
-  // In production: restrict to specific domains
-  if (isProduction) {
-    response.headers.set("Content-Security-Policy", "frame-ancestors 'self' https://web.totalum.app https://totalum-frontend-test.web.app http://localhost:8100");
-  } else {
-    response.headers.set("Content-Security-Policy", "frame-ancestors *");
-  }
-  response.headers.delete("X-Frame-Options"); // Remove X-Frame-Options if present
-
-  // Allow all API routes and static files
-  if (
-    pathname.startsWith("/api/") ||
-    pathname.startsWith("/_next/") ||
-    pathname.includes(".")
-  ) {
+  if (pathname === "/login") {
+    if (!session.valid || !session.role) return NextResponse.next();
+    const destination = session.role === "cliente" ? "/portal" : "/dashboard";
+    const response = NextResponse.redirect(new URL(destination, request.url));
+    persistRefreshedSession(response, session);
     return response;
   }
 
-  // Allow public routes
-  if (publicRoutes.some((route) => pathname === route || pathname.startsWith(route + "/"))) {
-    return response;
-  }
-
-  // Check session cookie for protected routes (lightweight Edge-compatible check)
-  // Better Auth uses "better-auth.session_token" or "__Secure-better-auth.session_token" (when secure)
-  const sessionCookie =
-    request.cookies.get("better-auth.session_token") ||
-    request.cookies.get("__Secure-better-auth.session_token");
-
-  if (!sessionCookie) {
-    // Redirect to login if no session cookie found
+  if (!session.valid || !session.role) {
+    if (isExerciseApi) {
+      const response = NextResponse.json({ ok: false, error: "No autenticado" }, { status: 401 });
+      clearSessionCookies(response);
+      return response;
+    }
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
-    const redirectResponse = NextResponse.redirect(loginUrl);
-
-    // Add CORS headers for non-production
-    addCorsHeaders(redirectResponse, request);
-
-    // Set CSP headers
-    if (isProduction) {
-      redirectResponse.headers.set("Content-Security-Policy", "frame-ancestors 'self' https://web.totalum.app https://totalum-frontend-test.web.app http://localhost:8100");
-    } else {
-      redirectResponse.headers.set("Content-Security-Policy", "frame-ancestors *");
-    }
-    return redirectResponse;
+    const response = NextResponse.redirect(loginUrl);
+    clearSessionCookies(response);
+    return response;
   }
 
-  // Cookie exists - allow access
-  // Note: Full session validation happens in Server Components/API routes
+  const professionalRoute =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/ejercicios") ||
+    isExerciseApi;
+
+  if (professionalRoute && session.role === "cliente") {
+    if (isExerciseApi) {
+      return NextResponse.json({ ok: false, error: "Acceso restringido" }, { status: 403 });
+    }
+    const response = NextResponse.redirect(new URL("/portal", request.url));
+    persistRefreshedSession(response, session);
+    return response;
+  }
+
+  if (pathname.startsWith("/portal") && session.role !== "cliente") {
+    const response = NextResponse.redirect(new URL("/dashboard", request.url));
+    persistRefreshedSession(response, session);
+    return response;
+  }
+
+  const response = NextResponse.next();
+  persistRefreshedSession(response, session);
   return response;
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/login",
+    "/dashboard/:path*",
+    "/portal/:path*",
+    "/ejercicios/:path*",
+    "/api/ejercicios/:path*",
   ],
 };
