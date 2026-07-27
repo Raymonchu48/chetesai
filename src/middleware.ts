@@ -114,6 +114,7 @@ function persistRefreshedSession(response: NextResponse, session: SessionResult)
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const session = await validateSession(request);
+  const isExerciseApi = pathname.startsWith("/api/ejercicios");
 
   if (pathname === "/login") {
     if (!session.valid || !session.role) return NextResponse.next();
@@ -124,6 +125,11 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!session.valid || !session.role) {
+    if (isExerciseApi) {
+      const response = NextResponse.json({ ok: false, error: "No autenticado" }, { status: 401 });
+      clearSessionCookies(response);
+      return response;
+    }
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     const response = NextResponse.redirect(loginUrl);
@@ -131,8 +137,15 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  const professionalRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/ejercicios");
+  const professionalRoute =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/ejercicios") ||
+    isExerciseApi;
+
   if (professionalRoute && session.role === "cliente") {
+    if (isExerciseApi) {
+      return NextResponse.json({ ok: false, error: "Acceso restringido" }, { status: 403 });
+    }
     const response = NextResponse.redirect(new URL("/portal", request.url));
     persistRefreshedSession(response, session);
     return response;
@@ -150,5 +163,11 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/dashboard/:path*", "/portal/:path*", "/ejercicios/:path*"],
+  matcher: [
+    "/login",
+    "/dashboard/:path*",
+    "/portal/:path*",
+    "/ejercicios/:path*",
+    "/api/ejercicios/:path*",
+  ],
 };
