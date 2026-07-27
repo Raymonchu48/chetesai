@@ -17,6 +17,18 @@ function toCliente(row: ClienteRow) {
   return { ...row, _id: row.id };
 }
 
+function normalizeClientePayload(body: Record<string, unknown>) {
+  return {
+    ...body,
+    nombre: String(body.nombre || "").trim(),
+    email: body.email ? String(body.email).trim() : null,
+    telefono: body.telefono ? String(body.telefono).trim() : null,
+    fecha_nacimiento: body.fecha_nacimiento || null,
+    fecha_alta: body.fecha_alta || new Date().toISOString().slice(0, 10),
+    notas: body.notas ? String(body.notas).trim() : null,
+  };
+}
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -46,12 +58,18 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = (await request.json()) as Record<string, unknown>;
+    const payload = normalizeClientePayload(body);
+
+    if (!payload.nombre) {
+      return NextResponse.json({ ok: false, error: "El nombre es obligatorio" }, { status: 400 });
+    }
+
     const rows = await supabaseRest<ClienteRow[]>(
       `clientes?id=eq.${encodeURIComponent(id)}`,
       {
         method: "PATCH",
         headers: { Prefer: "return=representation" },
-        body: JSON.stringify(body),
+        body: JSON.stringify(payload),
       }
     );
     if (!rows[0]) {
