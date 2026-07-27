@@ -17,6 +17,18 @@ function toCliente(row: ClienteRow) {
   return { ...row, _id: row.id };
 }
 
+function normalizeClientePayload(body: Record<string, unknown>) {
+  return {
+    ...body,
+    nombre: String(body.nombre || "").trim(),
+    email: body.email ? String(body.email).trim() : null,
+    telefono: body.telefono ? String(body.telefono).trim() : null,
+    fecha_nacimiento: body.fecha_nacimiento || null,
+    fecha_alta: body.fecha_alta || new Date().toISOString().slice(0, 10),
+    notas: body.notas ? String(body.notas).trim() : null,
+  };
+}
+
 export async function GET() {
   try {
     const rows = await supabaseRest<ClienteRow[]>(
@@ -35,14 +47,16 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as Record<string, unknown>;
-    if (!String(body.nombre || "").trim()) {
+    const payload = normalizeClientePayload(body);
+
+    if (!payload.nombre) {
       return NextResponse.json({ ok: false, error: "El nombre es obligatorio" }, { status: 400 });
     }
 
     const rows = await supabaseRest<ClienteRow[]>("clientes", {
       method: "POST",
       headers: { Prefer: "return=representation" },
-      body: JSON.stringify(body),
+      body: JSON.stringify(payload),
     });
 
     return NextResponse.json({ ok: true, data: rows[0] ? toCliente(rows[0]) : null });
