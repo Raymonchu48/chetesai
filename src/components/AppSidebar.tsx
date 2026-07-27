@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { files } from "@/assets/files";
+import LogoutButton from "@/components/LogoutButton";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -28,14 +29,15 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Sidebar */}
       <aside
         className={`${
           collapsed ? "w-[72px]" : "w-64"
         } bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col transition-all duration-300 shrink-0`}
       >
-        {/* Logo */}
-        <Link href="/" className="p-4 flex items-center gap-3 border-b border-sidebar-border min-h-[65px] hover:bg-sidebar-accent/50 transition-colors">
+        <Link
+          href="/dashboard"
+          className="p-4 flex items-center gap-3 border-b border-sidebar-border min-h-[65px] hover:bg-sidebar-accent/50 transition-colors"
+        >
           <img
             src={files.logo.url}
             alt="ChetesaíFitness+ Logo"
@@ -44,12 +46,11 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
           {!collapsed && (
             <div className="overflow-hidden">
               <h1 className="font-bold text-lg tracking-tight leading-tight">ChetesaíFitness+</h1>
-              <p className="text-[11px] text-sidebar-foreground/60 leading-tight">Entrenamiento Personal</p>
+              <p className="text-[11px] text-sidebar-foreground/60 leading-tight">Panel profesional</p>
             </div>
           )}
         </Link>
 
-        {/* Navigation */}
         <nav className="flex-1 p-3 space-y-1">
           {navItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
@@ -72,21 +73,20 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
           })}
         </nav>
 
-        {/* Collapse toggle */}
-        <div className="p-3 border-t border-sidebar-border">
+        <div className="border-t border-sidebar-border p-3">
+          <LogoutButton collapsed={collapsed} />
           <button
+            type="button"
             onClick={() => setCollapsed(!collapsed)}
-            className="flex items-center justify-center w-full py-2 rounded-lg text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+            className="mt-1 flex w-full items-center justify-center rounded-lg py-2 text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            aria-label={collapsed ? "Expandir menú" : "Contraer menú"}
           >
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
         </div>
       </aside>
 
-      {/* Main content */}
-      <main className="flex-1 overflow-y-auto bg-background">
-        {children}
-      </main>
+      <main className="flex-1 overflow-y-auto bg-background">{children}</main>
     </div>
   );
 }
