@@ -6,6 +6,13 @@ function optionalText(value: unknown) {
   return text || null;
 }
 
+function normalizeTags(value: unknown) {
+  if (Array.isArray(value)) {
+    return [...new Set(value.map((item) => String(item).trim().toLowerCase()).filter(Boolean))];
+  }
+  return [...new Set(String(value ?? "").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean))];
+}
+
 function normalizePayload(body: Record<string, unknown>) {
   return {
     nombre: String(body.nombre ?? "").trim(),
@@ -19,7 +26,14 @@ function normalizePayload(body: Record<string, unknown>) {
     errores_frecuentes: optionalText(body.errores_frecuentes),
     consejos: optionalText(body.consejos),
     imagen_url: optionalText(body.imagen_url),
+    gif_url: optionalText(body.gif_url),
+    miniatura_url: optionalText(body.miniatura_url),
     video_url: optionalText(body.video_url),
+    tipo_movimiento: optionalText(body.tipo_movimiento),
+    lateralidad: optionalText(body.lateralidad),
+    plano_movimiento: optionalText(body.plano_movimiento),
+    articulacion_principal: optionalText(body.articulacion_principal),
+    etiquetas: normalizeTags(body.etiquetas),
     activo: body.activo !== false,
   };
 }
