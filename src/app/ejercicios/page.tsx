@@ -1,345 +1,256 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import AppSidebar from "@/components/AppSidebar";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Dumbbell, Pencil, Trash2, Search, Play } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dumbbell, ExternalLink, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-interface Ejercicio {
+type Ejercicio = {
   _id: string;
   nombre: string;
   grupo_muscular: string;
+  grupo_secundario: string | null;
+  categoria: string;
   dificultad: string;
-  descripcion: string;
-  video_url: string;
-}
-
-const grupoLabels: Record<string, string> = {
-  pecho: "Pecho",
-  espalda: "Espalda",
-  hombros: "Hombros",
-  biceps: "Biceps",
-  triceps: "Triceps",
-  piernas: "Piernas",
-  abdominales: "Abdominales",
-  gluteos: "Gluteos",
-  cardio: "Cardio",
-  cuerpo_completo: "Cuerpo Completo",
+  material: string | null;
+  descripcion: string | null;
+  tecnica: string | null;
+  errores_frecuentes: string | null;
+  consejos: string | null;
+  imagen_url: string | null;
+  gif_url: string | null;
+  miniatura_url: string | null;
+  video_url: string | null;
+  tipo_movimiento: string | null;
+  lateralidad: string | null;
+  plano_movimiento: string | null;
+  articulacion_principal: string | null;
+  etiquetas: string[];
+  activo: boolean;
 };
 
-const grupoColors: Record<string, string> = {
-  pecho: "bg-red-100 text-red-700",
-  espalda: "bg-blue-100 text-blue-700",
-  hombros: "bg-orange-100 text-orange-700",
-  biceps: "bg-violet-100 text-violet-700",
-  triceps: "bg-cyan-100 text-cyan-700",
-  piernas: "bg-emerald-100 text-emerald-700",
-  abdominales: "bg-amber-100 text-amber-700",
-  gluteos: "bg-pink-100 text-pink-700",
-  cardio: "bg-teal-100 text-teal-700",
-  cuerpo_completo: "bg-indigo-100 text-indigo-700",
+type FormState = Omit<Ejercicio, "_id"> & { etiquetasTexto: string };
+
+const grupos = ["pecho", "espalda", "hombros", "biceps", "triceps", "piernas", "gluteos", "core", "cardio", "cuerpo_completo"];
+const categorias = ["fuerza", "cardio", "movilidad", "estiramiento", "rehabilitacion", "tecnica"];
+const dificultades = ["principiante", "intermedio", "avanzado"];
+const movimientos = ["empuje", "traccion", "bisagra", "sentadilla", "zancada", "rotacion", "anti_rotacion", "locomocion", "aislamiento", "movilidad"];
+const lateralidades = ["bilateral", "unilateral", "alterno"];
+const planos = ["horizontal", "vertical", "sagital", "frontal", "transversal", "multiplanar"];
+
+const labels: Record<string, string> = {
+  pecho: "Pecho", espalda: "Espalda", hombros: "Hombros", biceps: "Bíceps", triceps: "Tríceps",
+  piernas: "Piernas", gluteos: "Glúteos", core: "Core", cardio: "Cardio", cuerpo_completo: "Cuerpo completo",
+  fuerza: "Fuerza", movilidad: "Movilidad", estiramiento: "Estiramiento", rehabilitacion: "Rehabilitación",
+  tecnica: "Técnica", principiante: "Principiante", intermedio: "Intermedio", avanzado: "Avanzado",
+  empuje: "Empuje", traccion: "Tracción", bisagra: "Bisagra", sentadilla: "Sentadilla", zancada: "Zancada",
+  rotacion: "Rotación", anti_rotacion: "Anti-rotación", locomocion: "Locomoción", aislamiento: "Aislamiento",
+  bilateral: "Bilateral", unilateral: "Unilateral", alterno: "Alterno", horizontal: "Horizontal",
+  vertical: "Vertical", sagital: "Sagital", frontal: "Frontal", transversal: "Transversal", multiplanar: "Multiplanar",
 };
 
-const dificultadColors: Record<string, string> = {
-  principiante: "bg-emerald-100 text-emerald-700",
-  intermedio: "bg-amber-100 text-amber-700",
-  avanzado: "bg-red-100 text-red-700",
-};
-
-const emptyForm = {
-  nombre: "",
-  grupo_muscular: "pecho",
-  dificultad: "principiante",
-  descripcion: "",
-  video_url: "",
+const emptyForm: FormState = {
+  nombre: "", grupo_muscular: "pecho", grupo_secundario: null, categoria: "fuerza", dificultad: "principiante",
+  material: null, descripcion: null, tecnica: null, errores_frecuentes: null, consejos: null,
+  imagen_url: null, gif_url: null, miniatura_url: null, video_url: null,
+  tipo_movimiento: null, lateralidad: null, plano_movimiento: null, articulacion_principal: null,
+  etiquetas: [], etiquetasTexto: "", activo: true,
 };
 
 export default function EjerciciosPage() {
   const [ejercicios, setEjercicios] = useState<Ejercicio[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [filterGrupo, setFilterGrupo] = useState("todos");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState<FormState>(emptyForm);
+  const [search, setSearch] = useState("");
+  const [grupo, setGrupo] = useState("todos");
+  const [categoria, setCategoria] = useState("todos");
+  const [dificultad, setDificultad] = useState("todos");
+  const [material, setMaterial] = useState("todos");
+  const [movimiento, setMovimiento] = useState("todos");
 
   const fetchEjercicios = useCallback(async () => {
+    setLoading(true);
     try {
-      const res = await fetch("/api/ejercicios");
-      const json = (await res.json()) as { ok: boolean; data?: Ejercicio[] };
-      if (json.ok && json.data) {
-        setEjercicios(json.data);
-      }
-    } catch (err) {
-      console.error("Error fetching ejercicios:", err);
+      const response = await fetch("/api/ejercicios");
+      const data = (await response.json()) as { ok: boolean; data?: Ejercicio[]; error?: string };
+      if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo cargar la biblioteca");
+      setEjercicios(data.data || []);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error al cargar ejercicios");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    fetchEjercicios();
-  }, [fetchEjercicios]);
+  useEffect(() => { fetchEjercicios(); }, [fetchEjercicios]);
 
-  const handleSubmit = async () => {
-    try {
-      const url = editingId ? `/api/ejercicios/${editingId}` : "/api/ejercicios";
-      const method = editingId ? "PUT" : "POST";
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const json = (await res.json()) as { ok: boolean; error?: string };
-      if (json.ok) {
-        toast.success(editingId ? "Ejercicio actualizado" : "Ejercicio creado");
-        setDialogOpen(false);
-        setEditingId(null);
-        setForm(emptyForm);
-        fetchEjercicios();
-      } else {
-        toast.error(json.error || "Error al guardar");
-      }
-    } catch (err) {
-      console.error("Error saving exercise:", err);
-      toast.error("Error al guardar ejercicio");
-    }
-  };
+  const materiales = useMemo(() => [...new Set(ejercicios.map((item) => item.material).filter(Boolean) as string[])].sort(), [ejercicios]);
 
-  const handleEdit = (e: Ejercicio) => {
-    setEditingId(e._id);
-    setForm({
-      nombre: e.nombre || "",
-      grupo_muscular: e.grupo_muscular || "pecho",
-      dificultad: e.dificultad || "principiante",
-      descripcion: e.descripcion || "",
-      video_url: e.video_url || "",
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return ejercicios.filter((item) => {
+      const searchable = [item.nombre, item.descripcion, item.material, item.articulacion_principal, ...(item.etiquetas || [])];
+      const matchSearch = !term || searchable.filter(Boolean).some((value) => String(value).toLowerCase().includes(term));
+      return matchSearch
+        && (grupo === "todos" || item.grupo_muscular === grupo)
+        && (categoria === "todos" || item.categoria === categoria)
+        && (dificultad === "todos" || item.dificultad === dificultad)
+        && (material === "todos" || item.material === material)
+        && (movimiento === "todos" || item.tipo_movimiento === movimiento);
     });
+  }, [ejercicios, search, grupo, categoria, dificultad, material, movimiento]);
+
+  function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
+    setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function openCreate() {
+    setEditingId(null);
+    setForm(emptyForm);
     setDialogOpen(true);
-  };
+  }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Eliminar este ejercicio?")) return;
+  function openEdit(item: Ejercicio) {
+    const { _id, ...values } = item;
+    setEditingId(_id);
+    setForm({ ...values, etiquetasTexto: (values.etiquetas || []).join(", ") });
+    setDialogOpen(true);
+  }
+
+  async function saveExercise() {
     try {
-      const res = await fetch(`/api/ejercicios/${id}`, { method: "DELETE" });
-      const json = (await res.json()) as { ok: boolean };
-      if (json.ok) {
-        toast.success("Ejercicio eliminado");
-        fetchEjercicios();
-      }
-    } catch (err) {
-      console.error("Error deleting exercise:", err);
-      toast.error("Error al eliminar");
+      const payload = {
+        ...form,
+        etiquetas: form.etiquetasTexto.split(",").map((tag) => tag.trim()).filter(Boolean),
+      };
+      const response = await fetch(editingId ? `/api/ejercicios/${editingId}` : "/api/ejercicios", {
+        method: editingId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = (await response.json()) as { ok: boolean; error?: string };
+      if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo guardar el ejercicio");
+      toast.success(editingId ? "Ejercicio actualizado" : "Ejercicio creado");
+      setDialogOpen(false);
+      await fetchEjercicios();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error al guardar");
     }
-  };
+  }
 
-  const filtered = ejercicios.filter((e) => {
-    const matchSearch = e.nombre?.toLowerCase().includes(search.toLowerCase());
-    const matchGrupo = filterGrupo === "todos" || e.grupo_muscular === filterGrupo;
-    return matchSearch && matchGrupo;
-  });
+  async function deleteExercise(id: string) {
+    if (!window.confirm("¿Eliminar este ejercicio de la biblioteca?")) return;
+    try {
+      const response = await fetch(`/api/ejercicios/${id}`, { method: "DELETE" });
+      const data = (await response.json()) as { ok: boolean; error?: string };
+      if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo eliminar");
+      toast.success("Ejercicio eliminado");
+      await fetchEjercicios();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar");
+    }
+  }
 
   return (
     <AppSidebar>
-      <div className="p-6 md:p-8 max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="mx-auto max-w-7xl p-6 md:p-8">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center gap-3">
-              <Dumbbell className="w-8 h-8 text-primary" />
-              Ejercicios
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              {ejercicios.length} ejercicios en la biblioteca
-            </p>
+            <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight"><Dumbbell className="h-8 w-8 text-primary" /> Biblioteca de ejercicios</h1>
+            <p className="mt-1 text-muted-foreground">{ejercicios.length} ejercicios registrados · {filtered.length} visibles</p>
           </div>
-
-          <Dialog open={dialogOpen} onOpenChange={(open) => {
-            setDialogOpen(open);
-            if (!open) { setEditingId(null); setForm(emptyForm); }
-          }}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <Plus className="w-4 h-4" /> Nuevo Ejercicio
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>{editingId ? "Editar Ejercicio" : "Nuevo Ejercicio"}</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 mt-4">
-                <div>
-                  <Label>Nombre *</Label>
-                  <Input
-                    value={form.nombre}
-                    onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                    placeholder="Ej: Press de banca"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Grupo Muscular</Label>
-                    <Select
-                      value={form.grupo_muscular}
-                      onValueChange={(v) => setForm({ ...form, grupo_muscular: v })}
-                    >
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(grupoLabels).map(([k, v]) => (
-                          <SelectItem key={k} value={k}>{v}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Dificultad</Label>
-                    <Select
-                      value={form.dificultad}
-                      onValueChange={(v) => setForm({ ...form, dificultad: v })}
-                    >
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="principiante">Principiante</SelectItem>
-                        <SelectItem value="intermedio">Intermedio</SelectItem>
-                        <SelectItem value="avanzado">Avanzado</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label>Descripcion</Label>
-                  <Textarea
-                    value={form.descripcion}
-                    onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-                    placeholder="Instrucciones y descripcion del ejercicio..."
-                    rows={4}
-                  />
-                </div>
-                <div>
-                  <Label>Video YouTube (URL)</Label>
-                  <Input
-                    value={form.video_url}
-                    onChange={(e) => setForm({ ...form, video_url: e.target.value })}
-                    placeholder="https://www.youtube.com/watch?v=..."
-                  />
-                </div>
-                <Button onClick={handleSubmit} className="w-full">
-                  {editingId ? "Guardar Cambios" : "Crear Ejercicio"}
-                </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild><Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Nuevo ejercicio</Button></DialogTrigger>
+            <DialogContent className="max-h-[92vh] max-w-4xl overflow-y-auto">
+              <DialogHeader><DialogTitle>{editingId ? "Editar ejercicio" : "Nuevo ejercicio"}</DialogTitle></DialogHeader>
+              <div className="grid gap-4 py-2 md:grid-cols-2">
+                <Field label="Nombre *"><Input value={form.nombre} onChange={(e) => updateField("nombre", e.target.value)} /></Field>
+                <Field label="Material"><Input value={form.material || ""} onChange={(e) => updateField("material", e.target.value || null)} placeholder="Mancuernas, barra, polea..." /></Field>
+                <SelectField label="Grupo principal" value={form.grupo_muscular} values={grupos} onChange={(v) => updateField("grupo_muscular", v)} />
+                <Field label="Grupo secundario"><Input value={form.grupo_secundario || ""} onChange={(e) => updateField("grupo_secundario", e.target.value || null)} /></Field>
+                <SelectField label="Categoría" value={form.categoria} values={categorias} onChange={(v) => updateField("categoria", v)} />
+                <SelectField label="Dificultad" value={form.dificultad} values={dificultades} onChange={(v) => updateField("dificultad", v)} />
+                <SelectField label="Tipo de movimiento" value={form.tipo_movimiento || "ninguno"} values={movimientos} optional onChange={(v) => updateField("tipo_movimiento", v === "ninguno" ? null : v)} />
+                <SelectField label="Lateralidad" value={form.lateralidad || "ninguno"} values={lateralidades} optional onChange={(v) => updateField("lateralidad", v === "ninguno" ? null : v)} />
+                <SelectField label="Plano de movimiento" value={form.plano_movimiento || "ninguno"} values={planos} optional onChange={(v) => updateField("plano_movimiento", v === "ninguno" ? null : v)} />
+                <Field label="Articulación principal"><Input value={form.articulacion_principal || ""} onChange={(e) => updateField("articulacion_principal", e.target.value || null)} /></Field>
+                <Field label="Etiquetas"><Input value={form.etiquetasTexto} onChange={(e) => updateField("etiquetasTexto", e.target.value)} placeholder="hipertrofia, fuerza, principiante" /></Field>
+                <Field label="Imagen URL"><Input value={form.imagen_url || ""} onChange={(e) => updateField("imagen_url", e.target.value || null)} /></Field>
+                <Field label="Miniatura URL"><Input value={form.miniatura_url || ""} onChange={(e) => updateField("miniatura_url", e.target.value || null)} /></Field>
+                <Field label="GIF URL"><Input value={form.gif_url || ""} onChange={(e) => updateField("gif_url", e.target.value || null)} /></Field>
+                <Field label="Vídeo URL"><Input value={form.video_url || ""} onChange={(e) => updateField("video_url", e.target.value || null)} /></Field>
+                <TextField label="Descripción" value={form.descripcion} onChange={(v) => updateField("descripcion", v)} />
+                <TextField label="Técnica de ejecución" value={form.tecnica} onChange={(v) => updateField("tecnica", v)} />
+                <TextField label="Errores frecuentes" value={form.errores_frecuentes} onChange={(v) => updateField("errores_frecuentes", v)} />
+                <TextField label="Consejos del entrenador" value={form.consejos} onChange={(v) => updateField("consejos", v)} />
               </div>
+              <Button className="w-full" onClick={saveExercise}>{editingId ? "Guardar cambios" : "Crear ejercicio"}</Button>
             </DialogContent>
           </Dialog>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar ejercicio..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <Select value={filterGrupo} onValueChange={setFilterGrupo}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filtrar por grupo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos los grupos</SelectItem>
-              {Object.entries(grupoLabels).map(([k, v]) => (
-                <SelectItem key={k} value={k}>{v}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="mb-6 grid gap-3 md:grid-cols-6">
+          <div className="relative md:col-span-2"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar nombre, material, articulación o etiqueta" /></div>
+          <Filter value={grupo} values={grupos} allLabel="Todos los grupos" onChange={setGrupo} />
+          <Filter value={categoria} values={categorias} allLabel="Todas las categorías" onChange={setCategoria} />
+          <Filter value={dificultad} values={dificultades} allLabel="Todas las dificultades" onChange={setDificultad} />
+          <Filter value={movimiento} values={movimientos} allLabel="Todos los movimientos" onChange={setMovimiento} />
+          <Filter value={material} values={materiales} allLabel="Todos los materiales" onChange={setMaterial} />
         </div>
 
-        {/* Cards Grid */}
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="p-6"><div className="h-24 bg-muted rounded-lg" /></CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            {search || filterGrupo !== "todos" ? "No se encontraron ejercicios con esos filtros" : "No hay ejercicios en la biblioteca"}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((e) => (
-              <Card key={e._id} className="group hover:shadow-md hover:border-primary/30 transition-all duration-200">
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-bold text-foreground text-lg leading-tight">{e.nombre}</h3>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleEdit(e)}>
-                        <Pencil className="w-3.5 h-3.5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                        onClick={() => handleDelete(e._id)}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+        {loading ? <p className="py-12 text-center text-muted-foreground">Cargando biblioteca...</p> : filtered.length === 0 ? <p className="py-12 text-center text-muted-foreground">No hay ejercicios con esos filtros.</p> : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {filtered.map((item) => {
+              const media = item.miniatura_url || item.imagen_url || item.gif_url;
+              return (
+                <Card key={item._id} className="overflow-hidden transition-shadow hover:shadow-md">
+                  {media ? <img src={media} alt={item.nombre} className="h-44 w-full object-cover" /> : null}
+                  <CardContent className="p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div><h2 className="text-lg font-bold">{item.nombre}</h2><p className="text-sm text-muted-foreground">{labels[item.grupo_muscular] || item.grupo_muscular} · {labels[item.categoria] || item.categoria}</p></div>
+                      <div className="flex"><Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Pencil className="h-4 w-4" /></Button><Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteExercise(item._id)}><Trash2 className="h-4 w-4" /></Button></div>
                     </div>
-                  </div>
-
-                  <div className="flex gap-2 mb-3">
-                    <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${grupoColors[e.grupo_muscular] || "bg-gray-100 text-gray-700"}`}>
-                      {grupoLabels[e.grupo_muscular] || e.grupo_muscular}
-                    </span>
-                    <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${dificultadColors[e.dificultad] || "bg-gray-100 text-gray-700"}`}>
-                      {e.dificultad}
-                    </span>
-                  </div>
-
-                  {e.descripcion && (
-                    <p className="text-sm text-muted-foreground line-clamp-2">{e.descripcion}</p>
-                  )}
-
-                  {e.video_url && (
-                    <a
-                      href={e.video_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors text-sm font-medium"
-                    >
-                      <Play className="w-4 h-4 fill-red-600" />
-                      Ver Video en YouTube
-                    </a>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                      <span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">{labels[item.dificultad] || item.dificultad}</span>
+                      {item.material ? <span className="rounded-full bg-muted px-2.5 py-1">{item.material}</span> : null}
+                      {item.tipo_movimiento ? <span className="rounded-full bg-muted px-2.5 py-1">{labels[item.tipo_movimiento] || item.tipo_movimiento}</span> : null}
+                      {item.lateralidad ? <span className="rounded-full bg-muted px-2.5 py-1">{labels[item.lateralidad] || item.lateralidad}</span> : null}
+                    </div>
+                    {item.etiquetas?.length ? <div className="mt-3 flex flex-wrap gap-1">{item.etiquetas.map((tag) => <span key={tag} className="rounded bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">#{tag}</span>)}</div> : null}
+                    {item.descripcion ? <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">{item.descripcion}</p> : null}
+                    {item.video_url ? <a className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary" href={item.video_url} target="_blank" rel="noreferrer">Ver demostración <ExternalLink className="h-3.5 w-3.5" /></a> : null}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
     </AppSidebar>
   );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return <div className="space-y-2"><Label>{label}</Label>{children}</div>;
+}
+
+function TextField({ label, value, onChange }: { label: string; value: string | null; onChange: (value: string | null) => void }) {
+  return <Field label={label}><Textarea rows={4} value={value || ""} onChange={(e) => onChange(e.target.value || null)} /></Field>;
+}
+
+function SelectField({ label, value, values, onChange, optional = false }: { label: string; value: string; values: string[]; onChange: (value: string) => void; optional?: boolean }) {
+  return <Field label={label}><Select value={value} onValueChange={onChange}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{optional ? <SelectItem value="ninguno">Sin especificar</SelectItem> : null}{values.map((item) => <SelectItem key={item} value={item}>{labels[item] || item}</SelectItem>)}</SelectContent></Select></Field>;
+}
+
+function Filter({ value, values, allLabel, onChange }: { value: string; values: string[]; allLabel: string; onChange: (value: string) => void }) {
+  return <Select value={value} onValueChange={onChange}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="todos">{allLabel}</SelectItem>{values.map((item) => <SelectItem key={item} value={item}>{labels[item] || item}</SelectItem>)}</SelectContent></Select>;
 }
