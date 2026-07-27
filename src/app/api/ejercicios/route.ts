@@ -14,7 +14,14 @@ type EjercicioRow = {
   errores_frecuentes: string | null;
   consejos: string | null;
   imagen_url: string | null;
+  gif_url: string | null;
+  miniatura_url: string | null;
   video_url: string | null;
+  tipo_movimiento: string | null;
+  lateralidad: string | null;
+  plano_movimiento: string | null;
+  articulacion_principal: string | null;
+  etiquetas: string[];
   activo: boolean;
   created_at: string;
   updated_at: string;
@@ -27,6 +34,13 @@ function toEjercicio(row: EjercicioRow) {
 function optionalText(value: unknown) {
   const text = String(value ?? "").trim();
   return text || null;
+}
+
+function normalizeTags(value: unknown) {
+  if (Array.isArray(value)) {
+    return [...new Set(value.map((item) => String(item).trim().toLowerCase()).filter(Boolean))];
+  }
+  return [...new Set(String(value ?? "").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean))];
 }
 
 function normalizePayload(body: Record<string, unknown>) {
@@ -42,7 +56,14 @@ function normalizePayload(body: Record<string, unknown>) {
     errores_frecuentes: optionalText(body.errores_frecuentes),
     consejos: optionalText(body.consejos),
     imagen_url: optionalText(body.imagen_url),
+    gif_url: optionalText(body.gif_url),
+    miniatura_url: optionalText(body.miniatura_url),
     video_url: optionalText(body.video_url),
+    tipo_movimiento: optionalText(body.tipo_movimiento),
+    lateralidad: optionalText(body.lateralidad),
+    plano_movimiento: optionalText(body.plano_movimiento),
+    articulacion_principal: optionalText(body.articulacion_principal),
+    etiquetas: normalizeTags(body.etiquetas),
     activo: body.activo !== false,
   };
 }
@@ -56,12 +77,14 @@ export async function GET(request: NextRequest) {
     const categoria = params.get("categoria");
     const dificultad = params.get("dificultad");
     const material = params.get("material");
+    const movimiento = params.get("movimiento");
     const activo = params.get("activo");
 
     if (grupo) filters.push(`grupo_muscular=eq.${encodeURIComponent(grupo)}`);
     if (categoria) filters.push(`categoria=eq.${encodeURIComponent(categoria)}`);
     if (dificultad) filters.push(`dificultad=eq.${encodeURIComponent(dificultad)}`);
     if (material) filters.push(`material=eq.${encodeURIComponent(material)}`);
+    if (movimiento) filters.push(`tipo_movimiento=eq.${encodeURIComponent(movimiento)}`);
     if (activo === "true" || activo === "false") filters.push(`activo=eq.${activo}`);
 
     const rows = await supabaseRest<EjercicioRow[]>(`ejercicios?${filters.join("&")}`);
