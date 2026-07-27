@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseRest } from "../../../../../../lib/supabase-rest";
+import { supabaseRest } from "../../../../../lib/supabase-rest";
 
 type ClienteRow = {
   id: string;
