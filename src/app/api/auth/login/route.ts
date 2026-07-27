@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    const authData = await authResponse.json();
+  const authData = (await authResponse.json()) as any;
 
     if (!authResponse.ok) {
       return NextResponse.json(
