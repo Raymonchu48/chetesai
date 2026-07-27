@@ -6,6 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+type LoginResponse = {
+  ok: boolean;
+  error?: string;
+  redirectTo?: string;
+};
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -24,7 +30,7 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = await response.json();
+      const data = (await response.json()) as LoginResponse;
 
       if (!response.ok || !data.ok) {
         setError(data.error || "No se pudo iniciar sesión");
