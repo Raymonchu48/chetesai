@@ -7,20 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dumbbell, ExternalLink, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -37,51 +25,43 @@ type Ejercicio = {
   errores_frecuentes: string | null;
   consejos: string | null;
   imagen_url: string | null;
+  gif_url: string | null;
+  miniatura_url: string | null;
   video_url: string | null;
+  tipo_movimiento: string | null;
+  lateralidad: string | null;
+  plano_movimiento: string | null;
+  articulacion_principal: string | null;
+  etiquetas: string[];
   activo: boolean;
 };
 
-type FormState = Omit<Ejercicio, "_id">;
+type FormState = Omit<Ejercicio, "_id"> & { etiquetasTexto: string };
 
 const grupos = ["pecho", "espalda", "hombros", "biceps", "triceps", "piernas", "gluteos", "core", "cardio", "cuerpo_completo"];
 const categorias = ["fuerza", "cardio", "movilidad", "estiramiento", "rehabilitacion", "tecnica"];
 const dificultades = ["principiante", "intermedio", "avanzado"];
+const movimientos = ["empuje", "traccion", "bisagra", "sentadilla", "zancada", "rotacion", "anti_rotacion", "locomocion", "aislamiento", "movilidad"];
+const lateralidades = ["bilateral", "unilateral", "alterno"];
+const planos = ["horizontal", "vertical", "sagital", "frontal", "transversal", "multiplanar"];
 
 const labels: Record<string, string> = {
-  pecho: "Pecho",
-  espalda: "Espalda",
-  hombros: "Hombros",
-  biceps: "Bíceps",
-  triceps: "Tríceps",
-  piernas: "Piernas",
-  gluteos: "Glúteos",
-  core: "Core",
-  cardio: "Cardio",
-  cuerpo_completo: "Cuerpo completo",
-  fuerza: "Fuerza",
-  movilidad: "Movilidad",
-  estiramiento: "Estiramiento",
-  rehabilitacion: "Rehabilitación",
-  tecnica: "Técnica",
-  principiante: "Principiante",
-  intermedio: "Intermedio",
-  avanzado: "Avanzado",
+  pecho: "Pecho", espalda: "Espalda", hombros: "Hombros", biceps: "Bíceps", triceps: "Tríceps",
+  piernas: "Piernas", gluteos: "Glúteos", core: "Core", cardio: "Cardio", cuerpo_completo: "Cuerpo completo",
+  fuerza: "Fuerza", movilidad: "Movilidad", estiramiento: "Estiramiento", rehabilitacion: "Rehabilitación",
+  tecnica: "Técnica", principiante: "Principiante", intermedio: "Intermedio", avanzado: "Avanzado",
+  empuje: "Empuje", traccion: "Tracción", bisagra: "Bisagra", sentadilla: "Sentadilla", zancada: "Zancada",
+  rotacion: "Rotación", anti_rotacion: "Anti-rotación", locomocion: "Locomoción", aislamiento: "Aislamiento",
+  bilateral: "Bilateral", unilateral: "Unilateral", alterno: "Alterno", horizontal: "Horizontal",
+  vertical: "Vertical", sagital: "Sagital", frontal: "Frontal", transversal: "Transversal", multiplanar: "Multiplanar",
 };
 
 const emptyForm: FormState = {
-  nombre: "",
-  grupo_muscular: "pecho",
-  grupo_secundario: null,
-  categoria: "fuerza",
-  dificultad: "principiante",
-  material: null,
-  descripcion: null,
-  tecnica: null,
-  errores_frecuentes: null,
-  consejos: null,
-  imagen_url: null,
-  video_url: null,
-  activo: true,
+  nombre: "", grupo_muscular: "pecho", grupo_secundario: null, categoria: "fuerza", dificultad: "principiante",
+  material: null, descripcion: null, tecnica: null, errores_frecuentes: null, consejos: null,
+  imagen_url: null, gif_url: null, miniatura_url: null, video_url: null,
+  tipo_movimiento: null, lateralidad: null, plano_movimiento: null, articulacion_principal: null,
+  etiquetas: [], etiquetasTexto: "", activo: true,
 };
 
 export default function EjerciciosPage() {
@@ -95,6 +75,7 @@ export default function EjerciciosPage() {
   const [categoria, setCategoria] = useState("todos");
   const [dificultad, setDificultad] = useState("todos");
   const [material, setMaterial] = useState("todos");
+  const [movimiento, setMovimiento] = useState("todos");
 
   const fetchEjercicios = useCallback(async () => {
     setLoading(true);
@@ -110,28 +91,23 @@ export default function EjerciciosPage() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchEjercicios();
-  }, [fetchEjercicios]);
+  useEffect(() => { fetchEjercicios(); }, [fetchEjercicios]);
 
-  const materiales = useMemo(
-    () => [...new Set(ejercicios.map((item) => item.material).filter(Boolean) as string[])].sort(),
-    [ejercicios]
-  );
+  const materiales = useMemo(() => [...new Set(ejercicios.map((item) => item.material).filter(Boolean) as string[])].sort(), [ejercicios]);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     return ejercicios.filter((item) => {
-      const matchSearch = !term || [item.nombre, item.descripcion, item.material]
-        .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(term));
+      const searchable = [item.nombre, item.descripcion, item.material, item.articulacion_principal, ...(item.etiquetas || [])];
+      const matchSearch = !term || searchable.filter(Boolean).some((value) => String(value).toLowerCase().includes(term));
       return matchSearch
         && (grupo === "todos" || item.grupo_muscular === grupo)
         && (categoria === "todos" || item.categoria === categoria)
         && (dificultad === "todos" || item.dificultad === dificultad)
-        && (material === "todos" || item.material === material);
+        && (material === "todos" || item.material === material)
+        && (movimiento === "todos" || item.tipo_movimiento === movimiento);
     });
-  }, [ejercicios, search, grupo, categoria, dificultad, material]);
+  }, [ejercicios, search, grupo, categoria, dificultad, material, movimiento]);
 
   function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -146,16 +122,20 @@ export default function EjerciciosPage() {
   function openEdit(item: Ejercicio) {
     const { _id, ...values } = item;
     setEditingId(_id);
-    setForm(values);
+    setForm({ ...values, etiquetasTexto: (values.etiquetas || []).join(", ") });
     setDialogOpen(true);
   }
 
   async function saveExercise() {
     try {
+      const payload = {
+        ...form,
+        etiquetas: form.etiquetasTexto.split(",").map((tag) => tag.trim()).filter(Boolean),
+      };
       const response = await fetch(editingId ? `/api/ejercicios/${editingId}` : "/api/ejercicios", {
         method: editingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       const data = (await response.json()) as { ok: boolean; error?: string };
       if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo guardar el ejercicio");
@@ -169,14 +149,15 @@ export default function EjerciciosPage() {
 
   async function deleteExercise(id: string) {
     if (!window.confirm("¿Eliminar este ejercicio de la biblioteca?")) return;
-    const response = await fetch(`/api/ejercicios/${id}`, { method: "DELETE" });
-    const data = (await response.json()) as { ok: boolean; error?: string };
-    if (!response.ok || !data.ok) {
-      toast.error(data.error || "No se pudo eliminar");
-      return;
+    try {
+      const response = await fetch(`/api/ejercicios/${id}`, { method: "DELETE" });
+      const data = (await response.json()) as { ok: boolean; error?: string };
+      if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo eliminar");
+      toast.success("Ejercicio eliminado");
+      await fetchEjercicios();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar");
     }
-    toast.success("Ejercicio eliminado");
-    await fetchEjercicios();
   }
 
   return (
@@ -184,14 +165,12 @@ export default function EjerciciosPage() {
       <div className="mx-auto max-w-7xl p-6 md:p-8">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight">
-              <Dumbbell className="h-8 w-8 text-primary" /> Biblioteca de ejercicios
-            </h1>
+            <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight"><Dumbbell className="h-8 w-8 text-primary" /> Biblioteca de ejercicios</h1>
             <p className="mt-1 text-muted-foreground">{ejercicios.length} ejercicios registrados · {filtered.length} visibles</p>
           </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild><Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Nuevo ejercicio</Button></DialogTrigger>
-            <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+            <DialogContent className="max-h-[92vh] max-w-4xl overflow-y-auto">
               <DialogHeader><DialogTitle>{editingId ? "Editar ejercicio" : "Nuevo ejercicio"}</DialogTitle></DialogHeader>
               <div className="grid gap-4 py-2 md:grid-cols-2">
                 <Field label="Nombre *"><Input value={form.nombre} onChange={(e) => updateField("nombre", e.target.value)} /></Field>
@@ -200,7 +179,14 @@ export default function EjerciciosPage() {
                 <Field label="Grupo secundario"><Input value={form.grupo_secundario || ""} onChange={(e) => updateField("grupo_secundario", e.target.value || null)} /></Field>
                 <SelectField label="Categoría" value={form.categoria} values={categorias} onChange={(v) => updateField("categoria", v)} />
                 <SelectField label="Dificultad" value={form.dificultad} values={dificultades} onChange={(v) => updateField("dificultad", v)} />
+                <SelectField label="Tipo de movimiento" value={form.tipo_movimiento || "ninguno"} values={movimientos} optional onChange={(v) => updateField("tipo_movimiento", v === "ninguno" ? null : v)} />
+                <SelectField label="Lateralidad" value={form.lateralidad || "ninguno"} values={lateralidades} optional onChange={(v) => updateField("lateralidad", v === "ninguno" ? null : v)} />
+                <SelectField label="Plano de movimiento" value={form.plano_movimiento || "ninguno"} values={planos} optional onChange={(v) => updateField("plano_movimiento", v === "ninguno" ? null : v)} />
+                <Field label="Articulación principal"><Input value={form.articulacion_principal || ""} onChange={(e) => updateField("articulacion_principal", e.target.value || null)} /></Field>
+                <Field label="Etiquetas"><Input value={form.etiquetasTexto} onChange={(e) => updateField("etiquetasTexto", e.target.value)} placeholder="hipertrofia, fuerza, principiante" /></Field>
                 <Field label="Imagen URL"><Input value={form.imagen_url || ""} onChange={(e) => updateField("imagen_url", e.target.value || null)} /></Field>
+                <Field label="Miniatura URL"><Input value={form.miniatura_url || ""} onChange={(e) => updateField("miniatura_url", e.target.value || null)} /></Field>
+                <Field label="GIF URL"><Input value={form.gif_url || ""} onChange={(e) => updateField("gif_url", e.target.value || null)} /></Field>
                 <Field label="Vídeo URL"><Input value={form.video_url || ""} onChange={(e) => updateField("video_url", e.target.value || null)} /></Field>
                 <TextField label="Descripción" value={form.descripcion} onChange={(v) => updateField("descripcion", v)} />
                 <TextField label="Técnica de ejecución" value={form.tecnica} onChange={(v) => updateField("tecnica", v)} />
@@ -212,30 +198,40 @@ export default function EjerciciosPage() {
           </Dialog>
         </div>
 
-        <div className="mb-6 grid gap-3 md:grid-cols-5">
-          <div className="relative md:col-span-2"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nombre, descripción o material" /></div>
+        <div className="mb-6 grid gap-3 md:grid-cols-6">
+          <div className="relative md:col-span-2"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar nombre, material, articulación o etiqueta" /></div>
           <Filter value={grupo} values={grupos} allLabel="Todos los grupos" onChange={setGrupo} />
           <Filter value={categoria} values={categorias} allLabel="Todas las categorías" onChange={setCategoria} />
           <Filter value={dificultad} values={dificultades} allLabel="Todas las dificultades" onChange={setDificultad} />
+          <Filter value={movimiento} values={movimientos} allLabel="Todos los movimientos" onChange={setMovimiento} />
           <Filter value={material} values={materiales} allLabel="Todos los materiales" onChange={setMaterial} />
         </div>
 
         {loading ? <p className="py-12 text-center text-muted-foreground">Cargando biblioteca...</p> : filtered.length === 0 ? <p className="py-12 text-center text-muted-foreground">No hay ejercicios con esos filtros.</p> : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {filtered.map((item) => (
-              <Card key={item._id} className="overflow-hidden transition-shadow hover:shadow-md">
-                {item.imagen_url ? <img src={item.imagen_url} alt={item.nombre} className="h-44 w-full object-cover" /> : null}
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div><h2 className="text-lg font-bold">{item.nombre}</h2><p className="text-sm text-muted-foreground">{labels[item.grupo_muscular] || item.grupo_muscular} · {labels[item.categoria] || item.categoria}</p></div>
-                    <div className="flex"><Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Pencil className="h-4 w-4" /></Button><Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteExercise(item._id)}><Trash2 className="h-4 w-4" /></Button></div>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2 text-xs"><span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">{labels[item.dificultad] || item.dificultad}</span>{item.material ? <span className="rounded-full bg-muted px-2.5 py-1">{item.material}</span> : null}</div>
-                  {item.descripcion ? <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">{item.descripcion}</p> : null}
-                  {item.video_url ? <a className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary" href={item.video_url} target="_blank" rel="noreferrer">Ver demostración <ExternalLink className="h-3.5 w-3.5" /></a> : null}
-                </CardContent>
-              </Card>
-            ))}
+            {filtered.map((item) => {
+              const media = item.miniatura_url || item.imagen_url || item.gif_url;
+              return (
+                <Card key={item._id} className="overflow-hidden transition-shadow hover:shadow-md">
+                  {media ? <img src={media} alt={item.nombre} className="h-44 w-full object-cover" /> : null}
+                  <CardContent className="p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div><h2 className="text-lg font-bold">{item.nombre}</h2><p className="text-sm text-muted-foreground">{labels[item.grupo_muscular] || item.grupo_muscular} · {labels[item.categoria] || item.categoria}</p></div>
+                      <div className="flex"><Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Pencil className="h-4 w-4" /></Button><Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteExercise(item._id)}><Trash2 className="h-4 w-4" /></Button></div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                      <span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">{labels[item.dificultad] || item.dificultad}</span>
+                      {item.material ? <span className="rounded-full bg-muted px-2.5 py-1">{item.material}</span> : null}
+                      {item.tipo_movimiento ? <span className="rounded-full bg-muted px-2.5 py-1">{labels[item.tipo_movimiento] || item.tipo_movimiento}</span> : null}
+                      {item.lateralidad ? <span className="rounded-full bg-muted px-2.5 py-1">{labels[item.lateralidad] || item.lateralidad}</span> : null}
+                    </div>
+                    {item.etiquetas?.length ? <div className="mt-3 flex flex-wrap gap-1">{item.etiquetas.map((tag) => <span key={tag} className="rounded bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">#{tag}</span>)}</div> : null}
+                    {item.descripcion ? <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">{item.descripcion}</p> : null}
+                    {item.video_url ? <a className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary" href={item.video_url} target="_blank" rel="noreferrer">Ver demostración <ExternalLink className="h-3.5 w-3.5" /></a> : null}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
@@ -251,8 +247,8 @@ function TextField({ label, value, onChange }: { label: string; value: string | 
   return <Field label={label}><Textarea rows={4} value={value || ""} onChange={(e) => onChange(e.target.value || null)} /></Field>;
 }
 
-function SelectField({ label, value, values, onChange }: { label: string; value: string; values: string[]; onChange: (value: string) => void }) {
-  return <Field label={label}><Select value={value} onValueChange={onChange}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{values.map((item) => <SelectItem key={item} value={item}>{labels[item] || item}</SelectItem>)}</SelectContent></Select></Field>;
+function SelectField({ label, value, values, onChange, optional = false }: { label: string; value: string; values: string[]; onChange: (value: string) => void; optional?: boolean }) {
+  return <Field label={label}><Select value={value} onValueChange={onChange}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{optional ? <SelectItem value="ninguno">Sin especificar</SelectItem> : null}{values.map((item) => <SelectItem key={item} value={item}>{labels[item] || item}</SelectItem>)}</SelectContent></Select></Field>;
 }
 
 function Filter({ value, values, allLabel, onChange }: { value: string; values: string[]; allLabel: string; onChange: (value: string) => void }) {
