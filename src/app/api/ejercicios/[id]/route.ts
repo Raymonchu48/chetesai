@@ -6,34 +6,53 @@ function optionalText(value: unknown) {
   return text || null;
 }
 
-function normalizeTags(value: unknown) {
-  if (Array.isArray(value)) {
-    return [...new Set(value.map((item) => String(item).trim().toLowerCase()).filter(Boolean))];
-  }
-  return [...new Set(String(value ?? "").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean))];
+function stringArray(value: unknown) {
+  if (Array.isArray(value)) return value.map((item) => String(item).trim()).filter(Boolean);
+  return String(value ?? "").split(",").map((item) => item.trim()).filter(Boolean);
 }
 
 function normalizePayload(body: Record<string, unknown>) {
   return {
     nombre: String(body.nombre ?? "").trim(),
+    nombre_alternativo: optionalText(body.nombre_alternativo),
+    codigo_interno: optionalText(body.codigo_interno),
     grupo_muscular: String(body.grupo_muscular ?? "").trim(),
     grupo_secundario: optionalText(body.grupo_secundario),
+    musculos_estabilizadores: stringArray(body.musculos_estabilizadores),
     categoria: String(body.categoria ?? "fuerza").trim(),
+    subcategoria: optionalText(body.subcategoria),
     dificultad: String(body.dificultad ?? "principiante").trim(),
+    nivel_tecnico: optionalText(body.nivel_tecnico),
+    riesgo_lesion: optionalText(body.riesgo_lesion),
     material: optionalText(body.material),
+    material_alternativo: optionalText(body.material_alternativo),
+    apto_casa: body.apto_casa === true,
+    apto_gimnasio: body.apto_gimnasio !== false,
     descripcion: optionalText(body.descripcion),
     tecnica: optionalText(body.tecnica),
+    posicion_inicial: optionalText(body.posicion_inicial),
+    pasos_ejecucion: optionalText(body.pasos_ejecucion),
+    respiracion: optionalText(body.respiracion),
+    tempo_recomendado: optionalText(body.tempo_recomendado),
+    rango_movimiento: optionalText(body.rango_movimiento),
     errores_frecuentes: optionalText(body.errores_frecuentes),
     consejos: optionalText(body.consejos),
+    contraindicaciones: optionalText(body.contraindicaciones),
     imagen_url: optionalText(body.imagen_url),
-    gif_url: optionalText(body.gif_url),
     miniatura_url: optionalText(body.miniatura_url),
+    gif_url: optionalText(body.gif_url),
     video_url: optionalText(body.video_url),
     tipo_movimiento: optionalText(body.tipo_movimiento),
     lateralidad: optionalText(body.lateralidad),
     plano_movimiento: optionalText(body.plano_movimiento),
     articulacion_principal: optionalText(body.articulacion_principal),
-    etiquetas: normalizeTags(body.etiquetas),
+    variante_facil: optionalText(body.variante_facil),
+    variante_avanzada: optionalText(body.variante_avanzada),
+    regresion: optionalText(body.regresion),
+    progresion: optionalText(body.progresion),
+    etiquetas: stringArray(body.etiquetas),
+    objetivos: stringArray(body.objetivos),
+    ia_contexto: typeof body.ia_contexto === "object" && body.ia_contexto ? body.ia_contexto : {},
     activo: body.activo !== false,
   };
 }
@@ -48,10 +67,7 @@ export async function PUT(
     const payload = normalizePayload(body);
 
     if (!payload.nombre || !payload.grupo_muscular) {
-      return NextResponse.json(
-        { ok: false, error: "El nombre y el grupo muscular son obligatorios" },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, error: "El nombre y el grupo muscular son obligatorios" }, { status: 400 });
     }
 
     const rows = await supabaseRest<Array<Record<string, unknown>>>(
@@ -65,7 +81,6 @@ export async function PUT(
 
     return NextResponse.json({ ok: true, data: rows[0] ?? null });
   } catch (error) {
-    console.error("[API] PUT /api/ejercicios/[id] error:", error);
     return NextResponse.json(
       { ok: false, error: error instanceof Error ? error.message : "Error al actualizar ejercicio" },
       { status: 500 }
@@ -83,10 +98,8 @@ export async function DELETE(
       method: "DELETE",
       headers: { Prefer: "return=minimal" },
     });
-
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("[API] DELETE /api/ejercicios/[id] error:", error);
     return NextResponse.json(
       { ok: false, error: error instanceof Error ? error.message : "Error al eliminar ejercicio" },
       { status: 500 }
