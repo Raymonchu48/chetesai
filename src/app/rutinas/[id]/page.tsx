@@ -85,6 +85,8 @@ export default function RoutineEditorPage() {
   const [items, setItems] = useState<RutinaEjercicio[]>([]);
   const [library, setLibrary] = useState<EjercicioBiblioteca[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [libraryError, setLibraryError] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState(1);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
@@ -95,22 +97,35 @@ export default function RoutineEditorPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
+    setLibraryError(null);
     try {
-      const [routineResponse, exercisesResponse, libraryResponse] = await Promise.all([
+      const [routineResponse, exercisesResponse] = await Promise.all([
         fetch(`/api/rutinas/${routineId}`),
         fetch(`/api/rutinas/${routineId}/ejercicios`),
-        fetch("/api/ejercicios?activo=true"),
       ]);
+
       const routineData = (await routineResponse.json()) as { ok: boolean; data?: Rutina; error?: string };
       const exercisesData = (await exercisesResponse.json()) as { ok: boolean; data?: RutinaEjercicio[]; error?: string };
-      const libraryData = (await libraryResponse.json()) as { ok: boolean; data?: EjercicioBiblioteca[]; error?: string };
+
       if (!routineResponse.ok || !routineData.ok) throw new Error(routineData.error || "No se pudo cargar la rutina");
       if (!exercisesResponse.ok || !exercisesData.ok) throw new Error(exercisesData.error || "No se pudo cargar el plan");
+
       setRutina(routineData.data || null);
       setItems(exercisesData.data || []);
-      setLibrary(libraryData.data || []);
+
+      const libraryResponse = await fetch("/api/rutinas/biblioteca");
+      const libraryData = (await libraryResponse.json()) as { ok: boolean; data?: EjercicioBiblioteca[]; error?: string };
+      if (!libraryResponse.ok || !libraryData.ok) {
+        setLibrary([]);
+        setLibraryError(libraryData.error || "No se pudo cargar la biblioteca");
+      } else {
+        setLibrary(libraryData.data || []);
+      }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Error al cargar el editor");
+      const message = error instanceof Error ? error.message : "Error al cargar el editor";
+      setLoadError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -186,9 +201,8 @@ export default function RoutineEditorPage() {
   }
 
   async function move(item: RutinaEjercicio, direction: -1 | 1) {
-    const ordered = dayItems;
-    const index = ordered.findIndex((row) => row._id === item._id);
-    const target = ordered[index + direction];
+    const index = dayItems.findIndex((row) => row._id === item._id);
+    const target = dayItems[index + direction];
     if (!target) return;
     try {
       await Promise.all([
@@ -202,6 +216,7 @@ export default function RoutineEditorPage() {
   }
 
   if (loading) return <AppSidebar><p className="p-10 text-center text-muted-foreground">Cargando editor...</p></AppSidebar>;
+  if (loadError) return <AppSidebar><div className="mx-auto max-w-2xl p-10 text-center"><h1 className="text-xl font-bold">No se pudo cargar el editor</h1><p className="mt-3 text-muted-foreground">{loadError}</p><Button className="mt-5" onClick={load}>Reintentar</Button></div></AppSidebar>;
   if (!rutina) return <AppSidebar><p className="p-10 text-center text-muted-foreground">Rutina no encontrada.</p></AppSidebar>;
 
   return (
@@ -254,6 +269,8 @@ export default function RoutineEditorPage() {
           <DialogContent className="max-h-[85vh] max-w-4xl overflow-y-auto">
             <DialogHeader><DialogTitle>Biblioteca de ejercicios</DialogTitle></DialogHeader>
             <div className="relative"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input className="pl-9" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por nombre, músculo o material..." /></div>
+            {libraryError ? <div className="mt-4 rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{libraryError}</div> : null}
+            {!libraryError && visibleLibrary.length === 0 ? <p className="py-8 text-center text-sm text-muted-foreground">No hay ejercicios que coincidan con la búsqueda.</p> : null}
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {visibleLibrary.map((exercise) => <button key={exercise._id} type="button" onClick={() => openAdd(exercise)} className="rounded-xl border p-4 text-left transition hover:border-primary hover:bg-primary/5"><h3 className="font-bold">{exercise.nombre}</h3><p className="mt-1 text-sm text-muted-foreground">{exercise.grupo_muscular}{exercise.material ? ` · ${exercise.material}` : ""}</p></button>)}
             </div>
