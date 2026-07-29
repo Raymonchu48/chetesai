@@ -115,7 +115,9 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const session = await validateSession(request);
   const isProfessionalApi =
-    pathname.startsWith("/api/ejercicios") || pathname.startsWith("/api/rutinas");
+    pathname.startsWith("/api/ejercicios") ||
+    pathname.startsWith("/api/rutinas") ||
+    pathname.startsWith("/api/rutina-ejercicios");
 
   if (pathname === "/login") {
     if (!session.valid || !session.role) return NextResponse.next();
@@ -173,5 +175,6 @@ export const config = {
     "/rutinas/:path*",
     "/api/ejercicios/:path*",
     "/api/rutinas/:path*",
+    "/api/rutina-ejercicios/:path*",
   ],
 };
