@@ -20,6 +20,27 @@ function normalize(body: Record<string, unknown>) {
   };
 }
 
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const rows = await supabaseRest<Array<Record<string, unknown>>>(
+      `rutinas?id=eq.${encodeURIComponent(id)}&select=*`
+    );
+    if (!rows[0]) {
+      return NextResponse.json({ ok: false, error: "Rutina no encontrada" }, { status: 404 });
+    }
+    return NextResponse.json({ ok: true, data: { ...rows[0], _id: rows[0].id } });
+  } catch (error) {
+    return NextResponse.json(
+      { ok: false, error: error instanceof Error ? error.message : "Error al cargar rutina" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -83,7 +104,25 @@ export async function POST(
       body: JSON.stringify(copyPayload),
     });
 
-    return NextResponse.json({ ok: true, data: created[0] ?? null });
+    const copiedRoutine = created[0];
+    if (copiedRoutine?.id) {
+      const exercises = await supabaseRest<Array<Record<string, unknown>>>(
+        `rutina_ejercicios?rutina_id=eq.${encodeURIComponent(id)}&select=*`
+      );
+      if (exercises.length) {
+        const copies = exercises.map(({ id: _rowId, created_at: _created, updated_at: _updated, ...row }) => ({
+          ...row,
+          rutina_id: copiedRoutine.id,
+        }));
+        await supabaseRest("rutina_ejercicios", {
+          method: "POST",
+          headers: { Prefer: "return=minimal" },
+          body: JSON.stringify(copies),
+        });
+      }
+    }
+
+    return NextResponse.json({ ok: true, data: copiedRoutine ?? null });
   } catch (error) {
     return NextResponse.json(
       { ok: false, error: error instanceof Error ? error.message : "Error al duplicar rutina" },
