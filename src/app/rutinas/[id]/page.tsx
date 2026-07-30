@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowDown, ArrowLeft, ArrowUp, Dumbbell, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, Copy, Dumbbell, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 type Rutina = {
@@ -49,6 +49,8 @@ type RutinaEjercicio = {
   duracion_segundos: number | null;
   distancia_metros: number | null;
   observaciones: string | null;
+  notas_entrenador: string | null;
+  instrucciones_cliente: string | null;
   ejercicios?: {
     id: string;
     nombre: string;
@@ -76,6 +78,8 @@ const emptyConfig = {
   duracion_segundos: null as number | null,
   distancia_metros: null as number | null,
   observaciones: "",
+  notas_entrenador: "",
+  instrucciones_cliente: "",
 };
 
 export default function RoutineEditorPage() {
@@ -104,13 +108,10 @@ export default function RoutineEditorPage() {
         fetch(`/api/rutinas/${routineId}`),
         fetch(`/api/rutinas/${routineId}/ejercicios`),
       ]);
-
       const routineData = (await routineResponse.json()) as { ok: boolean; data?: Rutina; error?: string };
       const exercisesData = (await exercisesResponse.json()) as { ok: boolean; data?: RutinaEjercicio[]; error?: string };
-
       if (!routineResponse.ok || !routineData.ok) throw new Error(routineData.error || "No se pudo cargar la rutina");
       if (!exercisesResponse.ok || !exercisesData.ok) throw new Error(exercisesData.error || "No se pudo cargar el plan");
-
       setRutina(routineData.data || null);
       setItems(exercisesData.data || []);
 
@@ -165,6 +166,8 @@ export default function RoutineEditorPage() {
       duracion_segundos: item.duracion_segundos,
       distancia_metros: item.distancia_metros,
       observaciones: item.observaciones || "",
+      notas_entrenador: item.notas_entrenador || "",
+      instrucciones_cliente: item.instrucciones_cliente || "",
     });
     setConfigOpen(true);
   }
@@ -181,9 +184,22 @@ export default function RoutineEditorPage() {
       if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo guardar el ejercicio");
       toast.success(editingItem ? "Ejercicio actualizado" : "Ejercicio añadido");
       setConfigOpen(false);
+      setSelectedDay(config.dia);
       await load();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error al guardar");
+    }
+  }
+
+  async function duplicateExercise(id: string) {
+    try {
+      const response = await fetch(`/api/rutina-ejercicios/${id}`, { method: "POST" });
+      const data = (await response.json()) as { ok: boolean; error?: string };
+      if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo duplicar");
+      toast.success("Ejercicio duplicado");
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error al duplicar");
     }
   }
 
@@ -249,16 +265,17 @@ export default function RoutineEditorPage() {
               return <Card key={item._id}><CardContent className="flex flex-col gap-4 p-4 lg:flex-row lg:items-center">
                 <div className="flex min-w-0 flex-1 items-center gap-4">
                   {media ? <img src={media} alt={item.ejercicios?.nombre || "Ejercicio"} className="h-20 w-24 rounded-lg object-cover" /> : <div className="grid h-20 w-24 place-items-center rounded-lg bg-muted"><Dumbbell className="h-6 w-6 text-muted-foreground" /></div>}
-                  <div className="min-w-0"><p className="text-xs font-semibold uppercase tracking-wider text-primary">Ejercicio {index + 1}{item.bloque ? ` · ${item.bloque}` : ""}</p><h3 className="truncate text-lg font-bold">{item.ejercicios?.nombre || "Ejercicio"}</h3><p className="text-sm text-muted-foreground">{item.ejercicios?.grupo_muscular}{item.ejercicios?.material ? ` · ${item.ejercicios.material}` : ""}</p></div>
+                  <div className="min-w-0"><p className="text-xs font-semibold uppercase tracking-wider text-primary">Ejercicio {index + 1}{item.bloque ? ` · ${item.bloque}` : ""}</p><h3 className="truncate text-lg font-bold">{item.ejercicios?.nombre || "Ejercicio"}</h3><p className="text-sm text-muted-foreground">{item.ejercicios?.grupo_muscular}{item.ejercicios?.material ? ` · ${item.ejercicios.material}` : ""}</p>{item.instrucciones_cliente ? <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">Cliente: {item.instrucciones_cliente}</p> : null}</div>
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-center text-sm sm:grid-cols-6">
                   <Metric label="Series" value={String(item.series)} /><Metric label="Reps" value={item.repeticiones} /><Metric label="Descanso" value={`${item.descanso_segundos}s`} /><Metric label="Tempo" value={item.tempo || "—"} /><Metric label="RPE" value={item.rpe?.toString() || "—"} /><Metric label="RIR" value={item.rir?.toString() || "—"} />
                 </div>
                 <div className="flex justify-end">
-                  <Button variant="ghost" size="icon" disabled={index === 0} onClick={() => move(item, -1)}><ArrowUp className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" disabled={index === dayItems.length - 1} onClick={() => move(item, 1)}><ArrowDown className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Pencil className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" className="text-destructive" onClick={() => removeExercise(item._id)}><Trash2 className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" disabled={index === 0} onClick={() => move(item, -1)} title="Subir"><ArrowUp className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" disabled={index === dayItems.length - 1} onClick={() => move(item, 1)} title="Bajar"><ArrowDown className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => duplicateExercise(item._id)} title="Duplicar"><Copy className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => openEdit(item)} title="Editar"><Pencil className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" className="text-destructive" onClick={() => removeExercise(item._id)} title="Eliminar"><Trash2 className="h-4 w-4" /></Button>
                 </div>
               </CardContent></Card>;
             })}
@@ -279,7 +296,7 @@ export default function RoutineEditorPage() {
 
         <Dialog open={configOpen} onOpenChange={setConfigOpen}>
           <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
-            <DialogHeader><DialogTitle>{editingItem ? "Configurar ejercicio" : `Añadir ${selectedExercise?.nombre || "ejercicio"}`}</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>{editingItem ? `Configurar ${editingItem.ejercicios?.nombre || "ejercicio"}` : `Añadir ${selectedExercise?.nombre || "ejercicio"}`}</DialogTitle></DialogHeader>
             <div className="grid gap-4 py-2 md:grid-cols-3">
               <Field label="Día"><Select value={String(config.dia)} onValueChange={(value) => setConfig({ ...config, dia: Number(value) })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{days.map((day) => <SelectItem key={day} value={String(day)}>Día {day} · {dayLabels[day - 1]}</SelectItem>)}</SelectContent></Select></Field>
               <Field label="Bloque"><Input value={config.bloque} onChange={(event) => setConfig({ ...config, bloque: event.target.value })} placeholder="A, B, Superserie..." /></Field>
@@ -292,7 +309,9 @@ export default function RoutineEditorPage() {
               <Field label="RIR"><Input type="number" min={0} max={10} value={config.rir ?? ""} onChange={(event) => setConfig({ ...config, rir: event.target.value ? Number(event.target.value) : null })} /></Field>
               <Field label="Duración (segundos)"><Input type="number" min={1} value={config.duracion_segundos ?? ""} onChange={(event) => setConfig({ ...config, duracion_segundos: event.target.value ? Number(event.target.value) : null })} /></Field>
               <Field label="Distancia (metros)"><Input type="number" min={0} value={config.distancia_metros ?? ""} onChange={(event) => setConfig({ ...config, distancia_metros: event.target.value ? Number(event.target.value) : null })} /></Field>
-              <div className="md:col-span-3"><Field label="Observaciones"><Textarea rows={3} value={config.observaciones} onChange={(event) => setConfig({ ...config, observaciones: event.target.value })} placeholder="Indicaciones técnicas o adaptaciones para el cliente..." /></Field></div>
+              <div className="md:col-span-3"><Field label="Observaciones generales"><Textarea rows={2} value={config.observaciones} onChange={(event) => setConfig({ ...config, observaciones: event.target.value })} placeholder="Adaptaciones o información general..." /></Field></div>
+              <div className="md:col-span-3"><Field label="Notas privadas del entrenador"><Textarea rows={3} value={config.notas_entrenador} onChange={(event) => setConfig({ ...config, notas_entrenador: event.target.value })} placeholder="Solo visibles en el panel profesional." /></Field></div>
+              <div className="md:col-span-3"><Field label="Instrucciones para el cliente"><Textarea rows={3} value={config.instrucciones_cliente} onChange={(event) => setConfig({ ...config, instrucciones_cliente: event.target.value })} placeholder="Indicaciones técnicas que verá el cliente." /></Field></div>
             </div>
             <Button className="w-full" onClick={saveExercise}>{editingItem ? "Guardar configuración" : "Añadir a la rutina"}</Button>
           </DialogContent>
