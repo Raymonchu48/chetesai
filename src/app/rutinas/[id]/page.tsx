@@ -51,6 +51,14 @@ type RutinaEjercicio = {
   observaciones: string | null;
   notas_entrenador: string | null;
   instrucciones_cliente: string | null;
+  tipo_serie: string;
+  rol_ejercicio: string;
+  vueltas: number | null;
+  descanso_entre_vueltas: number | null;
+  series_calentamiento: number;
+  porcentaje_descarga: number | null;
+  pausas_rest_pause: number | null;
+  visible_cliente: boolean;
   ejercicios?: {
     id: string;
     nombre: string;
@@ -63,6 +71,23 @@ type RutinaEjercicio = {
 };
 
 const dayLabels = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+const typeLabels: Record<string, string> = {
+  normal: "Serie normal",
+  superserie: "Superserie",
+  triserie: "Triserie",
+  circuito: "Circuito",
+  dropset: "Dropset",
+  rest_pause: "Rest-pause",
+  calentamiento: "Calentamiento",
+};
+const roleLabels: Record<string, string> = {
+  principal: "Principal",
+  accesorio: "Accesorio",
+  activacion: "Activación",
+  tecnica: "Técnica",
+  movilidad: "Movilidad",
+  finisher: "Finisher",
+};
 
 const emptyConfig = {
   dia: 1,
@@ -80,6 +105,14 @@ const emptyConfig = {
   observaciones: "",
   notas_entrenador: "",
   instrucciones_cliente: "",
+  tipo_serie: "normal",
+  rol_ejercicio: "principal",
+  vueltas: null as number | null,
+  descanso_entre_vueltas: null as number | null,
+  series_calentamiento: 0,
+  porcentaje_descarga: null as number | null,
+  pausas_rest_pause: null as number | null,
+  visible_cliente: true,
 };
 
 export default function RoutineEditorPage() {
@@ -94,6 +127,7 @@ export default function RoutineEditorPage() {
   const [selectedDay, setSelectedDay] = useState(1);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedExercise, setSelectedExercise] = useState<EjercicioBiblioteca | null>(null);
   const [editingItem, setEditingItem] = useState<RutinaEjercicio | null>(null);
@@ -168,6 +202,14 @@ export default function RoutineEditorPage() {
       observaciones: item.observaciones || "",
       notas_entrenador: item.notas_entrenador || "",
       instrucciones_cliente: item.instrucciones_cliente || "",
+      tipo_serie: item.tipo_serie || "normal",
+      rol_ejercicio: item.rol_ejercicio || "principal",
+      vueltas: item.vueltas,
+      descanso_entre_vueltas: item.descanso_entre_vueltas,
+      series_calentamiento: item.series_calentamiento || 0,
+      porcentaje_descarga: item.porcentaje_descarga,
+      pausas_rest_pause: item.pausas_rest_pause,
+      visible_cliente: item.visible_cliente !== false,
     });
     setConfigOpen(true);
   }
@@ -249,7 +291,10 @@ export default function RoutineEditorPage() {
               {rutina.duracion_sesion_minutos ? <span className="rounded-full bg-muted px-3 py-1">{rutina.duracion_sesion_minutos} min</span> : null}
             </div>
           </div>
-          <Button onClick={() => setLibraryOpen(true)}><Plus className="mr-2 h-4 w-4" />Añadir ejercicio</Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setPreviewOpen(true)}>Vista cliente</Button>
+            <Button onClick={() => setLibraryOpen(true)}><Plus className="mr-2 h-4 w-4" />Añadir ejercicio</Button>
+          </div>
         </div>
 
         <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
@@ -265,7 +310,17 @@ export default function RoutineEditorPage() {
               return <Card key={item._id}><CardContent className="flex flex-col gap-4 p-4 lg:flex-row lg:items-center">
                 <div className="flex min-w-0 flex-1 items-center gap-4">
                   {media ? <img src={media} alt={item.ejercicios?.nombre || "Ejercicio"} className="h-20 w-24 rounded-lg object-cover" /> : <div className="grid h-20 w-24 place-items-center rounded-lg bg-muted"><Dumbbell className="h-6 w-6 text-muted-foreground" /></div>}
-                  <div className="min-w-0"><p className="text-xs font-semibold uppercase tracking-wider text-primary">Ejercicio {index + 1}{item.bloque ? ` · ${item.bloque}` : ""}</p><h3 className="truncate text-lg font-bold">{item.ejercicios?.nombre || "Ejercicio"}</h3><p className="text-sm text-muted-foreground">{item.ejercicios?.grupo_muscular}{item.ejercicios?.material ? ` · ${item.ejercicios.material}` : ""}</p>{item.instrucciones_cliente ? <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">Cliente: {item.instrucciones_cliente}</p> : null}</div>
+                  <div className="min-w-0">
+                    <div className="mb-1 flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-wider">
+                      <span className="text-primary">Ejercicio {index + 1}{item.bloque ? ` · ${item.bloque}` : ""}</span>
+                      <span className="rounded-full bg-muted px-2 py-0.5">{typeLabels[item.tipo_serie] || item.tipo_serie}</span>
+                      <span className="rounded-full bg-muted px-2 py-0.5">{roleLabels[item.rol_ejercicio] || item.rol_ejercicio}</span>
+                      {!item.visible_cliente ? <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-destructive">Oculto al cliente</span> : null}
+                    </div>
+                    <h3 className="truncate text-lg font-bold">{item.ejercicios?.nombre || "Ejercicio"}</h3>
+                    <p className="text-sm text-muted-foreground">{item.ejercicios?.grupo_muscular}{item.ejercicios?.material ? ` · ${item.ejercicios.material}` : ""}</p>
+                    {item.instrucciones_cliente ? <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">Cliente: {item.instrucciones_cliente}</p> : null}
+                  </div>
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-center text-sm sm:grid-cols-6">
                   <Metric label="Series" value={String(item.series)} /><Metric label="Reps" value={item.repeticiones} /><Metric label="Descanso" value={`${item.descanso_segundos}s`} /><Metric label="Tempo" value={item.tempo || "—"} /><Metric label="RPE" value={item.rpe?.toString() || "—"} /><Metric label="RIR" value={item.rir?.toString() || "—"} />
@@ -295,10 +350,12 @@ export default function RoutineEditorPage() {
         </Dialog>
 
         <Dialog open={configOpen} onOpenChange={setConfigOpen}>
-          <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+          <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
             <DialogHeader><DialogTitle>{editingItem ? `Configurar ${editingItem.ejercicios?.nombre || "ejercicio"}` : `Añadir ${selectedExercise?.nombre || "ejercicio"}`}</DialogTitle></DialogHeader>
             <div className="grid gap-4 py-2 md:grid-cols-3">
               <Field label="Día"><Select value={String(config.dia)} onValueChange={(value) => setConfig({ ...config, dia: Number(value) })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{days.map((day) => <SelectItem key={day} value={String(day)}>Día {day} · {dayLabels[day - 1]}</SelectItem>)}</SelectContent></Select></Field>
+              <Field label="Tipo de serie"><Select value={config.tipo_serie} onValueChange={(value) => setConfig({ ...config, tipo_serie: value })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{Object.entries(typeLabels).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent></Select></Field>
+              <Field label="Rol del ejercicio"><Select value={config.rol_ejercicio} onValueChange={(value) => setConfig({ ...config, rol_ejercicio: value })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{Object.entries(roleLabels).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent></Select></Field>
               <Field label="Bloque"><Input value={config.bloque} onChange={(event) => setConfig({ ...config, bloque: event.target.value })} placeholder="A, B, Superserie..." /></Field>
               <Field label="Series"><Input type="number" min={1} max={30} value={config.series} onChange={(event) => setConfig({ ...config, series: Number(event.target.value) })} /></Field>
               <Field label="Repeticiones"><Input value={config.repeticiones} onChange={(event) => setConfig({ ...config, repeticiones: event.target.value })} placeholder="10, 8-12, al fallo..." /></Field>
@@ -307,13 +364,35 @@ export default function RoutineEditorPage() {
               <Field label="Tempo"><Input value={config.tempo} onChange={(event) => setConfig({ ...config, tempo: event.target.value })} placeholder="3-1-1" /></Field>
               <Field label="RPE"><Input type="number" min={1} max={10} step="0.5" value={config.rpe ?? ""} onChange={(event) => setConfig({ ...config, rpe: event.target.value ? Number(event.target.value) : null })} /></Field>
               <Field label="RIR"><Input type="number" min={0} max={10} value={config.rir ?? ""} onChange={(event) => setConfig({ ...config, rir: event.target.value ? Number(event.target.value) : null })} /></Field>
+              <Field label="Series calentamiento"><Input type="number" min={0} max={10} value={config.series_calentamiento} onChange={(event) => setConfig({ ...config, series_calentamiento: Number(event.target.value) })} /></Field>
+              <Field label="Vueltas"><Input type="number" min={1} max={20} value={config.vueltas ?? ""} onChange={(event) => setConfig({ ...config, vueltas: event.target.value ? Number(event.target.value) : null })} /></Field>
+              <Field label="Descanso entre vueltas"><Input type="number" min={0} value={config.descanso_entre_vueltas ?? ""} onChange={(event) => setConfig({ ...config, descanso_entre_vueltas: event.target.value ? Number(event.target.value) : null })} /></Field>
+              <Field label="Descarga (%)"><Input type="number" min={0} max={100} value={config.porcentaje_descarga ?? ""} onChange={(event) => setConfig({ ...config, porcentaje_descarga: event.target.value ? Number(event.target.value) : null })} /></Field>
+              <Field label="Pausas rest-pause"><Input type="number" min={1} max={10} value={config.pausas_rest_pause ?? ""} onChange={(event) => setConfig({ ...config, pausas_rest_pause: event.target.value ? Number(event.target.value) : null })} /></Field>
               <Field label="Duración (segundos)"><Input type="number" min={1} value={config.duracion_segundos ?? ""} onChange={(event) => setConfig({ ...config, duracion_segundos: event.target.value ? Number(event.target.value) : null })} /></Field>
               <Field label="Distancia (metros)"><Input type="number" min={0} value={config.distancia_metros ?? ""} onChange={(event) => setConfig({ ...config, distancia_metros: event.target.value ? Number(event.target.value) : null })} /></Field>
+              <div className="flex items-end pb-2"><label className="flex items-center gap-3 text-sm font-medium"><input type="checkbox" checked={config.visible_cliente} onChange={(event) => setConfig({ ...config, visible_cliente: event.target.checked })} className="h-4 w-4" />Visible para el cliente</label></div>
               <div className="md:col-span-3"><Field label="Observaciones generales"><Textarea rows={2} value={config.observaciones} onChange={(event) => setConfig({ ...config, observaciones: event.target.value })} placeholder="Adaptaciones o información general..." /></Field></div>
               <div className="md:col-span-3"><Field label="Notas privadas del entrenador"><Textarea rows={3} value={config.notas_entrenador} onChange={(event) => setConfig({ ...config, notas_entrenador: event.target.value })} placeholder="Solo visibles en el panel profesional." /></Field></div>
               <div className="md:col-span-3"><Field label="Instrucciones para el cliente"><Textarea rows={3} value={config.instrucciones_cliente} onChange={(event) => setConfig({ ...config, instrucciones_cliente: event.target.value })} placeholder="Indicaciones técnicas que verá el cliente." /></Field></div>
             </div>
             <Button className="w-full" onClick={saveExercise}>{editingItem ? "Guardar configuración" : "Añadir a la rutina"}</Button>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+          <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+            <DialogHeader><DialogTitle>Vista del cliente · Día {selectedDay}</DialogTitle></DialogHeader>
+            <div className="space-y-3">
+              {dayItems.filter((item) => item.visible_cliente !== false).map((item, index) => <Card key={item._id}><CardContent className="p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-primary">{index + 1}. {typeLabels[item.tipo_serie] || "Serie normal"}</p>
+                <h3 className="mt-1 text-lg font-bold">{item.ejercicios?.nombre || "Ejercicio"}</h3>
+                <p className="text-sm text-muted-foreground">{item.series} series · {item.repeticiones} repeticiones · {item.descanso_segundos}s descanso</p>
+                {item.tempo ? <p className="mt-1 text-sm">Tempo: {item.tempo}</p> : null}
+                {item.instrucciones_cliente ? <div className="mt-3 rounded-lg bg-muted p-3 text-sm">{item.instrucciones_cliente}</div> : null}
+              </CardContent></Card>)}
+              {dayItems.filter((item) => item.visible_cliente !== false).length === 0 ? <p className="py-8 text-center text-sm text-muted-foreground">No hay ejercicios visibles para el cliente en este día.</p> : null}
+            </div>
           </DialogContent>
         </Dialog>
       </div>
