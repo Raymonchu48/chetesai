@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseRest } from "../../../../../lib/supabase-rest";
 
+function optionalNumber(value: unknown) {
+  return value === null || value === "" || value === undefined ? null : Number(value);
+}
+
 function normalize(body: Record<string, unknown>) {
   return {
     dia: Number(body.dia ?? 1),
@@ -8,15 +12,26 @@ function normalize(body: Record<string, unknown>) {
     orden: Number(body.orden ?? 1),
     series: Number(body.series ?? 3),
     repeticiones: String(body.repeticiones ?? "10").trim() || "10",
-    peso_kg: body.peso_kg === null || body.peso_kg === "" || body.peso_kg === undefined ? null : Number(body.peso_kg),
+    peso_kg: optionalNumber(body.peso_kg),
     descanso_segundos: Number(body.descanso_segundos ?? 60),
     tempo: body.tempo ? String(body.tempo).trim() : null,
-    rpe: body.rpe === null || body.rpe === "" || body.rpe === undefined ? null : Number(body.rpe),
-    rir: body.rir === null || body.rir === "" || body.rir === undefined ? null : Number(body.rir),
-    duracion_segundos: body.duracion_segundos === null || body.duracion_segundos === "" || body.duracion_segundos === undefined ? null : Number(body.duracion_segundos),
-    distancia_metros: body.distancia_metros === null || body.distancia_metros === "" || body.distancia_metros === undefined ? null : Number(body.distancia_metros),
+    rpe: optionalNumber(body.rpe),
+    rir: optionalNumber(body.rir),
+    duracion_segundos: optionalNumber(body.duracion_segundos),
+    distancia_metros: optionalNumber(body.distancia_metros),
     observaciones: body.observaciones ? String(body.observaciones).trim() : null,
+    notas_entrenador: body.notas_entrenador ? String(body.notas_entrenador).trim() : null,
+    instrucciones_cliente: body.instrucciones_cliente ? String(body.instrucciones_cliente).trim() : null,
   };
+}
+
+function validate(payload: ReturnType<typeof normalize>) {
+  if (payload.dia < 1 || payload.dia > 7) return "El día debe estar entre 1 y 7";
+  if (payload.series < 1 || payload.series > 30) return "Las series deben estar entre 1 y 30";
+  if (payload.descanso_segundos < 0 || payload.descanso_segundos > 3600) return "El descanso debe estar entre 0 y 3600 segundos";
+  if (payload.rpe !== null && (payload.rpe < 1 || payload.rpe > 10)) return "El RPE debe estar entre 1 y 10";
+  if (payload.rir !== null && (payload.rir < 0 || payload.rir > 10)) return "El RIR debe estar entre 0 y 10";
+  return null;
 }
 
 export async function PUT(
@@ -26,18 +41,63 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = (await request.json()) as Record<string, unknown>;
+    const payload = normalize(body);
+    const validationError = validate(payload);
+    if (validationError) {
+      return NextResponse.json({ ok: false, error: validationError }, { status: 400 });
+    }
+
     const rows = await supabaseRest<Array<Record<string, unknown>>>(
       `rutina_ejercicios?id=eq.${encodeURIComponent(id)}`,
       {
         method: "PATCH",
         headers: { Prefer: "return=representation" },
-        body: JSON.stringify(normalize(body)),
+        body: JSON.stringify(payload),
       }
     );
     return NextResponse.json({ ok: true, data: rows[0] ?? null });
   } catch (error) {
     return NextResponse.json(
       { ok: false, error: error instanceof Error ? error.message : "Error al actualizar ejercicio" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const rows = await supabaseRest<Array<Record<string, unknown>>>(
+      `rutina_ejercicios?id=eq.${encodeURIComponent(id)}&select=*`
+    );
+    const source = rows[0];
+    if (!source) {
+      return NextResponse.json({ ok: false, error: "Ejercicio no encontrado" }, { status: 404 });
+    }
+
+    const last = await supabaseRest<Array<{ orden: number }>>(
+      `rutina_ejercicios?rutina_id=eq.${encodeURIComponent(String(source.rutina_id))}&dia=eq.${Number(source.dia)}&select=orden&order=orden.desc&limit=1`
+    );
+
+    const copy = { ...source } as Record<string, unknown>;
+    delete copy.id;
+    delete copy.created_at;
+    delete copy.updated_at;
+    copy.orden = (last[0]?.orden ?? Number(source.orden ?? 0)) + 1;
+
+    const created = await supabaseRest<Array<Record<string, unknown>>>("rutina_ejercicios", {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify(copy),
+    });
+
+    return NextResponse.json({ ok: true, data: created[0] ?? null });
+  } catch (error) {
+    return NextResponse.json(
+      { ok: false, error: error instanceof Error ? error.message : "Error al duplicar ejercicio" },
       { status: 500 }
     );
   }
