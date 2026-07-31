@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, Dumbbell, History, PlayCircle, Square } from "lucide-react";
+import { CheckCircle2, Clock3, Dumbbell, History, PlayCircle, SkipForward, Square } from "lucide-react";
 import { toast } from "sonner";
 
 type Exercise = {
@@ -72,6 +72,7 @@ type HistoryRow = {
 };
 
 const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+const rpeValues = [6, 7, 8, 9, 10];
 
 export default function PortalPage() {
   const [data, setData] = useState<PortalData | null>(null);
@@ -84,6 +85,7 @@ export default function PortalPage() {
   const [finishing, setFinishing] = useState(false);
   const [sessionRpe, setSessionRpe] = useState("");
   const [sessionComment, setSessionComment] = useState("");
+  const [restSeconds, setRestSeconds] = useState(0);
 
   const loadHistory = useCallback(async () => {
     try {
@@ -109,6 +111,7 @@ export default function PortalPage() {
 
   useEffect(() => {
     setSession(null);
+    setRestSeconds(0);
     fetch(`/api/portal/entrenamiento?dia=${selectedDay}`)
       .then((response) => response.json())
       .then((result: { ok: boolean; data?: WorkoutSession | null }) => {
@@ -117,8 +120,17 @@ export default function PortalPage() {
       .catch(() => undefined);
   }, [selectedDay]);
 
+  useEffect(() => {
+    if (restSeconds <= 0) return;
+    const timer = window.setInterval(() => {
+      setRestSeconds((current) => Math.max(0, current - 1));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [restSeconds]);
+
   const dayExercises = useMemo(() => (data?.ejercicios || []).filter((item) => item.dia === selectedDay).sort((a, b) => a.orden - b.orden), [data, selectedDay]);
   const routineDays = data?.rutina?.dias_semana || 1;
+  const plannedSets = dayExercises.reduce((sum, item) => sum + Number(item.series || 0), 0);
   const completedSets = session?.series.filter((row) => row.completada).length || 0;
   const totalSets = session?.series.length || 0;
   const progress = totalSets ? Math.round((completedSets / totalSets) * 100) : 0;
@@ -147,7 +159,7 @@ export default function PortalPage() {
     setSession((current) => current ? { ...current, series: current.series.map((row) => row.id === id ? { ...row, ...patch } : row) } : current);
   }
 
-  async function saveSet(row: SetRow, completed: boolean) {
+  async function saveSet(row: SetRow, completed: boolean, rest = 60) {
     const next = { ...row, completada: completed };
     patchLocalSet(row.id, { completada: completed });
     try {
@@ -166,6 +178,7 @@ export default function PortalPage() {
       });
       const result = (await response.json()) as { ok: boolean; error?: string };
       if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo guardar la serie");
+      if (completed) setRestSeconds(rest);
     } catch (err) {
       patchLocalSet(row.id, { completada: row.completada });
       toast.error(err instanceof Error ? err.message : "Error al guardar");
@@ -189,6 +202,7 @@ export default function PortalPage() {
       const result = (await response.json()) as { ok: boolean; data?: WorkoutSession; error?: string };
       if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo finalizar");
       setSession(result.data || session);
+      setRestSeconds(0);
       await loadHistory();
       toast.success("Entrenamiento completado");
     } catch (err) {
@@ -214,15 +228,24 @@ export default function PortalPage() {
 
             <div className="mb-6 flex gap-2 overflow-x-auto pb-2">{Array.from({ length: routineDays }, (_, index) => index + 1).map((day) => <Button key={day} onClick={() => setSelectedDay(day)} className={selectedDay === day ? "bg-[#46624f] text-white hover:bg-[#3c5544]" : "border border-[#e7dfd3] bg-[#fffdf9] text-[#29312e] hover:bg-[#f0ede7]"}>Día {day} · {days[day - 1]}</Button>)}</div>
 
+            <section className="mb-6 grid gap-3 rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-5 shadow-sm sm:grid-cols-4">
+              <SummaryMetric label="Día" value={`${selectedDay} · ${days[selectedDay - 1]}`} />
+              <SummaryMetric label="Ejercicios" value={String(dayExercises.length)} />
+              <SummaryMetric label="Series" value={String(plannedSets)} />
+              <SummaryMetric label="Tiempo estimado" value={`${data.rutina.duracion_sesion_minutos || 60} min`} />
+            </section>
+
             {dayExercises.length > 0 && !session ? <Button className="mb-6 w-full bg-[#c9653b] py-6 text-base hover:bg-[#b65a35]" onClick={startWorkout} disabled={starting}><PlayCircle className="mr-2 h-5 w-5" />{starting ? "Iniciando..." : "Comenzar entrenamiento"}</Button> : null}
 
-            {session && sessionState === "en_curso" ? <section className="mb-6 rounded-3xl border border-[#d8e4da] bg-[#eef5ef] p-5"><div className="flex items-center justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.15em] text-[#46624f]">Sesión en curso</p><p className="mt-1 font-bold">{completedSets} de {totalSets} series completadas</p></div><span className="text-2xl font-bold text-[#46624f]">{progress}%</span></div><div className="mt-4 h-3 overflow-hidden rounded-full bg-white"><div className="h-full bg-[#46624f] transition-all" style={{ width: `${progress}%` }} /></div></section> : null}
+            {session && sessionState === "en_curso" ? <section className="sticky top-3 z-20 mb-6 rounded-3xl border border-[#d8e4da] bg-[#eef5ef]/95 p-5 shadow-lg backdrop-blur"><div className="flex items-center justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.15em] text-[#46624f]">Sesión en curso</p><p className="mt-1 font-bold">{completedSets} de {totalSets} series completadas</p></div><span className="text-2xl font-bold text-[#46624f]">{progress}%</span></div><div className="mt-4 h-3 overflow-hidden rounded-full bg-white"><div className="h-full bg-[#46624f] transition-all" style={{ width: `${progress}%` }} /></div></section> : null}
+
+            {restSeconds > 0 ? <section className="mb-6 flex flex-col items-center justify-between gap-4 rounded-3xl border border-[#f0d3c4] bg-[#fff4ee] p-5 text-center sm:flex-row sm:text-left"><div className="flex items-center gap-3"><Clock3 className="h-7 w-7 text-[#c9653b]" /><div><p className="text-xs font-bold uppercase tracking-[0.15em] text-[#c9653b]">Descanso</p><p className="text-3xl font-bold">{restSeconds}s</p></div></div><Button variant="outline" onClick={() => setRestSeconds(0)}><SkipForward className="mr-2 h-4 w-4" />Saltar descanso</Button></section> : null}
 
             <div className="space-y-4">{dayExercises.map((item, index) => {
               const exercise = item.ejercicios;
               const media = exercise?.miniatura_url || exercise?.imagen_url || exercise?.gif_url;
               const rows = session?.series.filter((row) => row.rutina_ejercicio_id === item.id) || [];
-              return <article key={item.id} className="rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-5 shadow-sm"><div className="flex flex-col gap-5 md:flex-row"><div className="h-28 w-full overflow-hidden rounded-2xl bg-[#f0ede7] md:w-36">{media ? <img src={media} alt={exercise?.nombre || "Ejercicio"} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center"><Dumbbell className="h-8 w-8 text-[#707872]" /></div>}</div><div className="min-w-0 flex-1"><p className="text-xs font-bold uppercase tracking-[0.15em] text-[#c9653b]">Ejercicio {index + 1} · {item.tipo_serie.replace("_", " ")}</p><h3 className="mt-1 text-xl font-bold">{exercise?.nombre || "Ejercicio"}</h3><p className="mt-1 text-sm text-[#707872]">{exercise?.grupo_muscular}{exercise?.material ? ` · ${exercise.material}` : ""}</p>{item.instrucciones_cliente ? <p className="mt-4 rounded-2xl bg-[#f7f4ee] p-4 text-sm leading-6 text-[#56605a]">{item.instrucciones_cliente}</p> : null}{rows.length ? <div className="mt-5 space-y-3">{rows.map((row) => <div key={row.id} className={`grid gap-2 rounded-2xl border p-3 sm:grid-cols-[70px_1fr_1fr_1fr_48px] ${row.completada ? "border-[#bcd3c0] bg-[#eef5ef]" : "border-[#e7dfd3]"}`}><div className="flex items-center font-bold">Serie {row.numero_serie}</div><Input type="number" min={0} placeholder={`Reps ${row.repeticiones_objetivo || ""}`} value={row.repeticiones_realizadas ?? ""} onChange={(e) => patchLocalSet(row.id, { repeticiones_realizadas: e.target.value ? Number(e.target.value) : null })} /><Input type="number" min={0} step="0.5" placeholder={`Kg ${row.peso_objetivo ?? ""}`} value={row.peso_real ?? ""} onChange={(e) => patchLocalSet(row.id, { peso_real: e.target.value ? Number(e.target.value) : null })} /><Input type="number" min={1} max={10} step="0.5" placeholder="RPE" value={row.rpe_real ?? ""} onChange={(e) => patchLocalSet(row.id, { rpe_real: e.target.value ? Number(e.target.value) : null })} /><Button size="icon" variant={row.completada ? "default" : "outline"} onClick={() => saveSet(row, !row.completada)}>{row.completada ? <CheckCircle2 className="h-5 w-5" /> : <Square className="h-5 w-5" />}</Button></div>)}</div> : null}{exercise?.video_url ? <a href={exercise.video_url} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#46624f]"><PlayCircle className="h-4 w-4" />Ver vídeo</a> : null}</div></div></article>;
+              return <article key={item.id} className="rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-5 shadow-sm"><div className="flex flex-col gap-5 md:flex-row"><div className="h-28 w-full overflow-hidden rounded-2xl bg-[#f0ede7] md:w-36">{media ? <img src={media} alt={exercise?.nombre || "Ejercicio"} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center"><Dumbbell className="h-8 w-8 text-[#707872]" /></div>}</div><div className="min-w-0 flex-1"><p className="text-xs font-bold uppercase tracking-[0.15em] text-[#c9653b]">Ejercicio {index + 1} · {item.tipo_serie.replace("_", " ")}</p><h3 className="mt-1 text-xl font-bold">{exercise?.nombre || "Ejercicio"}</h3><p className="mt-1 text-sm text-[#707872]">{exercise?.grupo_muscular}{exercise?.material ? ` · ${exercise.material}` : ""}</p>{item.instrucciones_cliente ? <p className="mt-4 rounded-2xl bg-[#f7f4ee] p-4 text-sm leading-6 text-[#56605a]">{item.instrucciones_cliente}</p> : null}{rows.length ? <div className="mt-5 space-y-3">{rows.map((row) => <div key={row.id} className={`rounded-2xl border p-3 ${row.completada ? "border-[#bcd3c0] bg-[#eef5ef]" : "border-[#e7dfd3]"}`}><div className="mb-3 flex items-center justify-between"><span className="font-bold">Serie {row.numero_serie}</span><span className="text-xs text-[#707872]">Objetivo: {row.repeticiones_objetivo || "—"} reps · {row.peso_objetivo ?? "—"} kg</span></div><div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto_48px]"><Input type="number" min={0} placeholder="Repeticiones reales" value={row.repeticiones_realizadas ?? ""} onChange={(e) => patchLocalSet(row.id, { repeticiones_realizadas: e.target.value ? Number(e.target.value) : null })} /><Input type="number" min={0} step="0.5" placeholder="Peso real (kg)" value={row.peso_real ?? ""} onChange={(e) => patchLocalSet(row.id, { peso_real: e.target.value ? Number(e.target.value) : null })} /><div className="flex gap-1">{rpeValues.map((value) => <button key={value} type="button" onClick={() => patchLocalSet(row.id, { rpe_real: value })} className={`h-10 min-w-10 rounded-xl border px-2 text-sm font-bold ${row.rpe_real === value ? "border-[#46624f] bg-[#46624f] text-white" : "border-[#e7dfd3] bg-white"}`}>{value}</button>)}</div><Button size="icon" variant={row.completada ? "default" : "outline"} onClick={() => saveSet(row, !row.completada, item.descanso_segundos)}>{row.completada ? <CheckCircle2 className="h-5 w-5" /> : <Square className="h-5 w-5" />}</Button></div></div>)}</div> : null}{exercise?.video_url ? <a href={exercise.video_url} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#46624f]"><PlayCircle className="h-4 w-4" />Ver vídeo</a> : null}</div></div></article>;
             })}</div>
 
             {session && sessionState === "en_curso" ? <section className="mt-6 rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-6"><h3 className="text-xl font-bold">Finalizar entrenamiento</h3><div className="mt-4 grid gap-4 md:grid-cols-3"><Input type="number" min={1} max={10} step="0.5" placeholder="RPE global" value={sessionRpe} onChange={(e) => setSessionRpe(e.target.value)} /><Textarea className="md:col-span-2" placeholder="¿Cómo te fue hoy?" value={sessionComment} onChange={(e) => setSessionComment(e.target.value)} /></div><Button className="mt-4 w-full bg-[#46624f] py-6" onClick={finishWorkout} disabled={finishing}>{finishing ? "Finalizando..." : `Finalizar sesión (${progress}%)`}</Button></section> : null}
@@ -242,6 +265,10 @@ function formatDuration(seconds: number | null) {
   const minutes = Math.floor(seconds / 60);
   const remaining = seconds % 60;
   return remaining ? `${minutes}m ${remaining}s` : `${minutes} min`;
+}
+
+function SummaryMetric({ label, value }: { label: string; value: string }) {
+  return <div className="rounded-2xl bg-[#f7f4ee] px-4 py-3"><p className="text-[10px] uppercase tracking-wide text-[#707872]">{label}</p><p className="mt-1 font-bold">{value}</p></div>;
 }
 
 function HistoryMetric({ label, value }: { label: string; value: string }) {
