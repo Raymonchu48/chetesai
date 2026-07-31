@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AppSidebar from "@/components/AppSidebar";
+import ExerciseMediaUploader from "@/components/ExerciseMediaUploader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -94,18 +95,12 @@ export default function EjerciciosPage() {
   useEffect(() => { fetchEjercicios(); }, [fetchEjercicios]);
 
   const materiales = useMemo(() => [...new Set(ejercicios.map((item) => item.material).filter(Boolean) as string[])].sort(), [ejercicios]);
-
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     return ejercicios.filter((item) => {
       const searchable = [item.nombre, item.descripcion, item.material, item.articulacion_principal, ...(item.etiquetas || [])];
       const matchSearch = !term || searchable.filter(Boolean).some((value) => String(value).toLowerCase().includes(term));
-      return matchSearch
-        && (grupo === "todos" || item.grupo_muscular === grupo)
-        && (categoria === "todos" || item.categoria === categoria)
-        && (dificultad === "todos" || item.dificultad === dificultad)
-        && (material === "todos" || item.material === material)
-        && (movimiento === "todos" || item.tipo_movimiento === movimiento);
+      return matchSearch && (grupo === "todos" || item.grupo_muscular === grupo) && (categoria === "todos" || item.categoria === categoria) && (dificultad === "todos" || item.dificultad === dificultad) && (material === "todos" || item.material === material) && (movimiento === "todos" || item.tipo_movimiento === movimiento);
     });
   }, [ejercicios, search, grupo, categoria, dificultad, material, movimiento]);
 
@@ -113,12 +108,7 @@ export default function EjerciciosPage() {
     setForm((current) => ({ ...current, [field]: value }));
   }
 
-  function openCreate() {
-    setEditingId(null);
-    setForm(emptyForm);
-    setDialogOpen(true);
-  }
-
+  function openCreate() { setEditingId(null); setForm(emptyForm); setDialogOpen(true); }
   function openEdit(item: Ejercicio) {
     const { _id, ...values } = item;
     setEditingId(_id);
@@ -128,23 +118,16 @@ export default function EjerciciosPage() {
 
   async function saveExercise() {
     try {
-      const payload = {
-        ...form,
-        etiquetas: form.etiquetasTexto.split(",").map((tag) => tag.trim()).filter(Boolean),
-      };
+      const payload = { ...form, etiquetas: form.etiquetasTexto.split(",").map((tag) => tag.trim()).filter(Boolean) };
       const response = await fetch(editingId ? `/api/ejercicios/${editingId}` : "/api/ejercicios", {
-        method: editingId ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        method: editingId ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
       });
       const data = (await response.json()) as { ok: boolean; error?: string };
       if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo guardar el ejercicio");
       toast.success(editingId ? "Ejercicio actualizado" : "Ejercicio creado");
       setDialogOpen(false);
       await fetchEjercicios();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Error al guardar");
-    }
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Error al guardar"); }
   }
 
   async function deleteExercise(id: string) {
@@ -155,22 +138,17 @@ export default function EjerciciosPage() {
       if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo eliminar");
       toast.success("Ejercicio eliminado");
       await fetchEjercicios();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "No se pudo eliminar");
-    }
+    } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo eliminar"); }
   }
 
   return (
     <AppSidebar>
       <div className="mx-auto max-w-7xl p-6 md:p-8">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight"><Dumbbell className="h-8 w-8 text-primary" /> Biblioteca de ejercicios</h1>
-            <p className="mt-1 text-muted-foreground">{ejercicios.length} ejercicios registrados · {filtered.length} visibles</p>
-          </div>
+          <div><h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight"><Dumbbell className="h-8 w-8 text-primary" /> Biblioteca de ejercicios</h1><p className="mt-1 text-muted-foreground">{ejercicios.length} ejercicios registrados · {filtered.length} visibles</p></div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild><Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Nuevo ejercicio</Button></DialogTrigger>
-            <DialogContent className="max-h-[92vh] max-w-4xl overflow-y-auto">
+            <DialogContent className="max-h-[92vh] max-w-5xl overflow-y-auto">
               <DialogHeader><DialogTitle>{editingId ? "Editar ejercicio" : "Nuevo ejercicio"}</DialogTitle></DialogHeader>
               <div className="grid gap-4 py-2 md:grid-cols-2">
                 <Field label="Nombre *"><Input value={form.nombre} onChange={(e) => updateField("nombre", e.target.value)} /></Field>
@@ -183,11 +161,18 @@ export default function EjerciciosPage() {
                 <SelectField label="Lateralidad" value={form.lateralidad || "ninguno"} values={lateralidades} optional onChange={(v) => updateField("lateralidad", v === "ninguno" ? null : v)} />
                 <SelectField label="Plano de movimiento" value={form.plano_movimiento || "ninguno"} values={planos} optional onChange={(v) => updateField("plano_movimiento", v === "ninguno" ? null : v)} />
                 <Field label="Articulación principal"><Input value={form.articulacion_principal || ""} onChange={(e) => updateField("articulacion_principal", e.target.value || null)} /></Field>
-                <Field label="Etiquetas"><Input value={form.etiquetasTexto} onChange={(e) => updateField("etiquetasTexto", e.target.value)} placeholder="hipertrofia, fuerza, principiante" /></Field>
-                <Field label="Imagen URL"><Input value={form.imagen_url || ""} onChange={(e) => updateField("imagen_url", e.target.value || null)} /></Field>
-                <Field label="Miniatura URL"><Input value={form.miniatura_url || ""} onChange={(e) => updateField("miniatura_url", e.target.value || null)} /></Field>
-                <Field label="GIF URL"><Input value={form.gif_url || ""} onChange={(e) => updateField("gif_url", e.target.value || null)} /></Field>
-                <Field label="Vídeo URL"><Input value={form.video_url || ""} onChange={(e) => updateField("video_url", e.target.value || null)} /></Field>
+                <div className="md:col-span-2"><Field label="Etiquetas"><Input value={form.etiquetasTexto} onChange={(e) => updateField("etiquetasTexto", e.target.value)} placeholder="hipertrofia, fuerza, principiante" /></Field></div>
+
+                <div className="md:col-span-2 mt-2 rounded-3xl border bg-muted/20 p-4">
+                  <div className="mb-4"><h3 className="text-lg font-bold">Biblioteca multimedia Chetesaí</h3><p className="text-sm text-muted-foreground">Sube contenido propio o pega una URL externa autorizada.</p></div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <MediaBlock kind="miniatura" label="Miniatura" value={form.miniatura_url} exerciseName={form.nombre} onChange={(url) => updateField("miniatura_url", url)} />
+                    <MediaBlock kind="imagen" label="Imagen principal" value={form.imagen_url} exerciseName={form.nombre} onChange={(url) => updateField("imagen_url", url)} />
+                    <MediaBlock kind="gif" label="GIF / animación" value={form.gif_url} exerciseName={form.nombre} onChange={(url) => updateField("gif_url", url)} />
+                    <MediaBlock kind="video" label="Vídeo" value={form.video_url} exerciseName={form.nombre} onChange={(url) => updateField("video_url", url)} />
+                  </div>
+                </div>
+
                 <TextField label="Descripción" value={form.descripcion} onChange={(v) => updateField("descripcion", v)} />
                 <TextField label="Técnica de ejecución" value={form.tecnica} onChange={(v) => updateField("tecnica", v)} />
                 <TextField label="Errores frecuentes" value={form.errores_frecuentes} onChange={(v) => updateField("errores_frecuentes", v)} />
@@ -211,26 +196,16 @@ export default function EjerciciosPage() {
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {filtered.map((item) => {
               const media = item.miniatura_url || item.imagen_url || item.gif_url;
-              return (
-                <Card key={item._id} className="overflow-hidden transition-shadow hover:shadow-md">
-                  {media ? <img src={media} alt={item.nombre} className="h-44 w-full object-cover" /> : null}
-                  <CardContent className="p-5">
-                    <div className="flex items-start justify-between gap-3">
-                      <div><h2 className="text-lg font-bold">{item.nombre}</h2><p className="text-sm text-muted-foreground">{labels[item.grupo_muscular] || item.grupo_muscular} · {labels[item.categoria] || item.categoria}</p></div>
-                      <div className="flex"><Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Pencil className="h-4 w-4" /></Button><Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteExercise(item._id)}><Trash2 className="h-4 w-4" /></Button></div>
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                      <span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">{labels[item.dificultad] || item.dificultad}</span>
-                      {item.material ? <span className="rounded-full bg-muted px-2.5 py-1">{item.material}</span> : null}
-                      {item.tipo_movimiento ? <span className="rounded-full bg-muted px-2.5 py-1">{labels[item.tipo_movimiento] || item.tipo_movimiento}</span> : null}
-                      {item.lateralidad ? <span className="rounded-full bg-muted px-2.5 py-1">{labels[item.lateralidad] || item.lateralidad}</span> : null}
-                    </div>
-                    {item.etiquetas?.length ? <div className="mt-3 flex flex-wrap gap-1">{item.etiquetas.map((tag) => <span key={tag} className="rounded bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">#{tag}</span>)}</div> : null}
-                    {item.descripcion ? <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">{item.descripcion}</p> : null}
-                    {item.video_url ? <a className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary" href={item.video_url} target="_blank" rel="noreferrer">Ver demostración <ExternalLink className="h-3.5 w-3.5" /></a> : null}
-                  </CardContent>
-                </Card>
-              );
+              return <Card key={item._id} className="overflow-hidden transition-shadow hover:shadow-md">
+                {media ? <img src={media} alt={item.nombre} className="h-44 w-full object-cover" /> : null}
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between gap-3"><div><h2 className="text-lg font-bold">{item.nombre}</h2><p className="text-sm text-muted-foreground">{labels[item.grupo_muscular] || item.grupo_muscular} · {labels[item.categoria] || item.categoria}</p></div><div className="flex"><Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Pencil className="h-4 w-4" /></Button><Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteExercise(item._id)}><Trash2 className="h-4 w-4" /></Button></div></div>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs"><span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">{labels[item.dificultad] || item.dificultad}</span>{item.material ? <span className="rounded-full bg-muted px-2.5 py-1">{item.material}</span> : null}{item.tipo_movimiento ? <span className="rounded-full bg-muted px-2.5 py-1">{labels[item.tipo_movimiento] || item.tipo_movimiento}</span> : null}</div>
+                  {item.etiquetas?.length ? <div className="mt-3 flex flex-wrap gap-1">{item.etiquetas.map((tag) => <span key={tag} className="rounded bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">#{tag}</span>)}</div> : null}
+                  {item.descripcion ? <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">{item.descripcion}</p> : null}
+                  {item.video_url ? <a className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary" href={item.video_url} target="_blank" rel="noreferrer">Ver demostración <ExternalLink className="h-3.5 w-3.5" /></a> : null}
+                </CardContent>
+              </Card>;
             })}
           </div>
         )}
@@ -239,18 +214,11 @@ export default function EjerciciosPage() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div className="space-y-2"><Label>{label}</Label>{children}</div>;
+function MediaBlock({ kind, label, value, exerciseName, onChange }: { kind: "miniatura" | "imagen" | "gif" | "video"; label: string; value: string | null; exerciseName: string; onChange: (value: string | null) => void }) {
+  return <div className="space-y-2"><ExerciseMediaUploader kind={kind} label={label} exerciseName={exerciseName} value={value} onUploaded={onChange} /><Input value={value || ""} onChange={(e) => onChange(e.target.value || null)} placeholder="O pega aquí una URL autorizada" /></div>;
 }
 
-function TextField({ label, value, onChange }: { label: string; value: string | null; onChange: (value: string | null) => void }) {
-  return <Field label={label}><Textarea rows={4} value={value || ""} onChange={(e) => onChange(e.target.value || null)} /></Field>;
-}
-
-function SelectField({ label, value, values, onChange, optional = false }: { label: string; value: string; values: string[]; onChange: (value: string) => void; optional?: boolean }) {
-  return <Field label={label}><Select value={value} onValueChange={onChange}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{optional ? <SelectItem value="ninguno">Sin especificar</SelectItem> : null}{values.map((item) => <SelectItem key={item} value={item}>{labels[item] || item}</SelectItem>)}</SelectContent></Select></Field>;
-}
-
-function Filter({ value, values, allLabel, onChange }: { value: string; values: string[]; allLabel: string; onChange: (value: string) => void }) {
-  return <Select value={value} onValueChange={onChange}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="todos">{allLabel}</SelectItem>{values.map((item) => <SelectItem key={item} value={item}>{labels[item] || item}</SelectItem>)}</SelectContent></Select>;
-}
+function Field({ label, children }: { label: string; children: React.ReactNode }) { return <div className="space-y-2"><Label>{label}</Label>{children}</div>; }
+function TextField({ label, value, onChange }: { label: string; value: string | null; onChange: (value: string | null) => void }) { return <Field label={label}><Textarea rows={4} value={value || ""} onChange={(e) => onChange(e.target.value || null)} /></Field>; }
+function SelectField({ label, value, values, onChange, optional = false }: { label: string; value: string; values: string[]; onChange: (value: string) => void; optional?: boolean }) { return <Field label={label}><Select value={value} onValueChange={onChange}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{optional ? <SelectItem value="ninguno">Sin especificar</SelectItem> : null}{values.map((item) => <SelectItem key={item} value={item}>{labels[item] || item}</SelectItem>)}</SelectContent></Select></Field>; }
+function Filter({ value, values, allLabel, onChange }: { value: string; values: string[]; allLabel: string; onChange: (value: string) => void }) { return <Select value={value} onValueChange={onChange}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="todos">{allLabel}</SelectItem>{values.map((item) => <SelectItem key={item} value={item}>{labels[item] || item}</SelectItem>)}</SelectContent></Select>; }
