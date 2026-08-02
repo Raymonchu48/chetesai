@@ -102,7 +102,9 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/api/rutina-ejercicios") ||
     pathname.startsWith("/api/progreso") ||
     pathname.startsWith("/api/nutricion") ||
-    pathname.startsWith("/api/sesiones");
+    pathname.startsWith("/api/sesiones") ||
+    pathname.startsWith("/api/pagos") ||
+    pathname.startsWith("/api/bonos");
 
   if (pathname === "/login") {
     if (!session.valid || !session.role) return NextResponse.next();
@@ -132,6 +134,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/progreso") ||
     pathname.startsWith("/nutricion") ||
     pathname.startsWith("/sesiones") ||
+    pathname.startsWith("/pagos") ||
     isProfessionalApi;
 
   if (professionalRoute && session.role === "cliente") {
@@ -162,11 +165,14 @@ export const config = {
     "/progreso/:path*",
     "/nutricion/:path*",
     "/sesiones/:path*",
+    "/pagos/:path*",
     "/api/ejercicios/:path*",
     "/api/rutinas/:path*",
     "/api/rutina-ejercicios/:path*",
     "/api/progreso/:path*",
     "/api/nutricion/:path*",
     "/api/sesiones/:path*",
+    "/api/pagos/:path*",
+    "/api/bonos/:path*",
   ],
 };
