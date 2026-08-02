@@ -1,0 +1,39 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Apple, Dumbbell, TrendingUp } from "lucide-react";
+
+const items = [
+  { href: "/portal", label: "Entrenamiento", icon: Dumbbell },
+  { href: "/portal/progreso", label: "Progreso", icon: TrendingUp },
+  { href: "/portal/bienestar", label: "Nutrición", icon: Apple },
+];
+
+export default function PortalLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  return (
+    <div className="min-h-screen pb-24">
+      {children}
+      <nav className="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-lg items-center justify-around rounded-2xl border border-[#d8dfd9] bg-[#fffdf9]/95 p-2 shadow-2xl backdrop-blur-xl">
+        {items.map((item) => {
+          const Icon = item.icon;
+          const active = item.href === "/portal" ? pathname === item.href : pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex min-w-24 flex-col items-center gap-1 rounded-xl px-3 py-2 text-xs font-semibold transition ${
+                active ? "bg-[#46624f] text-white" : "text-[#65706a] hover:bg-[#eef2ee] hover:text-[#29312e]"
+              }`}
+            >
+              <Icon className="h-5 w-5" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
+  );
+}
