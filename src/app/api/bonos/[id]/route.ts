@@ -88,7 +88,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           bono_cliente_id: id,
           sesion_id: String(body.sesion_id || "").trim() || null,
           cantidad: quantity,
-          concepto: String(body.concepto || "Sesión consumida").trim(),
+          concepto: String(body.concepto || "Sesión consumida manualmente").trim(),
           fecha: String(body.fecha || new Date().toISOString().slice(0, 10)),
           created_by: userId,
         }),
@@ -109,8 +109,40 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     if (action === "restaurar") {
-      const quantity = Math.max(1, Number(body.cantidad || 1));
+      const consumptionRows = await serviceRequest<Array<{
+        id: string;
+        cantidad: number;
+        sesion_id: string | null;
+      }>>(
+        `consumos_bono?bono_cliente_id=eq.${encodeURIComponent(id)}&select=id,cantidad,sesion_id&order=created_at.desc&limit=1`
+      );
+      const latestConsumption = consumptionRows[0];
+
+      if (latestConsumption?.sesion_id) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: "Ese consumo pertenece a una cita realizada. Cambia el estado de la cita para restaurar la sesión automáticamente.",
+          },
+          { status: 400 }
+        );
+      }
+
+      if (!latestConsumption && Number(membership.sesiones_consumidas || 0) <= 0) {
+        return NextResponse.json({ ok: false, error: "No hay sesiones para restaurar" }, { status: 400 });
+      }
+
+      const quantity = latestConsumption
+        ? Math.max(1, Number(latestConsumption.cantidad || 1))
+        : Math.max(1, Number(body.cantidad || 1));
       const consumed = Math.max(0, Number(membership.sesiones_consumidas || 0) - quantity);
+
+      if (latestConsumption) {
+        await serviceRequest(`consumos_bono?id=eq.${encodeURIComponent(latestConsumption.id)}`, {
+          method: "DELETE",
+        });
+      }
+
       const updatedRows = await serviceRequest<Array<Record<string, unknown>>>(
         `bonos_cliente?id=eq.${encodeURIComponent(id)}`,
         {
