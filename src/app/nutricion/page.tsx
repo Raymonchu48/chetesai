@@ -37,8 +37,22 @@ type Habit = {
   instrucciones: string | null;
 };
 type HabitRecord = { habito_id: string; fecha: string; completado: boolean; valor: number | null };
-
 type NutritionData = { plan: Plan | null; habitos: Habit[]; registros: HabitRecord[] };
+
+type PlanForm = {
+  id: string;
+  nombre: string;
+  objetivo: string;
+  calorias_objetivo: string;
+  proteinas_g: string;
+  carbohidratos_g: string;
+  grasas_g: string;
+  agua_ml: string;
+  recomendaciones: string;
+  fecha_inicio: string;
+  fecha_fin: string;
+  comidas: Meal[];
+};
 
 const defaultMeals: Meal[] = [
   { nombre: "Desayuno", hora: "08:00", descripcion: "" },
@@ -48,20 +62,22 @@ const defaultMeals: Meal[] = [
   { nombre: "Cena", hora: "21:00", descripcion: "" },
 ];
 
-const emptyPlan = {
-  id: "",
-  nombre: "Plan nutricional personalizado",
-  objetivo: "",
-  calorias_objetivo: "",
-  proteinas_g: "",
-  carbohidratos_g: "",
-  grasas_g: "",
-  agua_ml: "",
-  recomendaciones: "",
-  fecha_inicio: new Date().toISOString().slice(0, 10),
-  fecha_fin: "",
-  comidas: defaultMeals,
-};
+function newPlan(): PlanForm {
+  return {
+    id: "",
+    nombre: "Plan nutricional personalizado",
+    objetivo: "",
+    calorias_objetivo: "",
+    proteinas_g: "",
+    carbohidratos_g: "",
+    grasas_g: "",
+    agua_ml: "",
+    recomendaciones: "",
+    fecha_inicio: new Date().toISOString().slice(0, 10),
+    fecha_fin: "",
+    comidas: defaultMeals.map((meal) => ({ ...meal })),
+  };
+}
 
 const emptyHabit = {
   nombre: "",
@@ -84,7 +100,7 @@ const categoryLabels: Record<string, string> = {
 export default function NutritionPage() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [clienteId, setClienteId] = useState("");
-  const [plan, setPlan] = useState(emptyPlan);
+  const [plan, setPlan] = useState<PlanForm>(newPlan());
   const [habits, setHabits] = useState<Habit[]>([]);
   const [records, setRecords] = useState<HabitRecord[]>([]);
   const [habitForm, setHabitForm] = useState(emptyHabit);
@@ -124,8 +140,10 @@ export default function NutritionPage() {
         recomendaciones: current.recomendaciones || "",
         fecha_inicio: current.fecha_inicio || new Date().toISOString().slice(0, 10),
         fecha_fin: current.fecha_fin || "",
-        comidas: Array.isArray(current.comidas) && current.comidas.length ? current.comidas : defaultMeals,
-      } : emptyPlan);
+        comidas: Array.isArray(current.comidas) && current.comidas.length
+          ? current.comidas.map((meal) => ({ ...meal }))
+          : defaultMeals.map((meal) => ({ ...meal })),
+      } : newPlan());
       setHabits(result.data.habitos || []);
       setRecords(result.data.registros || []);
     } catch (error) {
@@ -146,9 +164,9 @@ export default function NutritionPage() {
     const start = new Date();
     start.setDate(start.getDate() - 6);
     const startDate = start.toISOString().slice(0, 10);
-    const relevant = records.filter((item) => item.fecha >= startDate && item.completado);
+    const completed = records.filter((item) => item.fecha >= startDate && item.completado).length;
     const possible = habits.length * 7;
-    return possible ? Math.round((relevant.length / possible) * 100) : 0;
+    return possible ? Math.round((completed / possible) * 100) : 0;
   }, [records, habits]);
 
   async function savePlan() {
@@ -238,7 +256,7 @@ export default function NutritionPage() {
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-4">
-              <Field label="Nombre del plan" value={plan.nombre} onChange={(value) => setPlan({ ...plan, nombre: value })} className="md:col-span-2" />
+              <Field label="Nombre del plan" type="text" value={plan.nombre} onChange={(value) => setPlan({ ...plan, nombre: value })} className="md:col-span-2" />
               <Field label="Fecha de inicio" type="date" value={plan.fecha_inicio} onChange={(value) => setPlan({ ...plan, fecha_inicio: value })} />
               <Field label="Fecha final" type="date" value={plan.fecha_fin} onChange={(value) => setPlan({ ...plan, fecha_fin: value })} />
               <Field label="Calorías objetivo" value={plan.calorias_objetivo} onChange={(value) => setPlan({ ...plan, calorias_objetivo: value })} />
@@ -246,7 +264,7 @@ export default function NutritionPage() {
               <Field label="Carbohidratos (g)" value={plan.carbohidratos_g} onChange={(value) => setPlan({ ...plan, carbohidratos_g: value })} />
               <Field label="Grasas (g)" value={plan.grasas_g} onChange={(value) => setPlan({ ...plan, grasas_g: value })} />
               <Field label="Agua diaria (ml)" value={plan.agua_ml} onChange={(value) => setPlan({ ...plan, agua_ml: value })} />
-              <Field label="Objetivo" value={plan.objetivo} onChange={(value) => setPlan({ ...plan, objetivo: value })} className="md:col-span-3" />
+              <Field label="Objetivo" type="text" value={plan.objetivo} onChange={(value) => setPlan({ ...plan, objetivo: value })} className="md:col-span-3" />
             </div>
 
             <div className="mt-6"><Label>Recomendaciones profesionales</Label><Textarea className="mt-2" rows={4} value={plan.recomendaciones} onChange={(event) => setPlan({ ...plan, recomendaciones: event.target.value })} placeholder="Prioridades, sustituciones, contexto y pautas generales..." /></div>
@@ -254,7 +272,7 @@ export default function NutritionPage() {
             <div className="mt-8"><h3 className="text-lg font-bold">Estructura diaria de comidas</h3><p className="mt-1 text-sm text-muted-foreground">Orientación flexible; no sustituye una valoración clínica cuando sea necesaria.</p></div>
             <div className="mt-4 grid gap-4 lg:grid-cols-2">
               {plan.comidas.map((meal, index) => <div key={`${meal.nombre}-${index}`} className="rounded-2xl border bg-muted/20 p-4">
-                <div className="grid gap-3 sm:grid-cols-[1fr_120px]"><Field label="Momento" value={meal.nombre} onChange={(value) => updateMeal(index, "nombre", value)} /><Field label="Hora" type="time" value={meal.hora} onChange={(value) => updateMeal(index, "hora", value)} /></div>
+                <div className="grid gap-3 sm:grid-cols-[1fr_120px]"><Field label="Momento" type="text" value={meal.nombre} onChange={(value) => updateMeal(index, "nombre", value)} /><Field label="Hora" type="time" value={meal.hora} onChange={(value) => updateMeal(index, "hora", value)} /></div>
                 <div className="mt-3"><Label>Propuesta</Label><Textarea className="mt-2" rows={3} value={meal.descripcion} onChange={(event) => updateMeal(index, "descripcion", event.target.value)} placeholder="Alimentos, cantidades orientativas y alternativas..." /></div>
               </div>)}
             </div>
@@ -264,7 +282,7 @@ export default function NutritionPage() {
             <div><h2 className="text-xl font-bold">Hábitos diarios</h2><p className="mt-1 text-sm text-muted-foreground">Define acciones concretas que el cliente registrará desde su portal.</p></div>
 
             <div className="mt-6 grid gap-4 rounded-2xl border bg-muted/20 p-4 md:grid-cols-6">
-              <Field label="Nombre" value={habitForm.nombre} onChange={(value) => setHabitForm({ ...habitForm, nombre: value })} className="md:col-span-2" />
+              <Field label="Nombre" type="text" value={habitForm.nombre} onChange={(value) => setHabitForm({ ...habitForm, nombre: value })} className="md:col-span-2" />
               <div><Label>Categoría</Label><Select value={habitForm.categoria} onValueChange={(value) => setHabitForm({ ...habitForm, categoria: value })}><SelectTrigger className="mt-2"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(categoryLabels).map(([key, label]) => <SelectItem key={key} value={key}>{label}</SelectItem>)}</SelectContent></Select></div>
               <div><Label>Registro</Label><Select value={habitForm.tipo_registro} onValueChange={(value) => setHabitForm({ ...habitForm, tipo_registro: value })}><SelectTrigger className="mt-2"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="booleano">Sí / no</SelectItem><SelectItem value="cantidad">Cantidad</SelectItem></SelectContent></Select></div>
               <Field label="Objetivo" value={habitForm.objetivo_valor} onChange={(value) => setHabitForm({ ...habitForm, objetivo_valor: value })} disabled={habitForm.tipo_registro !== "cantidad"} />
