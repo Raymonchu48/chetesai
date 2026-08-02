@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import LogoutButton from "@/components/LogoutButton";
+import ProgressPhotoGallery, { type ProgressPhotoMeasurement } from "@/components/ProgressPhotoGallery";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,9 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Activity, ArrowLeft, Plus, Scale, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
-type Medicion = {
-  id: string;
-  fecha: string;
+type Medicion = ProgressPhotoMeasurement & {
   peso_kg: number | null;
   altura_cm: number | null;
   grasa_corporal_pct: number | null;
@@ -59,7 +58,7 @@ export default function ClientProgressPage() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { void load(); }, [load]);
 
   const latest = data?.mediciones?.[0];
   const previous = data?.mediciones?.[1];
@@ -128,6 +127,8 @@ export default function ClientProgressPage() {
             </div>
 
             <Card className="mb-6"><CardContent className="p-6"><div className="mb-5 flex items-center gap-2"><TrendingUp className="h-5 w-5 text-[#46624f]" /><h2 className="text-xl font-bold">Evolución del peso</h2></div><WeightChart rows={data.mediciones} /></CardContent></Card>
+
+            <ProgressPhotoGallery measurements={data.mediciones} mode="client" />
 
             <section className="space-y-4">
               {data.mediciones.map((item) => <Card key={item.id}><CardContent className="p-5"><div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-sm font-semibold text-[#46624f]">{new Date(`${item.fecha}T12:00:00`).toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" })}</p><h3 className="mt-1 text-lg font-bold">{format(item.peso_kg, "kg")} · {format(item.grasa_corporal_pct, "% grasa")}</h3>{item.comentario_cliente ? <p className="mt-2 text-sm text-[#707872]">{item.comentario_cliente}</p> : null}</div><span className="rounded-full bg-[#eef5ef] px-3 py-1 text-xs font-semibold text-[#46624f]">{item.origen === "cliente" ? "Registrado por ti" : "Valoración profesional"}</span></div></CardContent></Card>)}
