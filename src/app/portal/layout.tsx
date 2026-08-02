@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Apple, CalendarDays, Dumbbell, TrendingUp } from "lucide-react";
+import { Apple, CalendarDays, Dumbbell, TrendingUp, WalletCards } from "lucide-react";
 
 const items = [
   { href: "/portal", label: "Entrenamiento", icon: Dumbbell },
   { href: "/portal/citas", label: "Citas", icon: CalendarDays },
   { href: "/portal/progreso", label: "Progreso", icon: TrendingUp },
   { href: "/portal/bienestar", label: "Nutrición", icon: Apple },
+  { href: "/portal/pagos", label: "Pagos", icon: WalletCards },
 ];
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
@@ -17,7 +18,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   return (
     <div className="min-h-screen pb-24">
       {children}
-      <nav className="fixed inset-x-3 bottom-3 z-50 mx-auto flex max-w-2xl items-center justify-around overflow-x-auto rounded-2xl border border-[#d8dfd9] bg-[#fffdf9]/95 p-2 shadow-2xl backdrop-blur-xl">
+      <nav className="fixed inset-x-3 bottom-3 z-50 mx-auto flex max-w-3xl items-center justify-around overflow-x-auto rounded-2xl border border-[#d8dfd9] bg-[#fffdf9]/95 p-2 shadow-2xl backdrop-blur-xl">
         {items.map((item) => {
           const Icon = item.icon;
           const active = item.href === "/portal" ? pathname === item.href : pathname.startsWith(item.href);
