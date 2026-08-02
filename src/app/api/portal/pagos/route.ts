@@ -43,11 +43,24 @@ async function getClient() {
   return clients[0];
 }
 
+function todayMadrid() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Madrid",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
 export async function GET() {
   try {
     const client = await getClient();
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayMadrid();
 
+    await serviceRequest(
+      `bonos_cliente?cliente_id=eq.${encodeURIComponent(client.id)}&estado=eq.programado&fecha_inicio=lte.${today}`,
+      { method: "PATCH", body: JSON.stringify({ estado: "activo" }) }
+    );
     await serviceRequest(
       `bonos_cliente?cliente_id=eq.${encodeURIComponent(client.id)}&estado=eq.activo&fecha_fin=lt.${today}`,
       { method: "PATCH", body: JSON.stringify({ estado: "vencido" }) }
