@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  Users,
+  Activity,
   CalendarDays,
-  CreditCard,
-  Dumbbell,
   ChevronLeft,
   ChevronRight,
+  ClipboardList,
+  CreditCard,
+  Dumbbell,
+  LayoutDashboard,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 import { files } from "@/assets/files";
@@ -18,9 +20,11 @@ import LogoutButton from "@/components/LogoutButton";
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/clientes", label: "Clientes", icon: Users },
+  { href: "/ejercicios", label: "Ejercicios", icon: Dumbbell },
+  { href: "/rutinas", label: "Rutinas", icon: ClipboardList },
+  { href: "/progreso", label: "Progreso", icon: Activity },
   { href: "/sesiones", label: "Sesiones", icon: CalendarDays },
   { href: "/pagos", label: "Pagos", icon: CreditCard },
-  { href: "/ejercicios", label: "Ejercicios", icon: Dumbbell },
 ];
 
 export default function AppSidebar({ children }: { children: React.ReactNode }) {

@@ -116,6 +116,9 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
   }
@@ -123,4 +126,35 @@
 
 button {
   cursor: pointer;
+}
+
+/* La portada mantiene las tarifas ocultas hasta que el visitante las solicita. */
+#tarifas {
+  display: none;
+}
+
+#tarifas:target {
+  display: block;
+  animation: reveal-pricing 450ms ease-out both;
+}
+
+@keyframes reveal-pricing {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  #tarifas:target {
+    animation: none;
+  }
 }
