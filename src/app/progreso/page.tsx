@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AppSidebar from "@/components/AppSidebar";
+import ProgressPhotoGallery, { type ProgressPhotoMeasurement } from "@/components/ProgressPhotoGallery";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,9 +13,7 @@ import { Activity, ArrowDownRight, ArrowUpRight, Plus, Scale, Trash2, TrendingUp
 import { toast } from "sonner";
 
 type Cliente = { _id: string; nombre: string; email: string };
-type Medicion = {
-  id: string;
-  fecha: string;
+type Medicion = ProgressPhotoMeasurement & {
   peso_kg: number | null;
   altura_cm: number | null;
   grasa_corporal_pct: number | null;
@@ -102,7 +101,7 @@ export default function ProgresoPage() {
     }
   }, [clienteId]);
 
-  useEffect(() => { loadMeasurements(); }, [loadMeasurements]);
+  useEffect(() => { void loadMeasurements(); }, [loadMeasurements]);
 
   const latest = mediciones[0];
   const previous = mediciones[1];
@@ -150,7 +149,7 @@ export default function ProgresoPage() {
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight"><Activity className="h-8 w-8 text-primary" />Seguimiento corporal</h1>
-            <p className="mt-1 text-muted-foreground">Mediciones, comparativas y evolución de cada cliente.</p>
+            <p className="mt-1 text-muted-foreground">Mediciones, fotografías comparativas y evolución de cada cliente.</p>
           </div>
           <Button onClick={() => setShowForm((value) => !value)} disabled={!clienteId}><Plus className="mr-2 h-4 w-4" />Nueva medición</Button>
         </div>
@@ -196,6 +195,8 @@ export default function ProgresoPage() {
           </div>
 
           <Card className="mb-6"><CardContent className="p-6"><div className="mb-5 flex items-center gap-2"><TrendingUp className="h-5 w-5 text-primary" /><h2 className="text-xl font-bold">Evolución del peso</h2></div><ProgressChart rows={mediciones} /></CardContent></Card>
+
+          <ProgressPhotoGallery measurements={mediciones} mode="professional" clienteId={clienteId} onChanged={loadMeasurements} />
 
           <div className="space-y-4">
             {mediciones.map((item) => <Card key={item.id}><CardContent className="p-5">
