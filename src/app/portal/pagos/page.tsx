@@ -37,12 +37,14 @@ type PortalData = {
 };
 
 const membershipStateLabels: Record<string, string> = {
+  programado: "Programado",
   activo: "Activo",
   agotado: "Agotado",
   vencido: "Vencido",
   cancelado: "Cancelado",
 };
 const membershipStateClasses: Record<string, string> = {
+  programado: "bg-violet-100 text-violet-800",
   activo: "bg-emerald-100 text-emerald-800",
   agotado: "bg-blue-100 text-blue-800",
   vencido: "bg-red-100 text-red-800",
@@ -130,7 +132,7 @@ export default function ClientPaymentsPage() {
             {!data.bonos.length ? <Empty text="Todavía no tienes bonos asignados." /> : <div className="grid gap-4 lg:grid-cols-2">{data.bonos.map((bonus) => {
               const remaining = Math.max(0, bonus.sesiones_totales - bonus.sesiones_consumidas);
               const percent = Math.min(100, Math.round((bonus.sesiones_consumidas / bonus.sesiones_totales) * 100));
-              return <Card key={bonus.id}><CardContent className="p-6"><div className="flex flex-wrap items-start justify-between gap-3"><div><div className="flex flex-wrap items-center gap-2"><h3 className="text-xl font-bold">{bonus.nombre}</h3><Badge className={membershipStateClasses[bonus.estado]}>{membershipStateLabels[bonus.estado] || bonus.estado}</Badge></div><p className="mt-1 text-sm text-[#707872]">{bonus.modalidad} · {formatMoney(bonus.precio_eur)}</p></div><p className="text-2xl font-bold text-[#46624f]">{remaining}<span className="text-sm font-medium text-[#707872]"> / {bonus.sesiones_totales}</span></p></div><div className="mt-5 h-3 overflow-hidden rounded-full bg-[#e8ece8]"><div className="h-full rounded-full bg-[#46624f]" style={{ width: `${percent}%` }} /></div><div className="mt-2 flex justify-between text-xs text-[#707872]"><span>{bonus.sesiones_consumidas} consumidas</span><span>{remaining} disponibles</span></div><p className="mt-4 text-sm text-[#707872]">Vigencia: {formatDate(bonus.fecha_inicio)} – {formatDate(bonus.fecha_fin)}{bonus.renovacion_automatica ? " · Renovación automática" : ""}</p></CardContent></Card>;
+              return <Card key={bonus.id}><CardContent className="p-6"><div className="flex flex-wrap items-start justify-between gap-3"><div><div className="flex flex-wrap items-center gap-2"><h3 className="text-xl font-bold">{bonus.nombre}</h3><Badge className={membershipStateClasses[bonus.estado]}>{membershipStateLabels[bonus.estado] || bonus.estado}</Badge></div><p className="mt-1 text-sm text-[#707872]">{bonus.modalidad} · {formatMoney(bonus.precio_eur)}</p></div><p className="text-2xl font-bold text-[#46624f]">{remaining}<span className="text-sm font-medium text-[#707872]"> / {bonus.sesiones_totales}</span></p></div><div className="mt-5 h-3 overflow-hidden rounded-full bg-[#e8ece8]"><div className="h-full rounded-full bg-[#46624f]" style={{ width: `${percent}%` }} /></div><div className="mt-2 flex justify-between text-xs text-[#707872]"><span>{bonus.sesiones_consumidas} consumidas</span><span>{remaining} disponibles</span></div><p className="mt-4 text-sm text-[#707872]">{bonus.estado === "programado" ? "Próximo periodo" : "Vigencia"}: {formatDate(bonus.fecha_inicio)} – {formatDate(bonus.fecha_fin)}{bonus.renovacion_automatica ? " · Renovación automática" : ""}</p></CardContent></Card>;
             })}</div>}
           </section>
 
