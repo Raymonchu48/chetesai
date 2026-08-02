@@ -27,6 +27,7 @@ import {
   CheckCircle2,
   Clock3,
   Inbox,
+  Mail,
   MapPin,
   Pencil,
   Plus,
@@ -140,6 +141,7 @@ export default function SessionsPage() {
   const [form, setForm] = useState<SessionForm>(emptyForm);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [emailingId, setEmailingId] = useState<string | null>(null);
   const [stateFilter, setStateFilter] = useState("todos");
   const [clientFilter, setClientFilter] = useState("todos");
 
@@ -186,6 +188,20 @@ export default function SessionsPage() {
     return [...groups.entries()];
   }, [filteredSessions]);
 
+  const schedulingConflict = useMemo(() => {
+    if (!dialogOpen || !form.inicio_at) return null;
+    const start = new Date(form.inicio_at).getTime();
+    const duration = Math.max(15, Number(form.duracion_minutos) || 60);
+    const end = start + duration * 60_000;
+    if (!Number.isFinite(start)) return null;
+    return sessions.find((session) => {
+      if (session.id === editingId || session.estado === "cancelada") return false;
+      const existingStart = new Date(session.inicio_at).getTime();
+      const existingEnd = existingStart + session.duracion_minutos * 60_000;
+      return start < existingEnd && end > existingStart;
+    }) || null;
+  }, [dialogOpen, editingId, form.inicio_at, form.duracion_minutos, sessions]);
+
   const now = Date.now();
   const endWeek = now + 7 * 24 * 60 * 60 * 1000;
   const todayKey = new Date().toDateString();
@@ -226,9 +242,12 @@ export default function SessionsPage() {
   function prepareFromRequest(request: Solicitud) {
     const client = clients.find((item) => item.email?.toLowerCase() === request.email.toLowerCase());
     if (!client) {
-      toast.error("Primero registra al cliente con el mismo correo electrónico");
+      toast.error("Recarga la página para completar la vinculación automática del cliente potencial");
       return;
     }
+    const requestedTime = /^\d{2}:\d{2}$/.test(request.franja_horaria || "")
+      ? request.franja_horaria
+      : "10:00";
     setEditingId(null);
     setForm({
       ...emptyForm,
@@ -236,15 +255,19 @@ export default function SessionsPage() {
       solicitud_id: request.id,
       titulo: "Valoración inicial",
       tipo_sesion: "valoracion_inicial",
-      modalidad: request.modalidad === "grupo_reducido" ? "presencial" : "presencial",
-      inicio_at: request.fecha_preferida ? `${request.fecha_preferida}T10:00` : defaultLocalDate(),
-      notas_profesional: [request.objetivo, request.mensaje, request.franja_horaria].filter(Boolean).join(" · "),
+      modalidad: "presencial",
+      inicio_at: request.fecha_preferida ? `${request.fecha_preferida}T${requestedTime}` : defaultLocalDate(),
+      notas_profesional: [request.objetivo, request.mensaje].filter(Boolean).join(" · "),
     });
     setDialogOpen(true);
   }
 
   async function saveSession() {
     if (!form.cliente_id || !form.titulo || !form.inicio_at) return toast.error("Completa cliente, título y fecha");
+    if (schedulingConflict) {
+      toast.error(`Ese horario coincide con ${schedulingConflict.titulo} a las ${formatTime(schedulingConflict.inicio_at)}`);
+      return;
+    }
     setSaving(true);
     try {
       const url = editingId ? `/api/sesiones/${editingId}` : "/api/sesiones";
@@ -275,6 +298,24 @@ export default function SessionsPage() {
       toast.error(error instanceof Error ? error.message : "Error al guardar");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function sendAppointmentEmail(session: Sesion) {
+    setEmailingId(session.id);
+    try {
+      const response = await fetch(`/api/sesiones/${session.id}/email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tipo: session.estado === "confirmada" ? "confirmacion" : "alternativa" }),
+      });
+      const result = (await response.json()) as { ok: boolean; error?: string };
+      if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo enviar el correo");
+      toast.success(session.estado === "confirmada" ? "Confirmación enviada" : "Propuesta de horario enviada");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo enviar el correo");
+    } finally {
+      setEmailingId(null);
     }
   }
 
@@ -323,7 +364,8 @@ export default function SessionsPage() {
                 <div className="sm:col-span-2"><Label>Notas profesionales</Label><Textarea className="mt-2" rows={4} value={form.notas_profesional} onChange={(event) => setForm({ ...form, notas_profesional: event.target.value })} /></div>
                 {form.estado === "cancelada" ? <Field label="Motivo de cancelación" value={form.motivo_cancelacion} onChange={(value) => setForm({ ...form, motivo_cancelacion: value })} className="sm:col-span-2" /> : null}
               </div>
-              <Button className="mt-5 w-full" onClick={saveSession} disabled={saving}>{saving ? "Guardando..." : editingId ? "Guardar cambios" : "Crear sesión"}</Button>
+              {schedulingConflict ? <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"><strong>Horario ocupado.</strong> Coincide con “{schedulingConflict.titulo}” a las {formatTime(schedulingConflict.inicio_at)}. Elige otra hora antes de guardar.</div> : null}
+              <Button className="mt-5 w-full" onClick={saveSession} disabled={saving || Boolean(schedulingConflict)}>{saving ? "Guardando..." : editingId ? "Guardar cambios" : "Crear sesión"}</Button>
             </DialogContent>
           </Dialog>
         </div>
@@ -346,9 +388,9 @@ export default function SessionsPage() {
             <div><Label>Filtrar por cliente</Label><Select value={clientFilter} onValueChange={setClientFilter}><SelectTrigger className="mt-2"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="todos">Todos</SelectItem>{clients.map((client) => <SelectItem key={client._id} value={client._id}>{client.nombre}</SelectItem>)}</SelectContent></Select></div>
           </CardContent></Card>
 
-          {!groupedSessions.length ? <Card><CardContent className="py-16 text-center"><CalendarDays className="mx-auto h-10 w-10 text-muted-foreground" /><h2 className="mt-4 text-xl font-bold">No hay sesiones en este filtro</h2></CardContent></Card> : <div className="space-y-7">{groupedSessions.map(([date, daySessions]) => <section key={date}><h2 className="mb-3 capitalize text-lg font-bold">{date}</h2><div className="space-y-3">{daySessions.map((session) => <Card key={session.id}><CardContent className="p-5"><div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"><div className="flex gap-4"><div className="min-w-20 rounded-2xl bg-primary/10 px-3 py-3 text-center text-primary"><p className="text-xl font-bold">{formatTime(session.inicio_at)}</p><p className="text-xs">{session.duracion_minutos} min</p></div><div><div className="flex flex-wrap items-center gap-2"><h3 className="text-lg font-bold">{session.titulo}</h3><Badge className={stateClasses[session.estado]}>{stateLabels[session.estado] || session.estado}</Badge></div><p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground"><UserRound className="h-4 w-4" />{session.clientes?.nombre || "Cliente"} · {typeLabels[session.tipo_sesion] || session.tipo_sesion}</p>{session.ubicacion ? <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="h-4 w-4" />{session.ubicacion}</p> : null}{session.motivo_cancelacion ? <p className="mt-2 text-sm text-red-600">{session.motivo_cancelacion}</p> : null}</div></div><div className="flex gap-2"><Button variant="outline" size="sm" onClick={() => openEdit(session)}><Pencil className="mr-2 h-4 w-4" />Editar</Button><Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteSession(session.id)}><Trash2 className="h-4 w-4" /></Button></div></div></CardContent></Card>)}</div></section>)}</div>}
+          {!groupedSessions.length ? <Card><CardContent className="py-16 text-center"><CalendarDays className="mx-auto h-10 w-10 text-muted-foreground" /><h2 className="mt-4 text-xl font-bold">No hay sesiones en este filtro</h2></CardContent></Card> : <div className="space-y-7">{groupedSessions.map(([date, daySessions]) => <section key={date}><h2 className="mb-3 capitalize text-lg font-bold">{date}</h2><div className="space-y-3">{daySessions.map((session) => <Card key={session.id}><CardContent className="p-5"><div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"><div className="flex gap-4"><div className="min-w-20 rounded-2xl bg-primary/10 px-3 py-3 text-center text-primary"><p className="text-xl font-bold">{formatTime(session.inicio_at)}</p><p className="text-xs">{session.duracion_minutos} min</p></div><div><div className="flex flex-wrap items-center gap-2"><h3 className="text-lg font-bold">{session.titulo}</h3><Badge className={stateClasses[session.estado]}>{stateLabels[session.estado] || session.estado}</Badge></div><p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground"><UserRound className="h-4 w-4" />{session.clientes?.nombre || "Cliente"} · {typeLabels[session.tipo_sesion] || session.tipo_sesion}</p>{session.ubicacion ? <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="h-4 w-4" />{session.ubicacion}</p> : null}{session.motivo_cancelacion ? <p className="mt-2 text-sm text-red-600">{session.motivo_cancelacion}</p> : null}</div></div><div className="flex flex-wrap gap-2"><Button variant="outline" size="sm" onClick={() => sendAppointmentEmail(session)} disabled={emailingId === session.id || session.estado === "cancelada" || session.estado === "realizada"}><Mail className="mr-2 h-4 w-4" />{emailingId === session.id ? "Enviando..." : session.estado === "confirmada" ? "Enviar confirmación" : "Proponer hora"}</Button><Button variant="outline" size="sm" onClick={() => openEdit(session)}><Pencil className="mr-2 h-4 w-4" />Editar</Button><Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteSession(session.id)}><Trash2 className="h-4 w-4" /></Button></div></div></CardContent></Card>)}</div></section>)}</div>}
         </> : <>
-          {!requests.length ? <Card><CardContent className="py-16 text-center"><Inbox className="mx-auto h-10 w-10 text-muted-foreground" /><h2 className="mt-4 text-xl font-bold">Todavía no hay solicitudes</h2></CardContent></Card> : <div className="space-y-4">{requests.map((request) => <Card key={request.id}><CardContent className="p-5"><div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"><div><div className="flex flex-wrap items-center gap-2"><h3 className="text-lg font-bold">{request.nombre}</h3><Badge className={requestStateClasses[request.estado]}>{request.estado}</Badge></div><p className="mt-1 text-sm text-muted-foreground">{request.email}{request.telefono ? ` · ${request.telefono}` : ""}</p><p className="mt-3 text-sm"><strong>Modalidad:</strong> {request.modalidad.replaceAll("_", " ")}</p>{request.objetivo ? <p className="mt-1 text-sm"><strong>Objetivo:</strong> {request.objetivo}</p> : null}{request.mensaje ? <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{request.mensaje}</p> : null}<p className="mt-3 text-xs text-muted-foreground">Recibida el {formatDateTime(request.created_at)}</p></div><div className="flex flex-wrap gap-2"><Button size="sm" onClick={() => prepareFromRequest(request)} disabled={request.estado === "convertida"}><Plus className="mr-2 h-4 w-4" />Preparar cita</Button>{request.estado === "nueva" ? <Button variant="outline" size="sm" onClick={() => updateRequest(request.id, "contactada")}><CheckCircle2 className="mr-2 h-4 w-4" />Contactada</Button> : null}{request.estado !== "descartada" && request.estado !== "convertida" ? <Button variant="ghost" size="sm" className="text-destructive" onClick={() => updateRequest(request.id, "descartada")}><XCircle className="mr-2 h-4 w-4" />Descartar</Button> : null}</div></div></CardContent></Card>)}</div>}
+          {!requests.length ? <Card><CardContent className="py-16 text-center"><Inbox className="mx-auto h-10 w-10 text-muted-foreground" /><h2 className="mt-4 text-xl font-bold">Todavía no hay solicitudes</h2></CardContent></Card> : <div className="space-y-4">{requests.map((request) => <Card key={request.id}><CardContent className="p-5"><div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"><div><div className="flex flex-wrap items-center gap-2"><h3 className="text-lg font-bold">{request.nombre}</h3><Badge className={requestStateClasses[request.estado]}>{request.estado}</Badge></div><p className="mt-1 text-sm text-muted-foreground">{request.email}{request.telefono ? ` · ${request.telefono}` : ""}</p><p className="mt-3 text-sm"><strong>Modalidad:</strong> {request.modalidad.replaceAll("_", " ")}</p>{request.fecha_preferida ? <p className="mt-1 text-sm"><strong>Preferencia:</strong> {formatRequestedDate(request.fecha_preferida, request.franja_horaria)}</p> : null}{request.objetivo ? <p className="mt-1 text-sm"><strong>Objetivo:</strong> {request.objetivo}</p> : null}{request.mensaje ? <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{request.mensaje}</p> : null}<p className="mt-3 text-xs text-muted-foreground">Recibida el {formatDateTime(request.created_at)}</p></div><div className="flex flex-wrap gap-2"><Button size="sm" onClick={() => prepareFromRequest(request)} disabled={request.estado === "convertida"}><Plus className="mr-2 h-4 w-4" />Preparar cita</Button>{request.estado === "nueva" ? <Button variant="outline" size="sm" onClick={() => updateRequest(request.id, "contactada")}><CheckCircle2 className="mr-2 h-4 w-4" />Contactada</Button> : null}{request.estado !== "descartada" && request.estado !== "convertida" ? <Button variant="ghost" size="sm" className="text-destructive" onClick={() => updateRequest(request.id, "descartada")}><XCircle className="mr-2 h-4 w-4" />Descartar</Button> : null}</div></div></CardContent></Card>)}</div>}
         </>}
       </div>
     </AppSidebar>
@@ -366,3 +408,7 @@ function Summary({ label, value, icon }: { label: string; value: string; icon: R
 }
 function formatTime(value: string) { return new Date(value).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }); }
 function formatDateTime(value: string) { return new Date(value).toLocaleString("es-ES", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }); }
+function formatRequestedDate(date: string, time: string | null) {
+  const formattedDate = new Date(`${date}T12:00:00`).toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" });
+  return /^\d{2}:\d{2}$/.test(time || "") ? `${formattedDate} a las ${time}` : formattedDate;
+}
