@@ -110,7 +110,7 @@ export default function Main() {
       const result = (await response.json()) as { ok: boolean; error?: string };
       if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo enviar la solicitud");
       form.reset();
-      setFormMessage({ type: "success", text: "Solicitud recibida. Te responderemos para concretar la valoración." });
+      setFormMessage({ type: "success", text: "Solicitud recibida. Te enviaremos un correo para confirmar la hora o proponerte una alternativa." });
     } catch (error) {
       setFormMessage({ type: "error", text: error instanceof Error ? error.message : "No se pudo enviar la solicitud" });
     } finally {
@@ -188,9 +188,10 @@ export default function Main() {
               <Field name="email" label="Email" type="email" required />
               <Field name="telefono" label="Teléfono" type="tel" />
               <label className="space-y-2 text-sm font-semibold">Modalidad<select name="modalidad" defaultValue="orientacion" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]"><option value="entrenamiento_personal">Entrenamiento personal</option><option value="grupo_reducido">Grupo reducido</option><option value="orientacion">Quiero orientación</option></select></label>
-              <Field name="fecha_preferida" label="Fecha preferida" type="date" />
-              <label className="space-y-2 text-sm font-semibold">Franja horaria<select name="franja_horaria" defaultValue="" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]"><option value="">Sin preferencia</option><option value="mañana">Mañana</option><option value="mediodía">Mediodía</option><option value="tarde">Tarde</option><option value="última hora">Última hora</option></select></label>
+              <Field name="fecha_preferida" label="Fecha preferida" type="date" required />
+              <Field name="franja_horaria" label="Hora aproximada" type="time" required />
             </div>
+            <p className="mt-2 text-xs text-[#67706b]">La hora solicitada queda pendiente de confirmación según disponibilidad.</p>
             <label className="mt-4 block space-y-2 text-sm font-semibold">Objetivo principal<input name="objetivo" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" placeholder="Mejorar condición física, ganar fuerza, perder grasa..." /></label>
             <label className="mt-4 block space-y-2 text-sm font-semibold">Cuéntame un poco más<textarea name="mensaje" rows={4} className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" /></label>
             <label className="mt-4 flex items-start gap-3 text-xs leading-5 text-[#67706b]"><input type="checkbox" name="consentimiento" required className="mt-1" />Acepto que mis datos sean utilizados para responder a esta solicitud de información.</label>
