@@ -1,7 +1,14 @@
--- Añade renovaciones encadenadas y registro de avisos financieros.
+-- Añade renovaciones encadenadas, bonos programados y registro de avisos financieros.
 
 alter table public.bonos_cliente
   add column if not exists renovado_desde_id uuid references public.bonos_cliente(id) on delete set null;
+
+alter table public.bonos_cliente
+  drop constraint if exists bonos_cliente_estado_check;
+
+alter table public.bonos_cliente
+  add constraint bonos_cliente_estado_check
+  check (estado in ('programado', 'activo', 'agotado', 'vencido', 'cancelado'));
 
 create unique index if not exists bonos_cliente_renovado_desde_unique_idx
   on public.bonos_cliente (renovado_desde_id)
