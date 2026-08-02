@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  Users,
+  Activity,
   CalendarDays,
-  CreditCard,
-  Dumbbell,
-  ClipboardList,
   ChevronLeft,
   ChevronRight,
+  ClipboardList,
+  CreditCard,
+  Dumbbell,
+  LayoutDashboard,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 import { files } from "@/assets/files";
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/clientes", label: "Clientes", icon: Users },
   { href: "/ejercicios", label: "Ejercicios", icon: Dumbbell },
   { href: "/rutinas", label: "Rutinas", icon: ClipboardList },
+  { href: "/progreso", label: "Progreso", icon: Activity },
   { href: "/sesiones", label: "Sesiones", icon: CalendarDays },
   { href: "/pagos", label: "Pagos", icon: CreditCard },
 ];
