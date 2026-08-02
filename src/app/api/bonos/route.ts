@@ -53,6 +53,15 @@ async function serviceRequest<T>(path: string, init: RequestInit = {}): Promise<
   return (text ? JSON.parse(text) : null) as T;
 }
 
+function todayMadrid() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Madrid",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
 function addDays(date: string, days: number) {
   const value = new Date(`${date}T00:00:00Z`);
   value.setUTCDate(value.getUTCDate() + days);
@@ -66,7 +75,11 @@ function statusFor(message: string) {
 export async function GET(request: NextRequest) {
   try {
     await assertProfessional();
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayMadrid();
+    await serviceRequest(
+      `bonos_cliente?estado=eq.programado&fecha_inicio=lte.${today}`,
+      { method: "PATCH", body: JSON.stringify({ estado: "activo" }) }
+    );
     await serviceRequest(
       `bonos_cliente?estado=eq.activo&fecha_fin=lt.${today}`,
       { method: "PATCH", body: JSON.stringify({ estado: "vencido" }) }
@@ -105,7 +118,7 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as Record<string, unknown>;
     const clientId = String(body.cliente_id || "").trim();
     const catalogId = String(body.catalogo_bono_id || "").trim();
-    const startDate = String(body.fecha_inicio || new Date().toISOString().slice(0, 10));
+    const startDate = String(body.fecha_inicio || todayMadrid());
     const paymentState = String(body.estado_pago || "pendiente");
     const paymentMethod = String(body.metodo_pago || "").trim();
 
@@ -135,6 +148,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: "El bono seleccionado no está disponible" }, { status: 404 });
     }
 
+    const today = todayMadrid();
     const endDate = addDays(startDate, Math.max(1, Number(plan.vigencia_dias || 31) - 1));
     const membershipRows = await serviceRequest<Array<Record<string, unknown>>>("bonos_cliente", {
       method: "POST",
@@ -149,7 +163,7 @@ export async function POST(request: NextRequest) {
         precio_eur: plan.precio_eur,
         fecha_inicio: startDate,
         fecha_fin: endDate,
-        estado: "activo",
+        estado: startDate > today ? "programado" : "activo",
         renovacion_automatica: Boolean(body.renovacion_automatica),
         notas: String(body.notas || "").trim() || null,
         created_by: userId,
@@ -160,7 +174,6 @@ export async function POST(request: NextRequest) {
 
     let payment: Record<string, unknown> | null = null;
     if (body.crear_pago !== false) {
-      const today = new Date().toISOString().slice(0, 10);
       const paymentRows = await serviceRequest<Array<Record<string, unknown>>>("pagos_cliente", {
         method: "POST",
         headers: { Prefer: "return=representation" },
