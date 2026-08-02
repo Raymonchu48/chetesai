@@ -3,65 +3,139 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import {
-  Users,
-  Dumbbell,
   ArrowRight,
-  ClipboardList,
-  Activity,
+  CalendarDays,
+  CheckCircle2,
+  ClipboardCheck,
+  Clock,
+  Dumbbell,
+  Mail,
+  MapPin,
   ShieldCheck,
-  Sparkles,
-  UserRoundCheck,
-  ChartNoAxesCombined,
+  Target,
+  TrendingUp,
+  UserRound,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { files, heroSlideshow } from "@/assets/files";
 
-const features = [
+const benefits = [
+  {
+    icon: UserRound,
+    title: "Entrenamiento 1:1",
+    description: "Atención individual y objetivos claros.",
+  },
   {
     icon: Users,
-    title: "Gestión integral de clientes",
-    description: "Centraliza perfiles, objetivos, estado, datos personales y seguimiento individual desde un único panel profesional.",
-    href: "/clientes",
-    action: "Gestionar clientes",
+    title: "Grupos reducidos 2–4",
+    description: "Más atención, motivación y calidad.",
   },
   {
-    icon: Dumbbell,
-    title: "Biblioteca profesional de ejercicios",
-    description: "Crea fichas técnicas completas con imágenes, animaciones, vídeos, biomecánica, consejos y errores frecuentes.",
-    href: "/ejercicios",
-    action: "Abrir biblioteca",
+    icon: ClipboardCheck,
+    title: "Seguimiento personalizado",
+    description: "Valoramos, ajustamos y medimos tu progreso.",
   },
   {
-    icon: ClipboardList,
-    title: "Rutinas personalizadas",
-    description: "Diseña planes por días, configura cargas, series, tempo, RPE, superseries e instrucciones específicas para cada cliente.",
-    href: "/rutinas",
-    action: "Crear rutinas",
-  },
-  {
-    icon: Activity,
-    title: "Seguimiento del rendimiento",
-    description: "Registra series, repeticiones, cargas, RPE, volumen e historial real de cada entrenamiento desde el portal del cliente.",
-    href: "/rutinas/asignaciones",
-    action: "Asignar planes",
+    icon: TrendingUp,
+    title: "Rutinas y progreso",
+    description: "Entrena con método y mejora de verdad.",
   },
 ];
 
-const highlights = [
+const services = [
   {
-    icon: ShieldCheck,
-    label: "Acceso seguro por roles",
-    sublabel: "Administrador, profesional y cliente",
+    icon: UserRound,
+    title: "Entrenamiento personal",
+    description: "Sesiones individuales centradas en tus objetivos, tu nivel y tu estilo de vida.",
   },
   {
-    icon: UserRoundCheck,
-    label: "Planes individualizados",
-    sublabel: "Una experiencia adaptada a cada persona",
+    icon: Users,
+    title: "Grupos reducidos",
+    description: "Entrena con dos a cuatro personas sin perder atención, técnica ni seguimiento.",
   },
   {
-    icon: ChartNoAxesCombined,
-    label: "Progreso basado en datos",
-    sublabel: "Historial, cargas, volumen y adherencia",
+    icon: ClipboardCheck,
+    title: "Seguimiento continuo",
+    description: "Valoraciones periódicas, revisión de cargas y ajustes para mantener el avance.",
+  },
+  {
+    icon: Target,
+    title: "Rutina adaptada",
+    description: "Un plan realista, progresivo y preparado específicamente para ti.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Técnica y progreso",
+    description: "Mejora cómo te mueves, gana confianza y consigue resultados medibles.",
+  },
+];
+
+const steps = [
+  {
+    number: "1",
+    title: "Reserva",
+    description: "Elige tu modalidad y solicita una primera valoración.",
+  },
+  {
+    number: "2",
+    title: "Valoramos y planificamos",
+    description: "Analizamos tu punto de partida, objetivos y disponibilidad.",
+  },
+  {
+    number: "3",
+    title: "Entrenas y progresas",
+    description: "Te acompañamos, medimos el avance y ajustamos tu plan.",
+  },
+];
+
+const personalPlans = [
+  {
+    name: "Básico",
+    sessions: "4 sesiones / mes",
+    price: "75 €",
+    perSession: "18,75 € por sesión",
+    features: ["Valoración inicial", "Programación mensual", "Seguimiento básico"],
+  },
+  {
+    name: "Activo",
+    sessions: "8 sesiones / mes",
+    price: "130 €",
+    perSession: "16,25 € por sesión",
+    popular: true,
+    features: ["Valoración inicial", "Revisión quincenal", "Mensajería de soporte"],
+  },
+  {
+    name: "Intensivo",
+    sessions: "12 sesiones / mes",
+    price: "165 €",
+    perSession: "13,75 € por sesión",
+    features: ["Valoración inicial", "Ajustes semanales", "Revisión técnica en vídeo"],
+  },
+];
+
+const groupPlans = [
+  { name: "Grupo Básico", sessions: "4 sesiones / mes", price: "45 €" },
+  { name: "Grupo Activo", sessions: "8 sesiones / mes", price: "80 €" },
+  { name: "Grupo Intensivo", sessions: "12 sesiones / mes", price: "110 €" },
+];
+
+const faqs = [
+  {
+    question: "¿Hay matrícula o permanencia?",
+    answer: "No hay matrícula ni permanencia. Puedes cambiar de modalidad al finalizar cada mes.",
+  },
+  {
+    question: "¿Puedo recuperar una sesión perdida?",
+    answer: "Con aviso previo de 24 horas se puede reubicar dentro del mismo mes, según disponibilidad.",
+  },
+  {
+    question: "¿Dónde se realizan los entrenamientos?",
+    answer: "Las sesiones se organizan en espacios indoor o exteriores de Baleares según disponibilidad y ubicación.",
+  },
+  {
+    question: "¿Necesito experiencia previa?",
+    answer: "No. El programa se adapta a tu condición física, experiencia y punto de partida.",
   },
 ];
 
@@ -73,156 +147,270 @@ export default function Main() {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(nextSlide, 5000);
+    const interval = setInterval(nextSlide, 5500);
     return () => clearInterval(interval);
   }, [nextSlide]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="relative min-h-[650px] overflow-hidden md:min-h-[760px]">
+    <main className="min-h-screen bg-[#f7f4ee] text-[#202724]">
+      <section id="inicio" className="relative min-h-[760px] overflow-hidden">
         {heroSlideshow.map((slide, index) => (
           <div
             key={index}
-            className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out"
+            className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
             style={{
               backgroundImage: `url(${slide.url})`,
               opacity: currentSlide === index ? 1 : 0,
-              zIndex: currentSlide === index ? 1 : 0,
             }}
           />
         ))}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-black/35" />
 
-        <div className="absolute inset-0 z-[2] bg-gradient-to-br from-black/80 via-black/60 to-[#183226]/80" />
+        <nav className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
+          <a href="#inicio" className="flex items-center gap-3">
+            <div className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg">
+              <img src={files.logo.url} alt="Chetesaí Fitness+" className="h-full w-full object-contain" />
+            </div>
+            <div className="hidden sm:block">
+              <p className="font-bold leading-tight text-white">Chetesaí Fitness+</p>
+              <p className="text-xs text-white/55">Entrenamiento personalizado</p>
+            </div>
+          </a>
 
-        <div className="relative z-10 mx-auto max-w-6xl px-6 py-20 md:py-28">
-          <div className="mb-7 flex items-center gap-4">
-            <img
-              src={files.logo.url}
-              alt="Chetesaí Fitness+"
-              className="h-16 w-16 rounded-2xl bg-white/90 object-contain p-1.5 shadow-lg backdrop-blur-sm md:h-20 md:w-20"
-            />
-            <div>
-              <span className="block text-sm font-medium uppercase tracking-[0.2em] text-white/65">
-                Entrenamiento · Nutrición · Seguimiento
-              </span>
-              <span className="mt-1 block text-xs font-semibold tracking-wide text-[#f0b35d]">
-                Carga tus energías y renueva tu vida
-              </span>
+          <div className="hidden items-center gap-7 text-sm font-medium text-white/80 lg:flex">
+            <a href="#servicios" className="transition hover:text-white">Servicios</a>
+            <a href="#proceso" className="transition hover:text-white">Cómo funciona</a>
+            <a href="#tarifas" className="transition hover:text-white">Tarifas</a>
+            <a href="#faq" className="transition hover:text-white">FAQ</a>
+            <Link href="/login" className="transition hover:text-white">Acceso clientes</Link>
+          </div>
+
+          <Button asChild className="rounded-xl bg-[#2f9e24] px-5 hover:bg-[#27891e]">
+            <a href="#contacto"><CalendarDays className="mr-2 h-4 w-4" />Reservar</a>
+          </Button>
+        </nav>
+
+        <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-5 pb-44 pt-16 lg:grid-cols-[230px_1fr] lg:px-8 lg:pt-20">
+          <div className="hidden border-r border-white/25 pr-10 lg:flex lg:items-center">
+            <div className="w-full overflow-hidden rounded-[30px] bg-white p-3 shadow-2xl">
+              <img src={files.logo.url} alt="Logo completo de Chetesaí Fitness+" className="aspect-square h-auto w-full object-contain" />
             </div>
           </div>
 
-          <div className="max-w-3xl">
-            <p className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-[#8fd09b]">
-              <Sparkles className="h-4 w-4" /> Plataforma profesional integral
+          <div className="max-w-3xl self-center">
+            <p className="mb-5 text-sm font-bold uppercase tracking-[0.18em] text-[#8cdb78]">
+              Entrenamiento personal y grupos reducidos en Baleares
             </p>
-            <h1 className="mb-7 text-5xl font-black leading-[0.95] tracking-tight text-white md:text-7xl">
-              Chetesaí<span className="text-primary">Fitness+</span>
+            <h1 className="max-w-3xl text-5xl font-black leading-[0.98] tracking-tight text-white md:text-7xl">
+              Entrena con cabeza.<br />
+              <span className="text-[#d8c7a5]">Mejora con método.</span>
             </h1>
-            <p className="max-w-2xl text-lg leading-relaxed text-white/75 md:text-xl">
-              Diseña programas personalizados, acompaña a cada cliente y transforma su progreso en información útil para tomar mejores decisiones.
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-white/75 md:text-xl">
+              Un enfoque realista, progresivo y medible para mejorar tu condición física sin rutinas genéricas ni promesas de humo.
             </p>
-          </div>
+            <p className="mt-5 flex items-center gap-2 text-sm font-semibold text-[#9fe68f]">
+              <Target className="h-4 w-4" /> Valoración inicial y planificación personalizada
+            </p>
 
-          <div className="mt-10 flex flex-wrap gap-4">
-            <Link href="/dashboard">
-              <Button size="lg" className="rounded-xl px-8 py-6 text-base font-semibold shadow-xl shadow-primary/25">
-                Entrar al panel profesional
-                <ArrowRight className="ml-2 h-5 w-5" />
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Button asChild size="lg" className="rounded-xl bg-[#2f9e24] px-7 py-6 text-base hover:bg-[#27891e]">
+                <a href="#contacto"><CalendarDays className="mr-2 h-5 w-5" />Reserva tu valoración</a>
               </Button>
-            </Link>
-            <Link href="/portal">
-              <Button
-                variant="outline"
-                size="lg"
-                className="rounded-xl border-white/20 bg-white/5 px-8 py-6 text-base font-semibold text-white backdrop-blur-sm hover:bg-white/10"
-              >
-                Acceso del cliente
+              <Button asChild size="lg" variant="outline" className="rounded-xl border-white/35 bg-black/15 px-7 py-6 text-base text-white hover:bg-white/10 hover:text-white">
+                <a href="#tarifas">Ver tarifas <ArrowRight className="ml-2 h-5 w-5" /></a>
               </Button>
-            </Link>
+            </div>
           </div>
+        </div>
 
-          <div className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {highlights.map((item) => {
-              const Icon = item.icon;
+        <div className="absolute inset-x-0 bottom-0 z-20 mx-auto max-w-7xl px-5 lg:px-8">
+          <div className="grid overflow-hidden rounded-t-3xl border border-white/15 bg-[#151917]/90 shadow-2xl backdrop-blur-xl md:grid-cols-4">
+            {benefits.map((benefit) => {
+              const Icon = benefit.icon;
               return (
-                <div
-                  key={item.label}
-                  className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/20 px-5 py-5 backdrop-blur-md"
-                >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/20">
-                    <Icon className="h-5 w-5 text-[#8fd09b]" />
+                <div key={benefit.title} className="flex gap-4 border-b border-white/10 p-5 last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0">
+                  <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-[#8cdb78]/35 bg-[#8cdb78]/10">
+                    <Icon className="h-6 w-6 text-[#8cdb78]" />
                   </div>
                   <div>
-                    <p className="font-bold leading-tight text-white">{item.label}</p>
-                    <p className="mt-1 text-xs leading-relaxed text-white/55">{item.sublabel}</p>
+                    <h2 className="font-bold text-white">{benefit.title}</h2>
+                    <p className="mt-1 text-sm leading-5 text-white/60">{benefit.description}</p>
                   </div>
                 </div>
               );
             })}
           </div>
-
-          <div className="mt-8 flex items-center gap-2">
-            {heroSlideshow.map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                aria-label={`Mostrar imagen ${index + 1}`}
-                onClick={() => setCurrentSlide(index)}
-                className={`h-1.5 rounded-full transition-all duration-500 ${
-                  currentSlide === index ? "w-8 bg-primary" : "w-3 bg-white/30 hover:bg-white/50"
-                }`}
-              />
-            ))}
-          </div>
         </div>
-      </div>
+      </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="mb-14 text-center">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-            Ecosistema Chetesaí
-          </p>
-          <h2 className="text-3xl font-bold text-foreground md:text-4xl">
-            Del diseño del plan al progreso real del cliente
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl leading-relaxed text-muted-foreground">
-            Herramientas conectadas para planificar, asignar, ejecutar y evaluar cada proceso de entrenamiento con criterio profesional.
+      <section id="servicios" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+        <div className="text-center">
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Servicios</p>
+          <h2 className="mt-3 text-3xl font-black md:text-5xl">Todo lo que necesitas para entrenar mejor</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-[#67706b]">
+            Atención cercana, planificación profesional y seguimiento para que el entrenamiento encaje en tu vida.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {features.map((feature) => {
-            const Icon = feature.icon;
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {services.map((service) => {
+            const Icon = service.icon;
             return (
-              <Link key={feature.href} href={feature.href} className="group">
-                <article className="h-full rounded-2xl border border-border bg-card p-7 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
-                    <Icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="mb-2 text-xl font-bold text-card-foreground">{feature.title}</h3>
-                  <p className="leading-relaxed text-muted-foreground">{feature.description}</p>
-                  <div className="mt-5 flex items-center gap-2 text-sm font-medium text-primary">
-                    {feature.action}
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </div>
-                </article>
-              </Link>
+              <article key={service.title} className="rounded-3xl border border-[#ded8cd] bg-[#fffdf9] p-6 text-center shadow-sm">
+                <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#eaf5e8]">
+                  <Icon className="h-7 w-7 text-[#2f9e24]" />
+                </div>
+                <h3 className="mt-5 text-lg font-bold">{service.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-[#67706b]">{service.description}</p>
+              </article>
             );
           })}
         </div>
       </section>
 
-      <footer className="border-t border-border bg-card">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 sm:flex-row">
-          <div className="flex items-center gap-3">
-            <img src={files.logo.url} alt="Chetesaí Fitness+" className="h-9 w-9 rounded-lg bg-white object-contain p-0.5" />
-            <span className="font-bold">Chetesaí Fitness+</span>
+      <section id="proceso" className="border-y border-[#ded8cd] bg-[#fffdf9]">
+        <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+          <div className="text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Cómo funciona</p>
+            <h2 className="mt-3 text-3xl font-black md:text-5xl">Un proceso sencillo y personal</h2>
           </div>
-          <p className="text-center text-sm text-muted-foreground sm:text-right">
-            Plataforma profesional de entrenamiento, nutrición y seguimiento personalizado.
-          </p>
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
+            {steps.map((step) => (
+              <article key={step.number} className="relative rounded-3xl border border-[#ded8cd] bg-white p-7">
+                <span className="grid h-11 w-11 place-items-center rounded-full bg-[#2f9e24] text-lg font-black text-white">{step.number}</span>
+                <h3 className="mt-5 text-xl font-bold">{step.title}</h3>
+                <p className="mt-3 leading-7 text-[#67706b]">{step.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="tarifas" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+        <div className="text-center">
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Bonos mensuales</p>
+          <h2 className="mt-3 text-3xl font-black md:text-5xl">Elige el ritmo que encaja contigo</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Planes flexibles, sin matrícula ni permanencia.</p>
+        </div>
+
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {personalPlans.map((plan) => (
+            <article key={plan.name} className={`relative rounded-3xl border bg-[#fffdf9] p-7 shadow-sm ${plan.popular ? "border-[#2f9e24] ring-2 ring-[#2f9e24]/10" : "border-[#ded8cd]"}`}>
+              {plan.popular ? <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#2f9e24] px-4 py-1 text-xs font-bold uppercase text-white">Más popular</span> : null}
+              <p className="text-center text-2xl font-black">{plan.name}</p>
+              <p className="mt-2 text-center text-sm font-semibold text-[#2f9e24]">{plan.sessions}</p>
+              <p className="mt-6 text-center text-4xl font-black">{plan.price}<span className="text-base font-medium text-[#67706b]"> / mes</span></p>
+              <p className="mt-1 text-center text-sm text-[#67706b]">{plan.perSession}</p>
+              <div className="mt-7 space-y-3">
+                {plan.features.map((feature) => (
+                  <p key={feature} className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-[#2f9e24]" />{feature}</p>
+                ))}
+              </div>
+              <Button asChild className={`mt-7 w-full rounded-xl ${plan.popular ? "bg-[#2f9e24] hover:bg-[#27891e]" : "bg-[#202724] hover:bg-[#303a35]"}`}>
+                <a href="#contacto">Elegir {plan.name}</a>
+              </Button>
+            </article>
+          ))}
+        </div>
+
+        <div className="mt-10 rounded-3xl border border-[#ded8cd] bg-[#fffdf9] p-7">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#2f9e24]">Grupos reducidos 2–4</p>
+              <h3 className="mt-2 text-2xl font-black">Comparte el entrenamiento, no la atención</h3>
+              <p className="mt-2 text-[#67706b]">Puedes venir con tu grupo o solicitar plaza en uno compatible.</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {groupPlans.map((plan) => (
+                <div key={plan.name} className="rounded-2xl bg-[#f1eee7] px-5 py-4 text-center">
+                  <p className="font-bold">{plan.name}</p>
+                  <p className="mt-1 text-xs text-[#67706b]">{plan.sessions}</p>
+                  <p className="mt-2 text-xl font-black text-[#2f9e24]">{plan.price}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" className="border-y border-[#ded8cd] bg-[#fffdf9]">
+        <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8">
+          <div className="text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Preguntas frecuentes</p>
+            <h2 className="mt-3 text-3xl font-black md:text-5xl">Antes de empezar</h2>
+          </div>
+          <div className="mt-12 grid gap-4 md:grid-cols-2">
+            {faqs.map((faq) => (
+              <article key={faq.question} className="rounded-3xl border border-[#ded8cd] bg-white p-6">
+                <h3 className="font-bold">{faq.question}</h3>
+                <p className="mt-3 text-sm leading-6 text-[#67706b]">{faq.answer}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="contacto" className="bg-[#18211d] text-white">
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.85fr_1.15fr] lg:px-8">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8cdb78]">Primera valoración</p>
+            <h2 className="mt-3 text-4xl font-black md:text-5xl">Cuéntame tu objetivo</h2>
+            <p className="mt-5 max-w-lg leading-7 text-white/65">
+              Envíame tus datos y te responderé para valorar tu punto de partida y encontrar la modalidad más adecuada.
+            </p>
+            <div className="mt-8 space-y-4 text-sm text-white/75">
+              <p className="flex items-center gap-3"><MapPin className="h-5 w-5 text-[#8cdb78]" />Baleares</p>
+              <p className="flex items-center gap-3"><Mail className="h-5 w-5 text-[#8cdb78]" />contacto@chetesaifitnnes.com</p>
+              <p className="flex items-center gap-3"><Clock className="h-5 w-5 text-[#8cdb78]" />Respuesta habitual en menos de 24 horas</p>
+              <p className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-[#8cdb78]" />Tus datos se utilizarán únicamente para atender la solicitud</p>
+            </div>
+          </div>
+
+          <form action="https://formspree.io/f/xldweebw" method="POST" className="rounded-3xl bg-white p-7 text-[#202724] shadow-2xl">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="space-y-2 text-sm font-semibold">Nombre
+                <input name="Nombre" required className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" />
+              </label>
+              <label className="space-y-2 text-sm font-semibold">Email
+                <input type="email" name="Email" required className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" />
+              </label>
+              <label className="space-y-2 text-sm font-semibold">Teléfono
+                <input type="tel" name="Telefono" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" />
+              </label>
+              <label className="space-y-2 text-sm font-semibold">Modalidad
+                <select name="Plan" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]">
+                  <option>Entrenamiento personal</option>
+                  <option>Grupo reducido</option>
+                  <option>Quiero orientación</option>
+                </select>
+              </label>
+            </div>
+            <label className="mt-4 block space-y-2 text-sm font-semibold">¿Cuál es tu objetivo?
+              <textarea name="Mensaje" rows={5} className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" />
+            </label>
+            <label className="mt-4 flex items-start gap-3 text-xs leading-5 text-[#67706b]">
+              <input type="checkbox" required className="mt-1" />
+              Acepto que mis datos sean utilizados para responder a esta solicitud de información.
+            </label>
+            <Button type="submit" className="mt-6 w-full rounded-xl bg-[#2f9e24] py-6 text-base hover:bg-[#27891e]">Solicitar valoración</Button>
+          </form>
+        </div>
+      </section>
+
+      <footer className="bg-[#111612] text-white/55">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-5 px-5 py-8 text-sm sm:flex-row lg:px-8">
+          <div className="flex items-center gap-3">
+            <div className="grid h-11 w-11 place-items-center overflow-hidden rounded-xl bg-white p-1">
+              <img src={files.logo.url} alt="Chetesaí Fitness+" className="h-full w-full object-contain" />
+            </div>
+            <div><p className="font-bold text-white">Chetesaí Fitness+</p><p>Entrena con cabeza. Mejora con método.</p></div>
+          </div>
+          <div className="flex items-center gap-5">
+            <Link href="/login" className="hover:text-white">Acceso privado</Link>
+            <span>© {new Date().getFullYear()} Chetesaí Fitness+</span>
+          </div>
         </div>
       </footer>
-    </div>
+    </main>
   );
 }
