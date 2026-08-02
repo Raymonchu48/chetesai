@@ -53,7 +53,7 @@ export async function GET() {
   try {
     const { client } = await getClient();
     const rows = await serviceRequest<Array<Record<string, unknown>>>(
-      `mediciones_corporales?cliente_id=eq.${encodeURIComponent(client.id)}&select=id,fecha,peso_kg,altura_cm,grasa_corporal_pct,masa_muscular_kg,agua_corporal_pct,pecho_cm,cintura_cm,cadera_cm,brazo_izq_cm,brazo_der_cm,muslo_izq_cm,muslo_der_cm,comentario_cliente,origen,created_at&order=fecha.desc,created_at.desc`
+      `mediciones_corporales?cliente_id=eq.${encodeURIComponent(client.id)}&select=id,fecha,peso_kg,altura_cm,grasa_corporal_pct,masa_muscular_kg,agua_corporal_pct,pecho_cm,cintura_cm,cadera_cm,brazo_izq_cm,brazo_der_cm,muslo_izq_cm,muslo_der_cm,foto_frontal_path,foto_lateral_path,foto_posterior_path,comentario_cliente,origen,created_at&order=fecha.desc,created_at.desc`
     );
     return NextResponse.json({ ok: true, data: { cliente: client, mediciones: rows } });
   } catch (error) {
