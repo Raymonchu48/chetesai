@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Activity,
+  Apple,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
@@ -23,6 +24,7 @@ const navItems = [
   { href: "/ejercicios", label: "Ejercicios", icon: Dumbbell },
   { href: "/rutinas", label: "Rutinas", icon: ClipboardList },
   { href: "/progreso", label: "Progreso", icon: Activity },
+  { href: "/nutricion", label: "Nutrición", icon: Apple },
   { href: "/sesiones", label: "Sesiones", icon: CalendarDays },
   { href: "/pagos", label: "Pagos", icon: CreditCard },
 ];
@@ -55,7 +57,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
           )}
         </Link>
 
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
             const Icon = item.icon;
