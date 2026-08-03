@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="title desc">
+  <title id="title">Chetesaí Fitness+ símbolo</title>
+  <desc id="desc">Monograma F con arco circular verde azulado y destello dorado</desc>
+  <rect width="600" height="600" rx="46" fill="#f3f1ec"/>
+  <path d="M447 83C323 30 176 66 101 171C30 271 52 414 151 499C229 567 352 575 458 507" fill="none" stroke="#123944" stroke-width="20" stroke-linecap="round"/>
+  <path d="M447 83C477 100 501 121 519 148" fill="none" stroke="#123944" stroke-width="9" stroke-linecap="round"/>
+  <text x="205" y="407" font-family="Georgia, 'Times New Roman', serif" font-size="318" fill="#123944">F</text>
+  <path d="M449 225L463 274L512 288L463 302L449 351L435 302L386 288L435 274Z" fill="#b38d45"/>
+</svg>
