@@ -140,7 +140,11 @@ begin
   set estado = 'cancelada', updated_at = now()
   where evento_id = p_evento_id and cliente_id = p_cliente_id;
 
-  if v_estado_anterior = 'confirmada' then
+  select count(*) into v_confirmadas
+  from public.inscripciones_eventos
+  where evento_id = p_evento_id and estado in ('confirmada', 'asistio');
+
+  if v_estado_anterior = 'confirmada' and v_confirmadas < v_evento.aforo then
     select cliente_id into v_promovida
     from public.inscripciones_eventos
     where evento_id = p_evento_id and estado = 'lista_espera'
@@ -152,12 +156,9 @@ begin
       update public.inscripciones_eventos
       set estado = 'confirmada', updated_at = now()
       where evento_id = p_evento_id and cliente_id = v_promovida;
+      v_confirmadas := v_confirmadas + 1;
     end if;
   end if;
-
-  select count(*) into v_confirmadas
-  from public.inscripciones_eventos
-  where evento_id = p_evento_id and estado in ('confirmada', 'asistio');
 
   if v_evento.estado = 'completo' and v_confirmadas < v_evento.aforo then
     update public.eventos set estado = 'publicado', updated_at = now()
