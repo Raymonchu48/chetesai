@@ -116,6 +116,9 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
   }
@@ -123,4 +126,107 @@
 
 button {
   cursor: pointer;
+}
+
+/* Identidad visual de la portada. */
+img[alt="Chetesaí Fitness+"] {
+  content: url("/brand/chetesai-logo-mark.svg");
+}
+
+img[alt="Logo completo de Chetesaí Fitness+"] {
+  content: url("/brand/chetesai-logo-full.svg");
+  aspect-ratio: auto !important;
+}
+
+/* Cápsula superior: negro carbón, blanco y dorado. */
+button:has(img[alt="Chetesaí Fitness+"]) {
+  border: 1px solid rgba(199, 162, 84, 0.32);
+  border-radius: 1.5rem;
+  background: linear-gradient(145deg, rgba(8, 8, 8, 0.72), rgba(18, 18, 17, 0.5));
+  padding: 0.5rem 0.75rem;
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+button:has(img[alt="Chetesaí Fitness+"]) > div:first-child {
+  background: rgba(0, 0, 0, 0.2) !important;
+  box-shadow: inset 0 0 0 1px rgba(199, 162, 84, 0.18) !important;
+  padding: 0.25rem !important;
+}
+
+button:has(img[alt="Chetesaí Fitness+"]) img {
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.45));
+}
+
+/* Tarjeta lateral: cristal oscuro con acento dorado. */
+div:has(> img[alt="Logo completo de Chetesaí Fitness+"]) {
+  border: 1px solid rgba(199, 162, 84, 0.28) !important;
+  background: linear-gradient(145deg, rgba(7, 7, 7, 0.78), rgba(18, 18, 17, 0.48)) !important;
+  padding: 1rem !important;
+  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+div:has(> img[alt="Logo completo de Chetesaí Fitness+"]) img {
+  filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.45));
+}
+
+/* Más presencia para la marca lateral en escritorio. */
+@media (min-width: 1024px) {
+  #inicio > div.relative.z-10.mx-auto.grid.max-w-7xl {
+    grid-template-columns: minmax(300px, 330px) minmax(0, 1fr) !important;
+    column-gap: 2rem !important;
+  }
+
+  #inicio div:has(> div > img[alt="Logo completo de Chetesaí Fitness+"]) {
+    padding-right: 1.5rem !important;
+  }
+
+  #inicio div:has(> img[alt="Logo completo de Chetesaí Fitness+"]) {
+    min-height: 300px;
+    padding: 1.35rem !important;
+    border-radius: 2rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #inicio div:has(> img[alt="Logo completo de Chetesaí Fitness+"]) img {
+    width: 100%;
+    max-width: 290px;
+    transform: scale(1.08);
+  }
+}
+
+/* La portada mantiene las tarifas ocultas hasta que el visitante las solicita. */
+#tarifas {
+  display: none;
+}
+
+#tarifas:target {
+  display: block;
+  animation: reveal-pricing 450ms ease-out both;
+}
+
+@keyframes reveal-pricing {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  #tarifas:target {
+    animation: none;
+  }
 }
