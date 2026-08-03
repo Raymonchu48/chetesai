@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 920" role="img" aria-labelledby="title desc">
+  <title id="title">Chetesaí Fitness+ · Carga tus energías</title>
+  <desc id="desc">Placa vertical oscura con emblema deportivo orbital, detalles dorados y figuras deportivas rojas.</desc>
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#080a09" stop-opacity=".96"/>
+      <stop offset=".55" stop-color="#121411" stop-opacity=".94"/>
+      <stop offset="1" stop-color="#050605" stop-opacity=".98"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2d58a"/>
+      <stop offset=".46" stop-color="#c59a42"/>
+      <stop offset="1" stop-color="#8e6728"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="43%" r="62%">
+      <stop offset="0" stop-color="#d6aa50" stop-opacity=".17"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000" flood-opacity=".55"/>
+    </filter>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="7" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <path id="brandArc" d="M132 232 Q320 92 508 232"/>
+  </defs>
+
+  <rect x="34" y="24" width="572" height="872" rx="54" fill="url(#panel)" stroke="url(#gold)" stroke-width="2.6" filter="url(#shadow)"/>
+  <rect x="48" y="38" width="544" height="844" rx="44" fill="url(#glow)" stroke="#f4d887" stroke-opacity=".12"/>
+
+  <text fill="#f4ead4" font-family="Arial, Helvetica, sans-serif" font-size="35" font-weight="700" letter-spacing="4.5">
+    <textPath href="#brandArc" startOffset="50%" text-anchor="middle">CHETESAÍ FITNESS+</textPath>
+  </text>
+
+  <g transform="translate(320 470)" fill="none" stroke="url(#gold)" stroke-width="6" stroke-linecap="round" opacity=".95">
+    <ellipse rx="212" ry="90" transform="rotate(-18)"/>
+    <ellipse rx="212" ry="90" transform="rotate(42)"/>
+    <ellipse rx="212" ry="90" transform="rotate(102)"/>
+  </g>
+
+  <g transform="translate(320 470)" fill="url(#gold)" filter="url(#softGlow)">
+    <circle cx="43" cy="-72" r="30"/>
+    <path d="M-10-55c24-35 62-43 91-14l-31 45c-15-12-27-13-38-4L-46 72c-11 19-31 29-56 27l64-90c12-18 21-39 28-64z"/>
+    <path d="M-39 55l-109 137 145-89 51-77c-19 7-36 17-50 30z"/>
+    <path d="M39-22c14 31 24 54 47 76 18 17 43 10 65-16l30-35c-9 45-35 91-75 100-37 8-67-22-87-58z"/>
+  </g>
+
+  <g fill="#e2342f" stroke="#e2342f" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="translate(320 298)">
+      <circle cy="-22" r="12"/>
+      <path d="M0-8v48M-42-42h84M-32-42l-9 0M32-42h9M-26 6L0 18 26 6M0 40l-22 42M0 40l22 42" fill="none" stroke-width="10"/>
+      <path d="M-45-49v14M45-49v14" stroke-width="10"/>
+    </g>
+    <g transform="translate(153 430)">
+      <circle cy="-24" r="10"/>
+      <path d="M0-10v62M0 12l-36 30M0 10l34 26M0 52l-27 52M0 52l31 49" fill="none" stroke-width="9"/>
+      <path d="M-40 38q8-22 0-42M38 34q-8-22 0-42" fill="none" stroke-width="4"/>
+    </g>
+    <g transform="translate(487 532)">
+      <circle cy="-26" r="11"/>
+      <path d="M0-11v64M0 4l-38-22M0 4l42-30M0 52l-28 47M0 52l31 46" fill="none" stroke-width="10"/>
+      <path d="M38-36v18M47-38v18M32-28h20M-49-28h20M-45-36v18M-36-38v18" fill="none" stroke-width="6"/>
+    </g>
+    <g transform="translate(320 674)">
+      <circle cy="-58" r="11"/>
+      <path d="M0-44v56M0-16l-35 34M0-14l37 31M0 12q-44 15-76 55M0 12q43 18 73 57" fill="none" stroke-width="9"/>
+      <path d="M-83 68h164" fill="none" stroke-width="5"/>
+    </g>
+  </g>
+
+  <text x="320" y="790" text-anchor="middle" fill="url(#gold)" font-family="Georgia, 'Times New Roman', serif" font-size="42" font-style="italic">“Carga tus energías”</text>
+  <path d="M184 828h112M344 828h112" stroke="#b88d3c" stroke-width="1.5" opacity=".55"/>
+  <path d="M320 813l8 15-8 15-8-15z" fill="#d7ad55"/>
+</svg>
