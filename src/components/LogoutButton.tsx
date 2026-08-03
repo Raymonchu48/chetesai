@@ -28,7 +28,7 @@ export default function LogoutButton({ collapsed = false }: { collapsed?: boolea
       type="button"
       onClick={handleLogout}
       disabled={loading}
-      className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground disabled:cursor-not-allowed disabled:opacity-60 ${
+      className={`flex w-full items-center gap-3 rounded-lg border border-[#46624f] bg-[#46624f] px-3 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#354d3d] hover:text-white disabled:cursor-not-allowed disabled:opacity-60 ${
         collapsed ? "justify-center" : ""
       }`}
       title={collapsed ? "Cerrar sesión" : undefined}
