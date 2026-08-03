@@ -15,25 +15,18 @@ const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 async function getProfileRole(accessToken: string): Promise<AppRole | null> {
   if (!supabaseUrl || !anonKey) return null;
-
   const userResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
     headers: { apikey: anonKey, Authorization: `Bearer ${accessToken}` },
     cache: "no-store",
   });
   if (!userResponse.ok) return null;
-
   const user = (await userResponse.json()) as { id?: string };
   if (!user.id) return null;
-
   const profileResponse = await fetch(
     `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=role,activo`,
-    {
-      headers: { apikey: anonKey, Authorization: `Bearer ${accessToken}` },
-      cache: "no-store",
-    }
+    { headers: { apikey: anonKey, Authorization: `Bearer ${accessToken}` }, cache: "no-store" }
   );
   if (!profileResponse.ok) return null;
-
   const profiles = (await profileResponse.json()) as Array<{ role?: AppRole; activo?: boolean }>;
   const profile = profiles[0];
   if (!profile || profile.activo === false) return null;
@@ -42,17 +35,13 @@ async function getProfileRole(accessToken: string): Promise<AppRole | null> {
 
 async function validateSession(request: NextRequest): Promise<SessionResult> {
   if (!supabaseUrl || !anonKey) return { valid: false };
-
   const accessToken = request.cookies.get("chetesai_access_token")?.value;
   const refreshToken = request.cookies.get("chetesai_refresh_token")?.value;
-
   if (accessToken) {
     const role = await getProfileRole(accessToken);
     if (role) return { valid: true, role, accessToken };
   }
-
   if (!refreshToken) return { valid: false };
-
   const refreshResponse = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
     method: "POST",
     headers: { apikey: anonKey, "Content-Type": "application/json" },
@@ -60,17 +49,10 @@ async function validateSession(request: NextRequest): Promise<SessionResult> {
     cache: "no-store",
   });
   if (!refreshResponse.ok) return { valid: false };
-
-  const refreshed = (await refreshResponse.json()) as {
-    access_token?: string;
-    refresh_token?: string;
-    expires_in?: number;
-  };
+  const refreshed = (await refreshResponse.json()) as { access_token?: string; refresh_token?: string; expires_in?: number };
   if (!refreshed.access_token) return { valid: false };
-
   const role = await getProfileRole(refreshed.access_token);
   if (!role) return { valid: false };
-
   return {
     valid: true,
     role,
@@ -119,7 +101,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/api/rutinas") ||
     pathname.startsWith("/api/rutina-ejercicios") ||
     pathname.startsWith("/api/progreso") ||
-    pathname.startsWith("/api/nutricion");
+    pathname.startsWith("/api/nutricion") ||
+    pathname.startsWith("/api/sesiones");
 
   if (pathname === "/login") {
     if (!session.valid || !session.role) return NextResponse.next();
@@ -148,12 +131,11 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/rutinas") ||
     pathname.startsWith("/progreso") ||
     pathname.startsWith("/nutricion") ||
+    pathname.startsWith("/sesiones") ||
     isProfessionalApi;
 
   if (professionalRoute && session.role === "cliente") {
-    if (isProfessionalApi) {
-      return NextResponse.json({ ok: false, error: "Acceso restringido" }, { status: 403 });
-    }
+    if (isProfessionalApi) return NextResponse.json({ ok: false, error: "Acceso restringido" }, { status: 403 });
     const response = NextResponse.redirect(new URL("/portal", request.url));
     persistRefreshedSession(response, session);
     return response;
@@ -179,10 +161,12 @@ export const config = {
     "/rutinas/:path*",
     "/progreso/:path*",
     "/nutricion/:path*",
+    "/sesiones/:path*",
     "/api/ejercicios/:path*",
     "/api/rutinas/:path*",
     "/api/rutina-ejercicios/:path*",
     "/api/progreso/:path*",
     "/api/nutricion/:path*",
+    "/api/sesiones/:path*",
   ],
 };

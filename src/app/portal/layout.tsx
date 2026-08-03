@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Apple, Dumbbell, TrendingUp } from "lucide-react";
+import { Apple, CalendarDays, Dumbbell, TrendingUp } from "lucide-react";
 
 const items = [
   { href: "/portal", label: "Entrenamiento", icon: Dumbbell },
+  { href: "/portal/citas", label: "Citas", icon: CalendarDays },
   { href: "/portal/progreso", label: "Progreso", icon: TrendingUp },
   { href: "/portal/bienestar", label: "Nutrición", icon: Apple },
 ];
@@ -16,7 +17,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   return (
     <div className="min-h-screen pb-24">
       {children}
-      <nav className="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-lg items-center justify-around rounded-2xl border border-[#d8dfd9] bg-[#fffdf9]/95 p-2 shadow-2xl backdrop-blur-xl">
+      <nav className="fixed inset-x-3 bottom-3 z-50 mx-auto flex max-w-2xl items-center justify-around overflow-x-auto rounded-2xl border border-[#d8dfd9] bg-[#fffdf9]/95 p-2 shadow-2xl backdrop-blur-xl">
         {items.map((item) => {
           const Icon = item.icon;
           const active = item.href === "/portal" ? pathname === item.href : pathname.startsWith(item.href);
@@ -24,7 +25,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             <Link
               key={item.href}
               href={item.href}
-              className={`flex min-w-24 flex-col items-center gap-1 rounded-xl px-3 py-2 text-xs font-semibold transition ${
+              className={`flex min-w-20 flex-col items-center gap-1 rounded-xl px-3 py-2 text-xs font-semibold transition sm:min-w-28 ${
                 active ? "bg-[#46624f] text-white" : "text-[#65706a] hover:bg-[#eef2ee] hover:text-[#29312e]"
               }`}
             >
