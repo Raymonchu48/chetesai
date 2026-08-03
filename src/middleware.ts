@@ -97,6 +97,8 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const session = await validateSession(request);
   const isProfessionalApi =
+    pathname.startsWith("/api/dashboard") ||
+    pathname.startsWith("/api/clientes") ||
     pathname.startsWith("/api/ejercicios") ||
     pathname.startsWith("/api/rutinas") ||
     pathname.startsWith("/api/rutina-ejercicios") ||
@@ -130,6 +132,7 @@ export async function middleware(request: NextRequest) {
 
   const professionalRoute =
     pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/clientes") ||
     pathname.startsWith("/ejercicios") ||
     pathname.startsWith("/rutinas") ||
     pathname.startsWith("/progreso") ||
@@ -162,6 +165,7 @@ export const config = {
     "/login",
     "/dashboard/:path*",
     "/portal/:path*",
+    "/clientes/:path*",
     "/ejercicios/:path*",
     "/rutinas/:path*",
     "/progreso/:path*",
@@ -169,6 +173,8 @@ export const config = {
     "/sesiones/:path*",
     "/pagos/:path*",
     "/informes/:path*",
+    "/api/dashboard/:path*",
+    "/api/clientes/:path*",
     "/api/ejercicios/:path*",
     "/api/rutinas/:path*",
     "/api/rutina-ejercicios/:path*",
