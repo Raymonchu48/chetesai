@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   ClientRow,
   EventRow,
+  escapeHtml,
   eventEmailTemplate,
   formatEventDate,
   getClientFromSession,
@@ -19,6 +20,11 @@ type CancellationResult = {
   estado: string;
   cliente_promovido_id?: string | null;
   plazas_disponibles?: number;
+};
+type CommunicationPreferences = {
+  cliente_id: string;
+  eventos_email: boolean;
+  recordatorios_email: boolean;
 };
 
 async function logCommunication(eventId: string, client: ClientRow, type: string, providerId?: string | null) {
@@ -39,11 +45,11 @@ async function logCommunication(eventId: string, client: ClientRow, type: string
 export async function GET() {
   try {
     const client = await getClientFromSession();
-    let preferences = await serviceRequest<Array<{ cliente_id: string; eventos_email: boolean; recordatorios_email: boolean }>>(
+    let preferences = await serviceRequest<CommunicationPreferences[]>(
       `preferencias_comunicacion?cliente_id=eq.${encodeURIComponent(client.id)}&select=cliente_id,eventos_email,recordatorios_email&limit=1`
     );
     if (!preferences[0]) {
-      preferences = await serviceRequest("preferencias_comunicacion", {
+      preferences = await serviceRequest<CommunicationPreferences[]>("preferencias_comunicacion", {
         method: "POST",
         headers: { Prefer: "return=representation" },
         body: JSON.stringify({ cliente_id: client.id, eventos_email: true, recordatorios_email: true }),
@@ -133,11 +139,14 @@ export async function DELETE(request: NextRequest) {
     if (event && client.email) {
       try {
         const date = formatEventDate(event.fecha_inicio);
+        const safeName = escapeHtml(client.nombre);
+        const safeTitle = escapeHtml(event.titulo);
+        const link = portalEventsUrl();
         const email = await sendEmail({
           to: [client.email],
           subject: `Inscripción cancelada: ${event.titulo}`,
-          html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#202724;line-height:1.6"><h1 style="color:#46624f">Chetesaí Fitness+</h1><p>Hola ${client.nombre},</p><p>Tu inscripción en <strong>${event.titulo}</strong>, prevista para ${date}, ha quedado cancelada.</p><p>Puedes consultar otras actividades en <a href="${portalEventsUrl()}">Eventos y comunidad</a>.</p></div>`,
-          text: `Hola ${client.nombre}. Tu inscripción en ${event.titulo}, prevista para ${date}, ha quedado cancelada. ${portalEventsUrl()}`,
+          html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#202724;line-height:1.6"><h1 style="color:#46624f">Chetesaí Fitness+</h1><p>Hola ${safeName},</p><p>Tu inscripción en <strong>${safeTitle}</strong>, prevista para ${escapeHtml(date)}, ha quedado cancelada.</p><p>Puedes consultar otras actividades en <a href="${escapeHtml(link)}">Eventos y comunidad</a>.</p></div>`,
+          text: `Hola ${client.nombre}. Tu inscripción en ${event.titulo}, prevista para ${date}, ha quedado cancelada. ${link}`,
         }, `event-unregister-${event.id}-${client.id}`);
         await logCommunication(event.id, client, "cancelacion", email?.id || null);
       } catch (error) {
