@@ -95,6 +95,15 @@ function persistRefreshedSession(response: NextResponse, session: SessionResult)
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // El acceso privado siempre exige introducir de nuevo las credenciales.
+  // Esto evita que una sesión anterior abra directamente el portal del cliente.
+  if (pathname === "/login") {
+    const response = NextResponse.next();
+    clearSessionCookies(response);
+    return response;
+  }
+
   const session = await validateSession(request);
   const isPortalApi = pathname.startsWith("/api/portal");
   const isProfessionalApi =
@@ -109,14 +118,6 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/api/pagos") ||
     pathname.startsWith("/api/bonos") ||
     pathname.startsWith("/api/informes");
-
-  if (pathname === "/login") {
-    if (!session.valid || !session.role) return NextResponse.next();
-    const destination = session.role === "cliente" ? "/portal" : "/dashboard";
-    const response = NextResponse.redirect(new URL(destination, request.url));
-    persistRefreshedSession(response, session);
-    return response;
-  }
 
   if (!session.valid || !session.role) {
     if (isProfessionalApi || isPortalApi) {
