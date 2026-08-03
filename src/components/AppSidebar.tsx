@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Activity,
   Apple,
+  BarChart3,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
@@ -27,6 +28,7 @@ const navItems = [
   { href: "/nutricion", label: "Nutrición", icon: Apple },
   { href: "/sesiones", label: "Sesiones", icon: CalendarDays },
   { href: "/pagos", label: "Pagos", icon: CreditCard },
+  { href: "/informes", label: "Informes", icon: BarChart3 },
 ];
 
 export default function AppSidebar({ children }: { children: React.ReactNode }) {
