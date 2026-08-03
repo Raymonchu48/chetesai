@@ -96,6 +96,7 @@ function persistRefreshedSession(response: NextResponse, session: SessionResult)
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const session = await validateSession(request);
+  const isPortalApi = pathname.startsWith("/api/portal");
   const isProfessionalApi =
     pathname.startsWith("/api/dashboard") ||
     pathname.startsWith("/api/clientes") ||
@@ -118,7 +119,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!session.valid || !session.role) {
-    if (isProfessionalApi) {
+    if (isProfessionalApi || isPortalApi) {
       const response = NextResponse.json({ ok: false, error: "No autenticado" }, { status: 401 });
       clearSessionCookies(response);
       return response;
@@ -149,6 +150,10 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
+  if (isPortalApi && session.role !== "cliente") {
+    return NextResponse.json({ ok: false, error: "Acceso restringido al portal del cliente" }, { status: 403 });
+  }
+
   if (pathname.startsWith("/portal") && session.role !== "cliente") {
     const response = NextResponse.redirect(new URL("/dashboard", request.url));
     persistRefreshedSession(response, session);
@@ -174,6 +179,7 @@ export const config = {
     "/pagos/:path*",
     "/informes/:path*",
     "/api/dashboard/:path*",
+    "/api/portal/:path*",
     "/api/clientes/:path*",
     "/api/ejercicios/:path*",
     "/api/rutinas/:path*",
