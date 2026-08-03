@@ -173,6 +173,33 @@ div:has(> img[alt="Logo completo de Chetesaí Fitness+"]) img {
   filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.45));
 }
 
+/* Más presencia para la marca lateral en escritorio. */
+@media (min-width: 1024px) {
+  #inicio > div.relative.z-10.mx-auto.grid.max-w-7xl {
+    grid-template-columns: minmax(300px, 330px) minmax(0, 1fr) !important;
+    column-gap: 2rem !important;
+  }
+
+  #inicio div:has(> div > img[alt="Logo completo de Chetesaí Fitness+"]) {
+    padding-right: 1.5rem !important;
+  }
+
+  #inicio div:has(> img[alt="Logo completo de Chetesaí Fitness+"]) {
+    min-height: 300px;
+    padding: 1.35rem !important;
+    border-radius: 2rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #inicio div:has(> img[alt="Logo completo de Chetesaí Fitness+"]) img {
+    width: 100%;
+    max-width: 290px;
+    transform: scale(1.08);
+  }
+}
+
 /* La portada mantiene las tarifas ocultas hasta que el visitante las solicita. */
 #tarifas {
   display: none;
