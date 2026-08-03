@@ -4,10 +4,12 @@ import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import {
   ArrowRight,
+  Award,
   CalendarDays,
   CheckCircle2,
   ClipboardCheck,
   Clock,
+  ExternalLink,
   Mail,
   MapPin,
   ShieldCheck,
@@ -18,6 +20,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { files, heroSlideshow } from "@/assets/files";
+
+const PROFILE_IMAGE_URL = "https://raymonchu48.github.io/Deportivo/Mi_imagen.png";
+const PROFILE_PDF_URL = "https://raymonchu48.github.io/Deportivo/Carta_presentacion_deportiva_profesional.pdf";
 
 const benefits = [
   { icon: UserRound, title: "Entrenamiento 1:1", description: "Atención individual y objetivo claro." },
@@ -57,6 +62,25 @@ const faqs = [
   { question: "¿Puedo recuperar una sesión perdida?", answer: "Con aviso previo de 24 horas se puede reubicar dentro del mismo mes, según disponibilidad." },
   { question: "¿Dónde se realizan los entrenamientos?", answer: "Las sesiones se organizan en espacios indoor o exteriores de Mallorca según disponibilidad y ubicación." },
   { question: "¿Necesito experiencia previa?", answer: "No. El programa se adapta a tu condición física, experiencia y punto de partida." },
+];
+
+const highlightedCredentials = [
+  {
+    tag: "FORMACIÓN OFICIAL",
+    title: "Certificado Profesional de Acondicionamiento Físico en Sala Polivalente",
+    detail: "Nivel 3 · Validez oficial nacional.",
+    featured: true,
+  },
+  {
+    tag: "NUTRICIÓN",
+    title: "Máster Experto en Alimentación y Nutrición",
+    detail: "1.000 h · Nutrición deportiva, dietoterapia y planificación dietética.",
+  },
+  {
+    tag: "PSICOLOGÍA DEPORTIVA",
+    title: "Máster en Coaching y Psicología Deportiva",
+    detail: "650 h · Motivación, liderazgo, emociones y rendimiento.",
+  },
 ];
 
 export default function Main() {
@@ -134,6 +158,7 @@ export default function Main() {
           <div className="hidden items-center gap-7 text-sm font-medium text-white/80 xl:flex">
             <button type="button" onClick={() => goTo("servicios")} className="transition hover:text-white">Servicios</button>
             <button type="button" onClick={() => goTo("proceso")} className="transition hover:text-white">Cómo funciona</button>
+            <button type="button" onClick={() => goTo("sobre-mi")} className="transition hover:text-white">Sobre mí</button>
             <button type="button" onClick={() => goTo("faq")} className="transition hover:text-white">FAQ</button>
             <Link href="/login" className="transition hover:text-white">Acceso clientes</Link>
           </div>
@@ -182,8 +207,53 @@ export default function Main() {
       <section id="faq" className="border-y border-[#ded8cd] bg-[#fffdf9]"><div className="mx-auto max-w-5xl px-5 py-20 lg:px-8"><div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Preguntas frecuentes</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Antes de empezar</h2></div><div className="mt-12 grid gap-4 md:grid-cols-2">{faqs.map((faq) => <article key={faq.question} className="rounded-3xl border border-[#ded8cd] bg-white p-6"><h3 className="font-bold">{faq.question}</h3><p className="mt-3 text-sm leading-6 text-[#67706b]">{faq.answer}</p></article>)}</div></div></section>
 
       <section id="contacto" className="bg-[#18211d] text-white">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.85fr_1.15fr] lg:px-8">
-          <div><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8cdb78]">Primera valoración</p><h2 className="mt-3 text-4xl font-black md:text-5xl">Cuéntame tu objetivo</h2><p className="mt-5 max-w-lg leading-7 text-white/65">Envíame tus datos y te responderé para valorar tu punto de partida y encontrar la modalidad más adecuada.</p><div className="mt-8 space-y-4 text-sm text-white/75"><p className="flex items-center gap-3"><MapPin className="h-5 w-5 text-[#8cdb78]" />Mallorca, Islas Baleares</p><p className="flex items-center gap-3"><Mail className="h-5 w-5 text-[#8cdb78]" />contacto@chetesaifitnnes.com</p><p className="flex items-center gap-3"><Clock className="h-5 w-5 text-[#8cdb78]" />Respuesta habitual en menos de 24 horas</p><p className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-[#8cdb78]" />Tus datos se utilizarán únicamente para atender la solicitud</p></div></div>
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.92fr_1.08fr] lg:px-8">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8cdb78]">Primera valoración</p>
+            <h2 className="mt-3 text-4xl font-black md:text-5xl">Cuéntame tu objetivo</h2>
+            <p className="mt-5 max-w-lg leading-7 text-white/65">Envíame tus datos y te responderé para valorar tu punto de partida y encontrar la modalidad más adecuada.</p>
+            <div className="mt-8 space-y-4 text-sm text-white/75">
+              <p className="flex items-center gap-3"><MapPin className="h-5 w-5 text-[#8cdb78]" />Mallorca, Islas Baleares</p>
+              <p className="flex items-center gap-3"><Mail className="h-5 w-5 text-[#8cdb78]" />contacto@chetesaifitnnes.com</p>
+              <p className="flex items-center gap-3"><Clock className="h-5 w-5 text-[#8cdb78]" />Respuesta habitual en menos de 24 horas</p>
+              <p className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-[#8cdb78]" />Tus datos se utilizarán únicamente para atender la solicitud</p>
+            </div>
+
+            <article id="sobre-mi" className="mt-10 scroll-mt-24 rounded-[28px] border border-[#b38d45]/35 bg-[#0f1713]/75 p-5 shadow-2xl shadow-black/25 backdrop-blur-xl sm:p-6">
+              <div className="grid gap-5 sm:grid-cols-[132px_1fr] sm:items-center">
+                <div className="mx-auto overflow-hidden rounded-2xl border border-white/15 bg-black/30 shadow-xl sm:mx-0">
+                  <img src={PROFILE_IMAGE_URL} alt="Ramón Curbalán, entrenador y profesional del deporte" className="h-44 w-32 object-cover object-top sm:h-48 sm:w-full" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#d7b86b]">Sobre mí</p>
+                  <h3 className="mt-2 text-2xl font-black text-white">Ramón Curbalán</h3>
+                  <p className="mt-3 text-sm leading-6 text-white/70">Profesional del entrenamiento, la nutrición y el rendimiento con una visión integral de la salud y la mejora física.</p>
+                  <p className="mt-3 text-sm font-semibold leading-6 text-[#9fe68f]">Método, seguimiento y adaptación individual para construir un progreso realista, medible y sostenible.</p>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-3">
+                {highlightedCredentials.map((credential) => (
+                  <div key={credential.title} className={`rounded-2xl border p-4 ${credential.featured ? "border-[#d7b86b]/55 bg-[#d7b86b]/10" : "border-white/10 bg-white/[0.04]"}`}>
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl ${credential.featured ? "bg-[#d7b86b] text-[#111612]" : "bg-[#8cdb78]/15 text-[#9fe68f]"}`}>
+                        <Award className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className={`text-[10px] font-black uppercase tracking-[0.16em] ${credential.featured ? "text-[#e7cb87]" : "text-[#8cdb78]"}`}>{credential.tag}</p>
+                        <p className="mt-1 text-sm font-bold leading-5 text-white">{credential.title}</p>
+                        <p className="mt-1 text-xs leading-5 text-white/60">{credential.detail}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <a href={PROFILE_PDF_URL} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#b38d45] px-5 py-3.5 text-sm font-black text-[#111612] transition hover:bg-[#c8a65b] focus:outline-none focus:ring-2 focus:ring-[#d7b86b] focus:ring-offset-2 focus:ring-offset-[#18211d]">
+                Ver perfil profesional <ExternalLink className="h-4 w-4" />
+              </a>
+            </article>
+          </div>
 
           <form onSubmit={submitReservation} className="rounded-3xl bg-white p-7 text-[#202724] shadow-2xl">
             <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
