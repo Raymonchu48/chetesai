@@ -64,6 +64,20 @@ export async function PATCH(
         const registrations = await serviceRequest<RegistrationRow[]>(
           `inscripciones_eventos?evento_id=eq.${encodeURIComponent(id)}&estado=in.(confirmada,lista_espera)&select=cliente_id,clientes(id,nombre,email)`
         );
+
+        if (registrations.length > 0) {
+          await serviceRequest(
+            `inscripciones_eventos?evento_id=eq.${encodeURIComponent(id)}&estado=in.(confirmada,lista_espera)`,
+            {
+              method: "PATCH",
+              body: JSON.stringify({
+                estado: "cancelada",
+                updated_at: new Date().toISOString(),
+              }),
+            }
+          );
+        }
+
         const recipients = registrations
           .map((item) => item.clientes as ClientRow | null)
           .filter((client): client is ClientRow => Boolean(client?.email));
