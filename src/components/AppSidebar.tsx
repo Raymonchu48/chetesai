@@ -14,6 +14,7 @@ import {
   Dumbbell,
   LayoutDashboard,
   Menu,
+  PartyPopper,
   Users,
   X,
 } from "lucide-react";
@@ -29,6 +30,7 @@ const navItems = [
   { href: "/progreso", label: "Progreso", icon: Activity },
   { href: "/nutricion", label: "Nutrición", icon: Apple },
   { href: "/sesiones", label: "Sesiones", icon: CalendarDays },
+  { href: "/eventos", label: "Eventos", icon: PartyPopper },
   { href: "/pagos", label: "Pagos", icon: CreditCard },
   { href: "/informes", label: "Informes", icon: BarChart3 },
 ];
