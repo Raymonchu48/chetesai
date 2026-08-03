@@ -126,19 +126,27 @@ export default function Main() {
         ))}
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-black/35" />
 
-        <nav className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
-          <button type="button" onClick={() => goTo("inicio")} className="flex items-center gap-3 text-left">
+        <nav className="relative z-20 mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:px-8">
+          <button type="button" onClick={() => goTo("inicio")} className="flex shrink-0 items-center gap-3 text-left">
             <div className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg"><img src={files.logo.url} alt="Chetesaí Fitness+" className="h-full w-full object-contain" /></div>
             <div className="hidden sm:block"><p className="font-bold leading-tight text-white">Chetesaí Fitness+</p><p className="text-xs text-white/55">Entrenamiento personalizado</p></div>
           </button>
-          <div className="hidden items-center gap-7 text-sm font-medium text-white/80 lg:flex">
+          <div className="hidden items-center gap-7 text-sm font-medium text-white/80 xl:flex">
             <button type="button" onClick={() => goTo("servicios")} className="transition hover:text-white">Servicios</button>
             <button type="button" onClick={() => goTo("proceso")} className="transition hover:text-white">Cómo funciona</button>
-            <button type="button" onClick={revealRates} className="transition hover:text-white">Tarifas</button>
             <button type="button" onClick={() => goTo("faq")} className="transition hover:text-white">FAQ</button>
             <Link href="/login" className="transition hover:text-white">Acceso clientes</Link>
           </div>
-          <Button className="rounded-xl bg-[#2f9e24] px-5 hover:bg-[#27891e]" onClick={() => goTo("contacto")}><CalendarDays className="mr-2 h-4 w-4" />Reservar</Button>
+          <div className="flex shrink-0 items-center gap-2">
+            <Button className="rounded-xl bg-[#2f9e24] px-4 hover:bg-[#27891e] lg:px-5" onClick={() => goTo("contacto")}>
+              <CalendarDays className="mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Reserva tu valoración</span>
+              <span className="sm:hidden">Reserva</span>
+            </Button>
+            <Button variant="outline" className="hidden rounded-xl border-white/35 bg-black/20 px-4 text-white hover:bg-white/10 hover:text-white sm:inline-flex lg:px-5" onClick={revealRates}>
+              Ver tarifas <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         </nav>
 
         <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-5 pb-44 pt-16 lg:grid-cols-[230px_1fr] lg:px-8 lg:pt-20">
@@ -148,10 +156,6 @@ export default function Main() {
             <h1 className="max-w-3xl text-5xl font-black leading-[0.98] tracking-tight text-white md:text-7xl">Entrena con cabeza.<br /><span className="text-[#d8c7a5]">Mejora con método.</span></h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-white/75 md:text-xl">Un enfoque realista, progresivo y medible para mejorar tu condición física sin rutinas genéricas ni promesas de humo.</p>
             <p className="mt-5 flex items-center gap-2 text-sm font-semibold text-[#9fe68f]"><Target className="h-4 w-4" />Valoración inicial y planificación personalizada</p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Button size="lg" className="rounded-xl bg-[#2f9e24] px-7 py-6 text-base hover:bg-[#27891e]" onClick={() => goTo("contacto")}><CalendarDays className="mr-2 h-5 w-5" />Reserva tu valoración</Button>
-              <Button size="lg" variant="outline" className="rounded-xl border-white/35 bg-black/15 px-7 py-6 text-base text-white hover:bg-white/10 hover:text-white" onClick={revealRates}>Ver tarifas <ArrowRight className="ml-2 h-5 w-5" /></Button>
-            </div>
           </div>
         </div>
 
