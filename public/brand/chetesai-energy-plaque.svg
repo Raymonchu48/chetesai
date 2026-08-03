@@ -1,75 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 920" role="img" aria-labelledby="title desc">
-  <title id="title">Chetesaí Fitness+ · Carga tus energías</title>
-  <desc id="desc">Placa vertical oscura con emblema deportivo orbital, detalles dorados y figuras deportivas rojas.</desc>
-  <defs>
-    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#080a09" stop-opacity=".96"/>
-      <stop offset=".55" stop-color="#121411" stop-opacity=".94"/>
-      <stop offset="1" stop-color="#050605" stop-opacity=".98"/>
-    </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#f2d58a"/>
-      <stop offset=".46" stop-color="#c59a42"/>
-      <stop offset="1" stop-color="#8e6728"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="50%" cy="43%" r="62%">
-      <stop offset="0" stop-color="#d6aa50" stop-opacity=".17"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0"/>
-    </radialGradient>
-    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
-      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000" flood-opacity=".55"/>
-    </filter>
-    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="7" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <path id="brandArc" d="M132 232 Q320 92 508 232"/>
-  </defs>
-
-  <rect x="34" y="24" width="572" height="872" rx="54" fill="url(#panel)" stroke="url(#gold)" stroke-width="2.6" filter="url(#shadow)"/>
-  <rect x="48" y="38" width="544" height="844" rx="44" fill="url(#glow)" stroke="#f4d887" stroke-opacity=".12"/>
-
-  <text fill="#f4ead4" font-family="Arial, Helvetica, sans-serif" font-size="35" font-weight="700" letter-spacing="4.5">
-    <textPath href="#brandArc" startOffset="50%" text-anchor="middle">CHETESAÍ FITNESS+</textPath>
-  </text>
-
-  <g transform="translate(320 470)" fill="none" stroke="url(#gold)" stroke-width="6" stroke-linecap="round" opacity=".95">
-    <ellipse rx="212" ry="90" transform="rotate(-18)"/>
-    <ellipse rx="212" ry="90" transform="rotate(42)"/>
-    <ellipse rx="212" ry="90" transform="rotate(102)"/>
-  </g>
-
-  <g transform="translate(320 470)" fill="url(#gold)" filter="url(#softGlow)">
-    <circle cx="43" cy="-72" r="30"/>
-    <path d="M-10-55c24-35 62-43 91-14l-31 45c-15-12-27-13-38-4L-46 72c-11 19-31 29-56 27l64-90c12-18 21-39 28-64z"/>
-    <path d="M-39 55l-109 137 145-89 51-77c-19 7-36 17-50 30z"/>
-    <path d="M39-22c14 31 24 54 47 76 18 17 43 10 65-16l30-35c-9 45-35 91-75 100-37 8-67-22-87-58z"/>
-  </g>
-
-  <g fill="#e2342f" stroke="#e2342f" stroke-linecap="round" stroke-linejoin="round">
-    <g transform="translate(320 298)">
-      <circle cy="-22" r="12"/>
-      <path d="M0-8v48M-42-42h84M-32-42l-9 0M32-42h9M-26 6L0 18 26 6M0 40l-22 42M0 40l22 42" fill="none" stroke-width="10"/>
-      <path d="M-45-49v14M45-49v14" stroke-width="10"/>
-    </g>
-    <g transform="translate(153 430)">
-      <circle cy="-24" r="10"/>
-      <path d="M0-10v62M0 12l-36 30M0 10l34 26M0 52l-27 52M0 52l31 49" fill="none" stroke-width="9"/>
-      <path d="M-40 38q8-22 0-42M38 34q-8-22 0-42" fill="none" stroke-width="4"/>
-    </g>
-    <g transform="translate(487 532)">
-      <circle cy="-26" r="11"/>
-      <path d="M0-11v64M0 4l-38-22M0 4l42-30M0 52l-28 47M0 52l31 46" fill="none" stroke-width="10"/>
-      <path d="M38-36v18M47-38v18M32-28h20M-49-28h20M-45-36v18M-36-38v18" fill="none" stroke-width="6"/>
-    </g>
-    <g transform="translate(320 674)">
-      <circle cy="-58" r="11"/>
-      <path d="M0-44v56M0-16l-35 34M0-14l37 31M0 12q-44 15-76 55M0 12q43 18 73 57" fill="none" stroke-width="9"/>
-      <path d="M-83 68h164" fill="none" stroke-width="5"/>
-    </g>
-  </g>
-
-  <text x="320" y="790" text-anchor="middle" fill="url(#gold)" font-family="Georgia, 'Times New Roman', serif" font-size="42" font-style="italic">“Carga tus energías”</text>
-  <path d="M184 828h112M344 828h112" stroke="#b88d3c" stroke-width="1.5" opacity=".55"/>
-  <path d="M320 813l8 15-8 15-8-15z" fill="#d7ad55"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 920" role="img" aria-labelledby="t d">
+<title id="t">Chetesaí Fitness+ · Carga tus energías</title>
+<desc id="d">Placa vertical oscura con el logotipo deportivo original, nombre corregido y lema Carga tus energías.</desc>
+<defs>
+<linearGradient id="p" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#090b0a"/><stop offset=".56" stop-color="#151814"/><stop offset="1" stop-color="#050605"/></linearGradient>
+<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f0d58d"/><stop offset=".5" stop-color="#c99d45"/><stop offset="1" stop-color="#8b6327"/></linearGradient>
+<radialGradient id="r" cx="50%" cy="42%" r="65%"><stop stop-color="#d5aa51" stop-opacity=".14"/><stop offset="1" stop-opacity="0"/></radialGradient>
+<filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dy="22" stdDeviation="24" flood-opacity=".58"/></filter>
+<filter id="a" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dy="2" stdDeviation="1.5" flood-color="#fff" flood-opacity=".18"/><feDropShadow dy="9" stdDeviation="12" flood-opacity=".48"/></filter>
+</defs>
+<rect x="34" y="24" width="572" height="872" rx="54" fill="url(#p)" stroke="url(#g)" stroke-width="2.5" filter="url(#s)"/>
+<rect x="49" y="39" width="542" height="842" rx="42" fill="url(#r)" stroke="#f3d78c" stroke-opacity=".1"/>
+<text x="320" y="144" text-anchor="middle" fill="#f5ead7" font-family="Arial,Helvetica,sans-serif" font-size="34" font-weight="700" letter-spacing="3.5">CHETESAÍ FITNESS+</text>
+<path d="M156 175H484" stroke="#b88d3d" stroke-width="1.5" opacity=".42"/>
+<g transform="translate(94 220) scale(1.56 1.55)" filter="url(#a)">
+<path d="M163,246L161,246L153,251L149,251L148,252L138,250L134,247L131,247L131,248L132,248L136,251L138,251L142,253L151,253L152,252L154,252L155,251L159,250L162,247L163,247ZM118,231L118,233L120,235L122,239L124,241L125,241L125,239L122,236L120,232ZM130,202L128,203L125,203L124,204L116,205L115,206L110,206L109,207L93,208L92,210L97,210L98,209L107,209L110,215L111,220L115,228L116,228L116,225L112,218L112,216L111,215L111,213L109,209L110,208L113,208L114,207L119,207L120,206L128,205L130,204ZM119,107L117,107L111,110L109,112L104,114L99,118L96,119L94,121L90,123L87,126L86,126L82,130L81,130L80,131L80,133L81,133L89,126L90,126L104,116L118,109ZM152,93L149,93L148,94L145,94L143,93L143,95L142,96L134,99L134,101L138,100L141,98L143,98L146,96L149,96L151,95ZM229,88L225,88L225,89L227,89L233,92L236,95L237,95L241,100L243,104L243,107L244,108L244,115L243,116L243,119L242,120L241,125L239,129L237,131L236,134L233,137L231,141L210,162L209,162L206,165L205,165L195,173L192,174L190,176L182,180L180,182L164,190L162,190L157,193L155,193L152,195L150,195L147,197L145,197L144,198L140,199L140,200L149,199L150,200L152,200L153,201L155,201L159,203L162,203L166,205L170,205L171,206L180,207L183,209L183,212L177,224L177,226L175,228L174,231L172,233L170,237L167,240L167,242L168,242L170,240L172,236L175,233L182,219L182,217L184,214L184,212L186,208L188,208L189,209L214,209L215,208L224,207L236,201L241,196L241,195L244,191L244,188L245,187L245,176L244,175L244,172L238,159L236,157L234,153L230,149L229,146L238,134L244,122L244,119L245,118L245,105L244,104L244,102L242,98L236,92ZM243,174L244,184L243,185L243,188L242,189L241,193L233,201L227,204L225,204L223,206L217,206L216,207L210,207L209,208L187,207L186,206L180,206L179,205L175,205L174,204L170,204L169,203L166,203L165,202L158,201L152,198L153,196L155,196L164,191L166,191L172,188L174,186L187,180L194,175L197,174L200,171L201,171L208,165L209,165L213,161L214,161L226,149L228,149L233,155L233,156L239,164L240,168ZM61,88L57,90L50,97L47,103L47,106L46,107L46,114L47,115L47,118L48,119L48,122L50,125L50,127L52,129L56,137L63,145L62,149L55,157L49,168L49,170L47,174L47,178L46,179L46,186L47,187L47,189L48,190L48,192L50,196L56,202L64,206L66,206L70,208L74,208L75,209L83,209L85,210L84,208L79,208L78,207L73,207L72,206L69,206L58,201L51,194L49,190L49,188L48,187L48,178L49,177L50,170L53,164L55,162L58,156L62,152L62,151L74,139L74,138L72,138L66,144L64,144L56,134L55,131L53,129L52,125L50,122L49,117L48,116L48,106L49,105L49,102L52,98L52,97L56,93L64,89L64,88ZM156,93L158,93L162,91L165,91L169,89L173,89L174,88L179,88L180,87L187,87L188,86L195,86L196,85L208,85L208,84L189,84L187,85L185,82L183,74L176,61L176,59L175,59L174,61L180,72L180,74L182,77L182,79L183,80L184,84L180,86L175,86L174,87L171,87L170,88L167,88L166,89L159,90L158,91L156,91ZM153,58L153,59L155,59L155,58ZM164,47L164,48L169,52L170,55L172,55L172,54L169,51L169,50L166,47ZM128,47L127,47L122,52L122,53L119,56L118,59L116,61L112,69L112,71L109,76L109,78L108,79L107,83L106,84L104,83L90,83L90,85L103,85L104,86L110,86L111,87L116,87L117,88L121,88L122,89L129,90L133,92L137,92L136,90L133,90L132,89L126,88L125,87L121,87L120,86L111,85L109,83L110,79L111,78L111,76L113,73L113,71L118,61L120,59L120,57L122,55L122,54L125,51L126,51Z" fill="#d8d6d0" fill-rule="evenodd"/>
+<path d="M144,212L144,213L145,213L145,212ZM198,179L198,181L199,181L199,179ZM158,177L152,167L149,165L144,159L143,159L134,151L130,149L125,148L121,150L121,158L126,163L126,165L123,169L121,170L117,176L115,177L115,178L113,179L113,180L105,188L105,189L102,191L91,206L97,202L99,202L103,198L112,193L125,183L128,182L133,177L139,173L142,174L145,177L146,180L142,185L137,187L130,192L121,196L121,197L129,197L130,196L134,196L137,194L143,193L152,188L154,185L155,185L157,182ZM170,142L171,143L172,148L176,153L177,156L183,160L188,160L195,157L196,155L200,152L206,142L208,135L206,135L204,139L194,149L190,151L186,150L181,144L180,139L176,133L173,133L171,135ZM73,129L73,130L74,130L74,129ZM171,107L165,111L163,115L163,122L165,125L169,128L176,128L181,124L183,120L183,116L181,113L181,111L176,107ZM153,117L150,112L143,106L133,102L125,103L125,105L124,106L122,106L121,107L121,109L118,112L118,115L116,118L116,123L115,124L115,132L117,132L118,127L123,117L128,113L134,113L136,114L137,116L138,116L148,125L151,125L153,123ZM122,57L122,58L123,58L123,57Z" fill="#f3b23c" fill-rule="evenodd"/>
+<path d="M136,202L134,202L132,203L132,204L134,204L136,203ZM140,201L141,204L135,208L135,218L134,220L129,225L121,228L121,229L128,228L134,225L137,222L138,222L141,226L141,230L140,232L137,235L133,236L128,239L127,243L130,245L132,244L143,244L144,243L149,243L150,244L164,244L165,240L161,237L153,234L149,228L149,205L147,202L142,202ZM144,206L146,205L147,207L145,208ZM216,169L213,171L213,177L215,179L219,179L221,178L222,176L222,171L219,169ZM237,168L231,167L230,165L228,165L227,167L228,173L225,179L223,181L220,181L219,182L214,182L213,181L208,182L206,179L206,177L204,178L202,177L200,178L197,177L196,181L198,181L199,182L200,190L202,192L204,192L207,189L209,189L210,190L210,204L220,204L221,205L223,204L223,188L228,181L233,172L235,173L237,172ZM78,94L76,95L76,99L72,101L71,104L68,107L65,108L65,109L67,109L71,106L74,108L74,110L73,111L73,118L74,119L73,122L74,124L73,125L73,130L72,131L72,133L74,135L78,135L78,128L80,126L80,124L81,123L81,113L80,112L80,108L82,106L89,106L89,105L85,105L82,101L79,99L79,95ZM77,124L78,125L78,128L75,130L74,128L75,127L75,125ZM161,58L157,58L158,62L161,60ZM132,57L132,59L135,64L141,70L142,75L143,76L143,78L141,80L138,81L138,85L139,86L139,90L138,92L142,92L141,86L143,84L152,85L153,86L152,92L155,92L154,90L155,82L150,78L150,74L153,68L157,65L157,64L154,65L150,68L148,67L148,65L147,64L145,64L143,67L140,67L134,60L134,58ZM168,53L166,54L166,57L165,58L166,64L168,64L168,62L172,59L172,58L170,58L169,57L169,54ZM126,52L125,56L124,57L121,57L121,58L123,58L125,60L125,62L126,63L128,63L128,61L129,60L129,54L128,52Z" fill="#e52d2d" fill-rule="evenodd"/>
+</g>
+<text x="320" y="760" text-anchor="middle" fill="url(#g)" font-family="Georgia,'Times New Roman',serif" font-size="42" font-style="italic">“Carga tus energías”</text>
+<path d="M184 807h112M344 807h112" stroke="#b88d3c" stroke-width="1.5" opacity=".55"/>
+<path d="M320 792l8 15-8 15-8-15z" fill="#d7ad55"/>
 </svg>
