@@ -1,0 +1,100 @@
+@media (max-width: 639px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  #inicio {
+    min-height: auto !important;
+    padding-bottom: 1.25rem !important;
+  }
+
+  #inicio header,
+  #inicio nav {
+    overflow: visible !important;
+  }
+
+  #inicio header > div,
+  #inicio nav > div {
+    flex-wrap: wrap !important;
+    row-gap: 0.75rem !important;
+  }
+
+  #inicio nav {
+    gap: 0.5rem !important;
+  }
+
+  #inicio nav > a:not([href="#contacto"]):not([href="#tarifas"]),
+  #inicio nav > button:not(:has(img[alt="Chetesaí Fitness+"])) {
+    display: none !important;
+  }
+
+  #inicio a[href="#contacto"],
+  #inicio a[href="#tarifas"] {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: 44px;
+    flex: 1 1 calc(50% - 0.4rem);
+    justify-content: center;
+    white-space: nowrap;
+    padding-inline: 0.8rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  #inicio > div.relative.z-10.mx-auto.grid.max-w-7xl {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 8.25rem 1.25rem 1.5rem !important;
+  }
+
+  #inicio > div.relative.z-10.mx-auto.grid.max-w-7xl > div:last-child {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    text-align: left !important;
+  }
+
+  #inicio h1 {
+    max-width: 100% !important;
+    margin-top: 1rem !important;
+    font-size: clamp(3rem, 14vw, 4.35rem) !important;
+    line-height: 0.93 !important;
+    letter-spacing: -0.055em !important;
+    text-wrap: balance;
+  }
+
+  #inicio h1 + p,
+  #inicio h1 ~ p {
+    max-width: 100% !important;
+  }
+
+  #inicio > div[class*="absolute"][class*="bottom"] {
+    position: relative !important;
+    inset: auto !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 1.5rem 1rem 0 !important;
+    transform: none !important;
+  }
+
+  #inicio > div[class*="absolute"][class*="bottom"] > div {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    border-radius: 1.4rem !important;
+    overflow: hidden !important;
+  }
+
+  #inicio > div[class*="absolute"][class*="bottom"] > div > div {
+    min-height: 0 !important;
+    padding: 1.15rem 1.1rem !important;
+  }
+
+  #inicio > div[class*="absolute"][class*="bottom"] h3,
+  #inicio > div[class*="absolute"][class*="bottom"] p {
+    font-size: inherit !important;
+  }
+}
