@@ -128,17 +128,10 @@ button {
   cursor: pointer;
 }
 
-/* Identidad visual de la portada. */
 img[alt="Chetesaí Fitness+"] {
   content: url("/brand/chetesai-logo-mark.svg");
 }
 
-img[alt="Logo completo de Chetesaí Fitness+"] {
-  content: url("/brand/chetesai-energy-plaque.svg");
-  aspect-ratio: auto !important;
-}
-
-/* Cápsula superior: negro carbón, blanco y dorado. */
 button:has(img[alt="Chetesaí Fitness+"]) {
   border: 1px solid rgba(199, 162, 84, 0.32);
   border-radius: 1.5rem;
@@ -159,51 +152,81 @@ button:has(img[alt="Chetesaí Fitness+"]) img {
   filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.45));
 }
 
-/* Tarjeta lateral: la nueva placa ya incorpora fondo y marco propios. */
-div:has(> img[alt="Logo completo de Chetesaí Fitness+"]) {
-  border: 0 !important;
-  background: transparent !important;
-  padding: 0 !important;
-  box-shadow: none !important;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+/* Hero limpio: sin imagen lateral, sin línea vertical y texto centrado. */
+#inicio > div.relative.z-10.mx-auto.grid.max-w-7xl {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  max-width: 76rem !important;
 }
 
-div:has(> img[alt="Logo completo de Chetesaí Fitness+"]) img {
-  filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.52));
+#inicio > div.relative.z-10.mx-auto.grid.max-w-7xl > div:first-child {
+  display: none !important;
 }
 
-/* Más presencia para la placa lateral en escritorio. */
-@media (min-width: 1024px) {
+#inicio > div.relative.z-10.mx-auto.grid.max-w-7xl > div:last-child {
+  max-width: 60rem !important;
+  margin-inline: auto;
+  text-align: center;
+}
+
+#inicio > div.relative.z-10.mx-auto.grid.max-w-7xl > div:last-child > p {
+  margin-inline: auto;
+}
+
+#inicio > div.relative.z-10.mx-auto.grid.max-w-7xl > div:last-child > p:last-child {
+  justify-content: center;
+}
+
+/* Imagen de entrenamiento integrada bajo el formulario. */
+#contacto form {
+  overflow: hidden;
+  align-self: stretch;
+}
+
+#contacto form::after {
+  content: "";
+  display: block;
+  min-height: 360px;
+  margin: 1.75rem -1.75rem -1.75rem;
+  border-radius: 0 0 1.5rem 1.5rem;
+  background-image:
+    linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.92) 8%, rgba(24, 33, 29, 0.42) 30%, rgba(24, 33, 29, 0.82) 78%, #18211d 100%),
+    linear-gradient(to right, rgba(24, 33, 29, 0.22), rgba(24, 33, 29, 0.45)),
+    url("https://storage.googleapis.com/totalum-live-bucket/chetesai/files/personal-trainer-marratxi-2048x1152.jpg?GoogleAccessId=totalum-live%40totalum-live.iam.gserviceaccount.com&Expires=2086261055&Signature=tielNgAgSBBx1%2BJn2rtzUlN4MkPNc20qSwf1cK%2FOmeATxMAmSrAwjAPaFIaoNf63QGe6iD33Nj7gKv0jX3%2FwLLsE5oEJO%2Bi%2F4m4dpcxY9qZZMyckUyp6TwbJlJywe%2FimQmHl2xwUAuPyUYG%2FCk63%2Bo%2FKuJEmghTTrS6F4BtE%2BJy9EpvFnnA58avmJG3z8%2BukixSZytcDxLBbHaD2dKMIsmFRayl4JIiotGRmV7%2FaOKdcIcK4ZmmdgpQgoW7iBm4dXDIFYlV5VGPp8YOjhso4L1FndNFsArEceyBqrjyYUki32SVQv1pgBzNLBQF90nT%2BVt3AogW5tAwWQgNfst777w%3D%3D");
+  background-position: center top, center, center 38%;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+@media (max-width: 1023px) {
   #inicio > div.relative.z-10.mx-auto.grid.max-w-7xl {
-    grid-template-columns: minmax(300px, 340px) minmax(0, 1fr) !important;
-    column-gap: 2rem !important;
+    padding-top: 4.5rem !important;
   }
 
-  #inicio div:has(> div > img[alt="Logo completo de Chetesaí Fitness+"]) {
-    padding-right: 1.5rem !important;
-  }
-
-  #inicio div:has(> img[alt="Logo completo de Chetesaí Fitness+"]) {
-    min-height: 420px;
-    border-radius: 2rem !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: visible !important;
-  }
-
-  #inicio div:has(> img[alt="Logo completo de Chetesaí Fitness+"]) img {
-    width: auto !important;
-    height: auto !important;
-    max-width: 100%;
-    max-height: 410px;
-    object-fit: contain;
-    transform: none;
+  #contacto form::after {
+    min-height: 280px;
   }
 }
 
-/* La portada mantiene las tarifas ocultas hasta que el visitante las solicita. */
+@media (max-width: 639px) {
+  #inicio > div.relative.z-10.mx-auto.grid.max-w-7xl > div:last-child {
+    text-align: left;
+  }
+
+  #inicio > div.relative.z-10.mx-auto.grid.max-w-7xl > div:last-child > p {
+    margin-inline: 0;
+  }
+
+  #inicio > div.relative.z-10.mx-auto.grid.max-w-7xl > div:last-child > p:last-child {
+    justify-content: flex-start;
+  }
+
+  #contacto form::after {
+    min-height: 220px;
+  }
+}
+
 #tarifas {
   display: none;
 }
