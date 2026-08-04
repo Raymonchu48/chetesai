@@ -96,8 +96,6 @@ function persistRefreshedSession(response: NextResponse, session: SessionResult)
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // El acceso privado siempre exige introducir de nuevo las credenciales.
-  // Esto evita que una sesión anterior abra directamente el portal del cliente.
   if (pathname === "/login") {
     const response = NextResponse.next();
     clearSessionCookies(response);
@@ -115,6 +113,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/api/progreso") ||
     pathname.startsWith("/api/nutricion") ||
     pathname.startsWith("/api/sesiones") ||
+    pathname.startsWith("/api/eventos") ||
     pathname.startsWith("/api/pagos") ||
     pathname.startsWith("/api/bonos") ||
     pathname.startsWith("/api/informes");
@@ -140,6 +139,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/progreso") ||
     pathname.startsWith("/nutricion") ||
     pathname.startsWith("/sesiones") ||
+    pathname.startsWith("/eventos") ||
     pathname.startsWith("/pagos") ||
     pathname.startsWith("/informes") ||
     isProfessionalApi;
@@ -177,6 +177,7 @@ export const config = {
     "/progreso/:path*",
     "/nutricion/:path*",
     "/sesiones/:path*",
+    "/eventos/:path*",
     "/pagos/:path*",
     "/informes/:path*",
     "/api/dashboard/:path*",
@@ -188,6 +189,7 @@ export const config = {
     "/api/progreso/:path*",
     "/api/nutricion/:path*",
     "/api/sesiones/:path*",
+    "/api/eventos/:path*",
     "/api/pagos/:path*",
     "/api/bonos/:path*",
     "/api/informes/:path*",
