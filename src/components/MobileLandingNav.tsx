@@ -60,7 +60,21 @@ export function MobileLandingNav() {
     });
 
     setOpen(false);
-    window.setTimeout(() => ratesButton?.click(), 120);
+    ratesButton?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+
+    let attempts = 0;
+    const scrollWhenReady = () => {
+      const ratesSection = document.getElementById("tarifas");
+      if (ratesSection) {
+        ratesSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      attempts += 1;
+      if (attempts < 20) window.setTimeout(scrollWhenReady, 100);
+    };
+
+    window.setTimeout(scrollWhenReady, 80);
   }
 
   return (
