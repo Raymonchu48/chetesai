@@ -53,9 +53,12 @@ export function MobileLandingNav() {
   }
 
   function showRates() {
-    const ratesButton = Array.from(document.querySelectorAll<HTMLButtonElement>("button")).find((button) =>
-      button.textContent?.toLowerCase().includes("ver tarifas")
-    );
+    const ratesButton = Array.from(document.querySelectorAll<HTMLButtonElement>("button")).find((button) => {
+      const isRatesButton = button.textContent?.toLowerCase().includes("ver tarifas");
+      const isInsideMobileMenu = Boolean(button.closest("#mobile-landing-menu"));
+      return isRatesButton && !isInsideMobileMenu;
+    });
+
     setOpen(false);
     window.setTimeout(() => ratesButton?.click(), 120);
   }
@@ -68,7 +71,7 @@ export function MobileLandingNav() {
         aria-expanded={open}
         aria-controls="mobile-landing-menu"
         onClick={() => setOpen(true)}
-        className="fixed right-4 top-[5.75rem] z-[70] grid h-12 w-12 place-items-center rounded-2xl border border-[#b38d45]/40 bg-[#101713]/90 text-white shadow-2xl backdrop-blur-xl xl:hidden"
+        className="fixed left-4 top-[5.75rem] z-[70] grid h-12 w-12 place-items-center rounded-2xl border border-[#b38d45]/40 bg-[#101713]/90 text-white shadow-2xl backdrop-blur-xl xl:hidden"
       >
         <Menu className="h-6 w-6" />
       </button>
@@ -84,8 +87,8 @@ export function MobileLandingNav() {
       <aside
         id="mobile-landing-menu"
         aria-label="Navegación móvil"
-        className={`fixed right-0 top-0 z-[90] flex h-dvh w-[86%] max-w-sm flex-col border-l border-[#b38d45]/25 bg-[#101713] text-white shadow-2xl transition-transform duration-300 ease-out xl:hidden ${
-          open ? "translate-x-0" : "translate-x-full"
+        className={`fixed left-0 top-0 z-[90] flex h-dvh w-[86%] max-w-sm flex-col border-r border-[#b38d45]/25 bg-[#101713] text-white shadow-2xl transition-transform duration-300 ease-out xl:hidden ${
+          open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-5">
