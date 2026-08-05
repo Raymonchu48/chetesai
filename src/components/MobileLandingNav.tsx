@@ -71,7 +71,7 @@ export function MobileLandingNav() {
         aria-expanded={open}
         aria-controls="mobile-landing-menu"
         onClick={() => setOpen(true)}
-        className="fixed left-4 top-[5.75rem] z-[70] grid h-12 w-12 place-items-center rounded-2xl border border-[#b38d45]/40 bg-[#101713]/90 text-white shadow-2xl backdrop-blur-xl xl:hidden"
+        className="fixed left-4 top-[6.75rem] z-[70] grid h-12 w-12 place-items-center rounded-2xl border border-[#b38d45]/40 bg-[#101713]/90 text-white shadow-2xl backdrop-blur-xl xl:hidden"
       >
         <Menu className="h-6 w-6" />
       </button>
