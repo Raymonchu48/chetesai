@@ -7,6 +7,7 @@ import "./mobile-fixes.css";
 import { ScriptExecutor } from "@/components/ScriptExecutor";
 import { DevToolsHandler } from "@/components/DevToolsHandler";
 import { GlobalErrorCatcher } from "@/components/GlobalErrorCatcher";
+import { MobileLandingNav } from "@/components/MobileLandingNav";
 import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -23,11 +24,12 @@ export const revalidate = 0;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <GlobalErrorCatcher />
         <ScriptExecutor />
         <DevToolsHandler />
+        <MobileLandingNav />
         <div className="min-h-screen flex flex-col">
           <main className="flex-1">{children}</main>
         </div>
