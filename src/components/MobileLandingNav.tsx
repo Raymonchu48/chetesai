@@ -14,6 +14,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
+import { TariffsModal } from "@/components/TariffsModal";
 
 const navigationItems = [
   { id: "servicios", label: "Servicios", icon: PanelsTopLeft },
@@ -25,15 +26,40 @@ const navigationItems = [
 export function MobileLandingNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [ratesOpen, setRatesOpen] = useState(false);
 
   useEffect(() => {
-    if (!open) return;
+    if (pathname !== "/") return;
+
+    const handleRatesClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const control = target?.closest("button, a");
+      if (!control || control.closest('[role="dialog"]')) return;
+
+      const label = control.textContent?.trim().toLowerCase() || "";
+      if (!label.includes("ver tarifas")) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(false);
+      setRatesOpen(true);
+    };
+
+    document.addEventListener("click", handleRatesClick, true);
+    return () => document.removeEventListener("click", handleRatesClick, true);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!open && !ratesOpen) return;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        setOpen(false);
+        setRatesOpen(false);
+      }
     };
 
     window.addEventListener("keydown", handleEscape);
@@ -41,7 +67,7 @@ export function MobileLandingNav() {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [open]);
+  }, [open, ratesOpen]);
 
   if (pathname !== "/") return null;
 
@@ -52,29 +78,16 @@ export function MobileLandingNav() {
     }, 120);
   }
 
-  function showRates() {
-    const ratesButton = Array.from(document.querySelectorAll<HTMLButtonElement>("button")).find((button) => {
-      const isRatesButton = button.textContent?.toLowerCase().includes("ver tarifas");
-      const isInsideMobileMenu = Boolean(button.closest("#mobile-landing-menu"));
-      return isRatesButton && !isInsideMobileMenu;
-    });
-
+  function openRates() {
     setOpen(false);
-    ratesButton?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+    setRatesOpen(true);
+  }
 
-    let attempts = 0;
-    const scrollWhenReady = () => {
-      const ratesSection = document.getElementById("tarifas");
-      if (ratesSection) {
-        ratesSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        return;
-      }
-
-      attempts += 1;
-      if (attempts < 20) window.setTimeout(scrollWhenReady, 100);
-    };
-
-    window.setTimeout(scrollWhenReady, 80);
+  function reserveFromRates() {
+    setRatesOpen(false);
+    window.setTimeout(() => {
+      document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 120);
   }
 
   return (
@@ -162,7 +175,7 @@ export function MobileLandingNav() {
             </button>
             <button
               type="button"
-              onClick={showRates}
+              onClick={openRates}
               className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 px-4 py-4 font-bold text-white"
             >
               <Tags className="h-5 w-5" />
@@ -171,6 +184,8 @@ export function MobileLandingNav() {
           </div>
         </nav>
       </aside>
+
+      <TariffsModal open={ratesOpen} onClose={() => setRatesOpen(false)} onReserve={reserveFromRates} />
     </>
   );
 }
