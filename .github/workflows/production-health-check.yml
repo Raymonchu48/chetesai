@@ -1,0 +1,26 @@
+name: Production health check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check homepage
+        run: |
+          curl --fail --silent --show-error --location --max-time 20 \
+            --retry 2 --retry-delay 5 \
+            https://chetesaifitness.com > /dev/null
+
+      - name: Check login page
+        run: |
+          curl --fail --silent --show-error --location --max-time 20 \
+            --retry 2 --retry-delay 5 \
+            https://chetesaifitness.com/login > /dev/null
