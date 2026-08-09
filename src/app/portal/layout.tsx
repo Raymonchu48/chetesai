@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Apple, CalendarDays, Dumbbell, PartyPopper, TrendingUp, WalletCards } from "lucide-react";
+import { Apple, BookOpen, CalendarDays, Dumbbell, PartyPopper, TrendingUp, WalletCards } from "lucide-react";
 
 const items = [
   { href: "/portal", label: "Entrenamiento", icon: Dumbbell },
+  { href: "/portal/ejercicios", label: "Guías", icon: BookOpen },
   { href: "/portal/citas", label: "Citas", icon: CalendarDays },
   { href: "/portal/eventos", label: "Eventos", icon: PartyPopper },
   { href: "/portal/progreso", label: "Progreso", icon: TrendingUp },
