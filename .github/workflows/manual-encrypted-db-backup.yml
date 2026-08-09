@@ -46,7 +46,7 @@ jobs:
           rm -f "backup/chetesai.dump"
 
       - name: Upload encrypted artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: chetesai-db-backup-${{ github.run_id }}
           path: backup/*.enc
