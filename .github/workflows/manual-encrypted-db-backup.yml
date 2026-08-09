@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Install PostgreSQL client
+      - name: Prepare PostgreSQL 17 client
         run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
+          docker pull postgres:17
+          docker run --rm postgres:17 pg_dump --version
 
       - name: Validate required secrets
         env:
@@ -29,8 +29,11 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
           mkdir -p backup
-          pg_dump "$SUPABASE_DB_URL" --format=custom --no-owner --no-acl --file="backup/chetesai.dump"
-          pg_restore --list "backup/chetesai.dump" > /dev/null
+          docker run --rm \
+            -e SUPABASE_DB_URL \
+            -v "$PWD/backup:/backup" \
+            postgres:17 \
+            sh -lc 'pg_dump "$SUPABASE_DB_URL" --format=custom --no-owner --no-acl --file="/backup/chetesai.dump" && pg_restore --list "/backup/chetesai.dump" > /dev/null'
 
       - name: Encrypt backup
         env:
