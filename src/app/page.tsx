@@ -74,12 +74,12 @@ const highlightedCredentials = [
   {
     tag: "NUTRICIÓN",
     title: "Máster Experto en Alimentación y Nutrición",
-    detail: "1.000 h · Nutrición deportiva, dietoterapia y planificación dietética.",
+    detail: "Nutrición deportiva, dietoterapia y planificación dietética.",
   },
   {
     tag: "PSICOLOGÍA DEPORTIVA",
     title: "Máster en Coaching y Psicología Deportiva",
-    detail: "650 h · Motivación, liderazgo, emociones y rendimiento.",
+    detail: "Motivación, liderazgo, emociones y rendimiento.",
   },
 ];
 
