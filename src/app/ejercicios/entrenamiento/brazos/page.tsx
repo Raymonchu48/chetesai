@@ -13,7 +13,7 @@ function list(v?:string|null){return String(v||"").split(/;|\n/).map(x=>x.trim()
 
 export default function BrazosVisualPage(){
  const[items,setItems]=useState<Exercise[]>([]); const[selected,setSelected]=useState<Exercise|null>(null); const[loading,setLoading]=useState(true); const[filter,setFilter]=useState("todos");
- useEffect(()=>{(async()=>{try{const r=await fetch("/api/ejercicios?activo=true");const d=await r.json();setItems((d.data||[]).filter((x:Exercise)=>["biceps","triceps","brazos"].includes(x.grupo_muscular)))}finally{setLoading(false)}})()},[]);
+ useEffect(()=>{(async()=>{try{const r=await fetch("/api/ejercicios?activo=true");const d=(await r.json()) as {data?:Exercise[]};setItems((d.data||[]).filter((x:Exercise)=>["biceps","triceps","brazos"].includes(x.grupo_muscular)))}finally{setLoading(false)}})()},[]);
  const visible=filter==="todos"?items:items.filter(x=>x.grupo_muscular===filter);
  return <AppSidebar><main className="mx-auto max-w-7xl p-5 md:p-8">
    <section className="mb-7 overflow-hidden rounded-[2rem] border bg-gradient-to-br from-slate-950 via-lime-950 to-slate-900 p-7 text-white shadow-xl md:p-10">
