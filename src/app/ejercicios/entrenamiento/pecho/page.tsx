@@ -14,7 +14,7 @@ function groupFor(item:Exercise){const code=item.codigo_interno||"";if(["CHE-PEC
 
 export default function PechoVisualPage(){
  const[items,setItems]=useState<Exercise[]>([]);const[selected,setSelected]=useState<Exercise|null>(null);const[loading,setLoading]=useState(true);const[filter,setFilter]=useState("todos");
- useEffect(()=>{(async()=>{try{const r=await fetch("/api/ejercicios?activo=true");const d=await r.json();setItems((d.data||[]).filter((x:Exercise)=>x.grupo_muscular==="pecho"))}finally{setLoading(false)}})()},[]);
+ useEffect(()=>{(async()=>{try{const r=await fetch("/api/ejercicios?activo=true");const d=(await r.json()) as {data?:Exercise[]};setItems((d.data||[]).filter((x:Exercise)=>x.grupo_muscular==="pecho"))}finally{setLoading(false)}})()},[]);
  const visible=filter==="todos"?items:items.filter(x=>groupFor(x)===filter);
  return <AppSidebar><main className="mx-auto max-w-7xl p-5 md:p-8">
   <section className="mb-7 overflow-hidden rounded-[2rem] border bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900 p-7 text-white shadow-xl md:p-10">

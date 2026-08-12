@@ -13,7 +13,7 @@ function list(v?:string|null){return String(v||"").split(/;|\n/).map(x=>x.trim()
 
 export default function PiernasVisualPage(){
  const[items,setItems]=useState<Exercise[]>([]); const[selected,setSelected]=useState<Exercise|null>(null); const[loading,setLoading]=useState(true);
- useEffect(()=>{(async()=>{try{const r=await fetch("/api/ejercicios?activo=true");const d=await r.json();setItems((d.data||[]).filter((x:Exercise)=>x.grupo_muscular==="piernas"))}finally{setLoading(false)}})()},[]);
+ useEffect(()=>{(async()=>{try{const r=await fetch("/api/ejercicios?activo=true");const d=(await r.json()) as {data?:Exercise[]};setItems((d.data||[]).filter((x:Exercise)=>x.grupo_muscular==="piernas"))}finally{setLoading(false)}})()},[]);
  return <AppSidebar><main className="mx-auto max-w-7xl p-5 md:p-8">
    <section className="mb-7 overflow-hidden rounded-[2rem] border bg-gradient-to-br from-slate-950 via-lime-950 to-slate-900 p-7 text-white shadow-xl md:p-10">
      <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[.18em] text-lime-200"><Dumbbell className="h-3.5 w-3.5"/> Chetesaí Fitness+ · Piernas</div>
