@@ -1,5 +1,30 @@
-import { redirect } from "next/navigation";
+"use client";
 
-export default function BrazosPage() {
-  redirect("/ejercicios/entrenamiento?grupo=brazos");
+import { useEffect, useState } from "react";
+import AppSidebar from "@/components/AppSidebar";
+import ArmExerciseVisual from "@/components/exercises/ArmExerciseVisual";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Dumbbell, PlayCircle, Target, TriangleAlert, TrendingUp, RotateCcw, Sparkles } from "lucide-react";
+
+type Exercise={_id:string;codigo_interno?:string|null;nombre:string;grupo_muscular:string;dificultad:string;material?:string|null;descripcion?:string|null;tecnica?:string|null;errores_frecuentes?:string|null;consejos?:string|null;progresion?:string|null;regresion?:string|null;variante_facil?:string|null;variante_avanzada?:string|null;video_url?:string|null};
+function list(v?:string|null){return String(v||"").split(/;|\n/).map(x=>x.trim()).filter(Boolean)}
+
+export default function BrazosVisualPage(){
+ const[items,setItems]=useState<Exercise[]>([]); const[selected,setSelected]=useState<Exercise|null>(null); const[loading,setLoading]=useState(true); const[filter,setFilter]=useState("todos");
+ useEffect(()=>{(async()=>{try{const r=await fetch("/api/ejercicios?activo=true");const d=await r.json();setItems((d.data||[]).filter((x:Exercise)=>["biceps","triceps","brazos"].includes(x.grupo_muscular)))}finally{setLoading(false)}})()},[]);
+ const visible=filter==="todos"?items:items.filter(x=>x.grupo_muscular===filter);
+ return <AppSidebar><main className="mx-auto max-w-7xl p-5 md:p-8">
+   <section className="mb-7 overflow-hidden rounded-[2rem] border bg-gradient-to-br from-slate-950 via-lime-950 to-slate-900 p-7 text-white shadow-xl md:p-10">
+     <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[.18em] text-lime-200"><Dumbbell className="h-3.5 w-3.5"/> Chetesaí Fitness+ · Brazos</div>
+     <h1 className="mt-4 text-4xl font-black md:text-6xl">Guías visuales de brazos</h1><p className="mt-4 max-w-3xl text-white/70">Bíceps y tríceps con posición inicial, ejecución, técnica, errores frecuentes y progresiones, siguiendo el mismo sistema visual Chetesaí de Piernas.</p>
+     <div className="mt-6 flex flex-wrap gap-2">{[["todos","Todos"],["biceps","Bíceps"],["triceps","Tríceps"]].map(([v,l])=><button key={v} onClick={()=>setFilter(v)} className={`rounded-full px-4 py-2 text-sm font-black transition ${filter===v?"bg-lime-400 text-slate-950":"border border-white/15 bg-white/10 text-white"}`}>{l}</button>)}</div>
+   </section>
+   {loading?<div className="py-20 text-center text-muted-foreground">Cargando ejercicios...</div>:<div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{visible.map(item=><Card key={item._id} className="overflow-hidden rounded-[1.7rem] border-0 shadow-sm ring-1 ring-border transition hover:-translate-y-1 hover:shadow-xl"><button className="block w-full text-left" onClick={()=>setSelected(item)}><div className="h-64"><ArmExerciseVisual code={item.codigo_interno} name={item.nombre} group={item.grupo_muscular}/></div><CardContent className="p-5"><div className="flex items-center justify-between gap-3"><div><h2 className="text-xl font-black">{item.nombre}</h2><p className="mt-1 text-sm text-muted-foreground">{item.material||"Sin material"}</p></div><span className="rounded-full bg-lime-500/10 px-3 py-1 text-xs font-black text-lime-700 dark:text-lime-300">{item.dificultad}</span></div><div className="mt-4 flex items-center justify-between text-xs font-bold uppercase tracking-[.12em] text-primary"><span>Ver guía completa</span><PlayCircle className="h-5 w-5"/></div></CardContent></button></Card>)}</div>}
+   <Dialog open={!!selected} onOpenChange={o=>!o&&setSelected(null)}><DialogContent className="max-h-[94vh] max-w-5xl overflow-y-auto p-0">{selected?<Detail item={selected}/>:null}</DialogContent></Dialog>
+ </main></AppSidebar>
 }
+
+function Detail({item}:{item:Exercise}){const errors=list(item.errores_frecuentes),tips=list(item.consejos);return <div><div className="grid md:grid-cols-[1.1fr_.9fr]"><div className="min-h-[420px]"><ArmExerciseVisual code={item.codigo_interno} name={item.nombre} group={item.grupo_muscular}/></div><div className="p-7"><DialogHeader><DialogTitle className="text-left text-3xl font-black">{item.nombre}</DialogTitle></DialogHeader><div className="mt-4 flex gap-2"><span className="rounded-full bg-lime-500/10 px-3 py-1 text-xs font-black text-lime-700 dark:text-lime-300">{item.grupo_muscular==="triceps"?"Tríceps":"Bíceps"}</span><span className="rounded-full bg-muted px-3 py-1 text-xs font-bold">{item.dificultad}</span></div><p className="mt-5 text-sm leading-6 text-muted-foreground">{item.descripcion||item.tecnica}</p>{item.video_url?<Button asChild className="mt-5 w-full"><a href={item.video_url} target="_blank" rel="noreferrer"><PlayCircle className="mr-2 h-4 w-4"/>Ver vídeo</a></Button>:null}</div></div><div className="grid gap-5 p-6 md:grid-cols-2 md:p-8"><Panel icon={<Target/>} title="Técnica"><p>{item.tecnica||"Pendiente"}</p></Panel><Panel icon={<TriangleAlert/>} title="Errores frecuentes">{errors.length?<ul>{errors.map(x=><li key={x}>• {x}</li>)}</ul>:<p>Sin errores registrados.</p>}</Panel><Panel icon={<TrendingUp/>} title="Progresión"><p>{item.progresion||item.variante_avanzada||"Pendiente"}</p></Panel><Panel icon={<RotateCcw/>} title="Regresión"><p>{item.regresion||item.variante_facil||"Pendiente"}</p></Panel><Panel icon={<Sparkles/>} title="Consejos del entrenador" className="md:col-span-2">{tips.length?<ul>{tips.map(x=><li key={x}>• {x}</li>)}</ul>:<p>Sin consejos registrados.</p>}</Panel></div></div>}
+function Panel({icon,title,children,className=""}:{icon:React.ReactNode;title:string;children:React.ReactNode;className?:string}){return <section className={`rounded-3xl border bg-muted/20 p-5 ${className}`}><div className="mb-3 flex items-center gap-2 font-black text-primary"><span className="h-5 w-5">{icon}</span><h3 className="text-foreground">{title}</h3></div><div className="text-sm leading-6 text-muted-foreground">{children}</div></section>}
