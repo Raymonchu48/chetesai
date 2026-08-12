@@ -1,0 +1,1 @@
+Cobertura visual completa de Piernas preparada para los ejercicios CHE-PIE disponibles en la biblioteca.
