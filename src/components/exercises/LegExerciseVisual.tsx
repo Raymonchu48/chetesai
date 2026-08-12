@@ -1,69 +1,35 @@
-type Pose={hip:number;knee:number;torso:number;arms?:"front"|"down"|"bar";box?:boolean;bench?:boolean;wide?:boolean;seated?:boolean;machine?:"press"|"extension"|"curl"};
+const LEG_SPRITE="data:image/webp;base64,UklGRm4VAABXRUJQVlA4IGIVAACwcwCdASqkAaQBPp1OoU0lpCMiIjRYqLATiWdu/HyZjg0Nc3abEpsX+obbE86v6QP8F0yfqO7zl/i8l68kf4b8bvAz++eEPhP81e13ID56/3voV/JfvN+f8r/939pfoz8Rv8P1Avx/+e/6v0L3qfN/6b0BfXf7F/1/7n5CWod4K9gH+a/1n067337n/vfYB/mn+F9V//C8fX1F+2PwGfzz/BddT0gw56TBiQEgJASAkBICQEY7nZkXhzjnHOOcc45xxZ8s5uXM3rAFmXm6CgMQYbtIZ63NAaVzaaXco3YBzyw8AdvwK46nQKjpkjF4V4Ysi3cDuZyBSP0L2kc87pdy4oxeXPp8Z1/2NOghpVLejwwfp5oz1lu0rS3f7xk7hWtYsZRXknqN7IlrSjpeFeUN2YBKvoxxV9MDKVTIIIk6gMn1V808rD5UWTPlmSIqrbRcVZ0OiJat6zLNRu9/wsjUSLV9/O/mVv/pMGJWF1gSAkBICQEgJASAkBICQEgJASAkBICQEgJASAkBICQEgJAR+SdSmgJASN4lGWm2ydZl/vDjg03TfomASTUPHN/opDrGB35aYd46ikD2dn2Gpyg9Ep8D+jjBnUedvTQCp1ASCD6dkabAInQ3/CORFn4Rv3QfBc2fyzdQm9++17WxZlNZRi0RTETH6adaTddGZ7DZn+AWT7VDmucrQZacczFmfYAUKwIMBtwGrqGTg7qmG+QL12BAo9OM4hdri5IEAzIr7HhrIi8SPwYCr9izo4xeHOOcc45xzjnHOOcc45xzjnHOOcc45xzjnHOOcc45xzjnHOOcc2HjQ8wfJTA8MrGi8fQwiqOAAwrJojeICcklEs2FxiPxHXVh0kh/vmulkes/SchPFBZi16pAyswrFyEHLm1Su9jKoRHamJs22c5oSsc2bNQTWemufRmNa1poNQUDfLIhNAQClrP69OoBp7ijxDhziEsmgTJqC2pJbQSY/KyNTbriEAYdkPqHrU/DK7PN7fUsqMtmSqc45xzjnHOOcc45xzjnHOOcc45xzjnHOOcc45xzjnHOOcc44vkLhjnFllFbdmQzXhzjiw+NmYMHAUzdgFx9gFa+a6tzPiBlfPyoxxXrjiE5BRxSayWF7wYE2M09+i6BwzGQKDFGlhnqqknBWpGugC7bWnA+UZxdkThagEV2YnVlvK8eyD/y2zIvHI1JgtCdSEBIFXy394c45xzjnHOOcc45xzjnHOOcc45xzjnHOKwAAP7/gggCNTf0xtsMzcrAiGUcXSEtbGdf2XbDNjyLjvhOay2nXa30LYtf/snnyNFnVbFx+pr3gbdxuYfYgwrIw739SRR20XRyRTO7EHpS/qDLYNvUGYGkKvmv+HARpaCVYhqEjXbfeJ06NgPH/MIMNLBN+3Cg8TQE81VK2JOy5pkcM1b8K3lMYbDYic4MBT1bOn+eqP1S+xp0NIqdxxr/olryzK9ICo5idvg+QQguzqfiF1lWcjpYECktdtEdzyzuxajVzZ/Mr7/IhJdTZ3rDPkWUXLYwBKz5WkOcbt5DmC7dnM0mpEVDBpHBD0pFkD/QDh9RKo8OMEXn0Z1YMOYLf/L1zZFbIqyEfAhTK9y8BAEhrI3Fn1gFHq05qWntMYfEnRFuhCcktDfPqeAd6MZwHPXcmYS1Tp1Y+gtutQEGWpZiKMJXaGDuLnMdJZeFXgBxouKffbNLo/88jsUAaXn/Q1RhB8yfiw3Bm0ZMewpZmWp/zohpFbz4dhw3aHARlclzXoteLYYxyWzdKc3yW+N0zjDNlAw5st7OuioyU5OblfzI/9SVMP0GQMAeWZP7XXwG0RArir9QbNTDsSRs67TcvjJWrq6g97CICTrHaQuqMDdypG3+byMyJojUZc7luvKHMSg/f8lSKwlJtBrzdEPP/Ih/dWryDENvZdelx+pmfr9yM0ROQGilK6jyGljZz3qfdyhtmTayuL3bXSB3/5nRah5M6P/g5MZrZ6YLBqrjmRQIyPb5stgSooaCRdvovWddnEf+L68yXnjJGYm+NtoXwbpEYWG4Q/GrSc5zBZAkjiEAByDuKnA+z66DMPBM19AWjRVwJIqZYUn1gFW0Ft4Kb6m0iu2FkC/A7TiY/FaBa2xSJHqToj0U9gar4s3lHZBpJpcyY7kqJSzzkKSw0AydDckTVVJs7h9EJ9Evkkr8xwi1F4ZhKcKZU3oRFmMRuOp8n80Sd2ZyzchihC5xVoUq+FG70rv3AYv64XUSQxcepRM6Kmu8HeFa4hNXrh9IoJRPHQfQX9xrjmkcJqfoPzfhVaoxr706E+FWJxO5WN+ROJPFoU34RtzngkftS0cJJxyQ0UppcklABaXGPnUMBGUMb9/XPyM5S68TTiKSMSVV5rUGl548uXrcN0p4v4mfSLv9NOS0C/6SBpAT3Bj45pGK3/PQP5xGvFzgJJdrrDwKqQB6oOBX1+ZyipgICj62oz8yZZjY0/H+GYMARcnKE8IGLIDhXy/uZNSeRAbJoCC7AZJ3d6Xxbv9Qy099dHuwxUdKl7t6HLwxq8wH2SJ96we+6OTGbrcg3YM2E9/2gXM6gS8gVFwS91bwDTAbNhzVzadNVPqZTmRl5tefVbNc+M2B//MI+7DYUKzfTbyYYCprlMUx2bc7QCmnR3Aey7kOWTqWJrEzGuP3MA5vuL5BB3a+kYSQ78PWy3dYvXJyWcHP3FEF+hIYQyonHMip341bJ4V+Fi5Z37xwoR+ol54dTx07rDlTxFKt1Y3/tLHYREMAeqHN1Qs/mCEfFf6HVTGkaOhLBk8ROKN72x/E5/lI+4tXj4Xf/xOrsvRty6gLiyc1qV4E81tR0ssEhQZWoB/Qw4BoNVfvg7uXzek6W/F+0xvdo2qA42NZGmpagCgiVj+toDe8tFTj9Q1OWGVK9Xuz1gItWyObmNursEAdBsFeu9b5ChH8Rwz0h399lcHI4t7uM4f528M2H6Rtin655PHJO2js9+GstkMPEtxHHRWv/WhpIKoQc3tf8m4e53JDa1v4an35VAA2+qU/MPu8wehncPjfiYOjhpg82voMiZeAkd2E+tMnX0esYl3Ytcb4TRUU2sTmAPlehydkACuRqYGQTkB5IuCvvKe3LDnb+jz5Z74RUQW6Df4MCdt1K/cTDGjI5j1aLmvZsRv6YY1A180ZhnhelEtLwnSJ3Q02OnGSQAAAAAIiPRf4P+OF9OpYnDqmnhs2Z8u59HL7Vb9bHGr9VE9BkPEoQcwXmLjGqoXhV/PrcpKXHzNhpSuIrJpouj/nf4LPKMuQm6NxxFbed3wcSbG7ovHEWiZ9bWSr7RSWZLSpXpa01+bG8gUeV55lXnFfS/zI1J2Macxzb3j4LHGiVwCaP7/naNi9OWQQU5IlUYT8N5AG3BCYrxjTdRqJtfsj+iAjafLcm8torfYKbCnIcpWLFkpbP3VI2/8D2/8Co9/Pv9nB7dmvlS2XI4m5CZibdZPoMIylAmiDlGzPp1s4oX2Lt47wSnQ0ZcGhks9TpDkCZ8XLX7C3qdfuv8aDCXSMbGCcYrnnM5JM8wwf7puZ+HrefOFmC9t2qXKV35YbmGrSTzPVqpGN9qzKtLpA6JXnmqScEvbAj/Py4C+MMe4pb9PTleKDNyR1HoFuSJpJTiwlM2GDz+RqI+ehFeqvM/v2v6qESX9XhqB9tER6VwR9XtGudKi1taAEb4d1qx+v4znqlV+n/R4nWL/RPaksVEV423Y5MedaBZlyp9AYOoHtMTz48LLsoGcRZ3l9NXnyC0SiACcfbt8gsrjHsTIKQievhOLfux8yuJRmCWY2LPzg2rqplzo5dOTs6hiwPAB/g8NPvoe6mJDBZUqkop3xJ0qfvG5HO5IWjVP9dBAwnMSCtHzpaXIeLohljhM/ae1VarwFV2k8V/kmQZGTYPMdnYMBwscYCxlpm9DwTAHJI2Bd0kGeLZovMDmd7UMBJCYdhSRYhhCPUrSoRby3N0/Vz+y7kiqpMfHRbFVZ3JySF/xFj/+dCcSGsQU9hNxc+4heJn+3V2VbKGvy80mlfzLR14RQHMU2X5BprVEVILxqNWZIFXLOSTevVsDKMtCUQPSRXuu/mqmQp8DMmNTayN+Rswkdx3qvLZdGtEGSL75A+W+KI4Z4IVkvXByh0EDfVFMEElrg2POFaUg4872TN8NxeoTadmNVDclJRZ7K/I7U/PcPvJkRPBfCw+7w7uawGzzWcrFry/UCqT6at9zhZEAjtJqS86FgwwfH2zvcwLS2eAbnuWIgqPEp5TUxr+PZKsaiosJr8+2yKNvjKbEu9cV/H20O6jP95i50OshrTotFoFQcE7R4LSIfUfLYpjyWTY23/N7mg4tRIwselFY1uBlwTjpnr9YY/v5Z81GA1skP+IJDhHf/nIbCE/ExWYsGoRBu3fqJId+c6IIigb64ttw8NpI+RU+/vr8fXFbWr9zwEANkiN7Q0g850cSv+/LoVMiURAMC2JL3/ep3DqsGiCBEm2qGdiR1dW0TixjG/6+VnYtnUYFGprrR9mxwRJ2AVBl5ydvSw/qZt7A7UVeco8rk38uLcvaZrSkxXirfL9HO2mBQO5SqWyNbxRvS6fDXqsmklYBpruJu+bPzMIQ+nvb0jNQ2AtITTD/6LkFVUJ043Zyx+97dHWJLPCMaOWOBBTO8xjmPVe94yEwSwXwZD/LTGJ2xnNPcQk/W4y3zaY55z9lAE2d1MW2rxr7/yMqhrVXGA6RcVkIua1Th1NqUejpkRKGl6Z9jVVZj9AG9VPxBaWXU3G4ZAwLPzSdgbw2M8296SboDkNb+SXPdlHsOjYAAAAARe5A9RbCGtcQ8hbolse4cChj+cDUR/J/B2zlP8tfbuX3pHTc70fpNmo9NtPlcshO4mkst4y263DdDu+QyDa20B4Y5PhuCoIpNmjRVqde7nRhUjNJSwoK6kddZnSfFOOoRO77Rn1qG42JLgImTy5Q/dRDmj41aUGp/G6iDeGJZg1Ai3Lfz+hCQYq11jo1OX77QGptrU7hLOQvKu0x6KqsF9UypwMTOE9z+LllfmtjSaW4uAlVaIOZXrrRg7Hlze50o6B8e/4Nye2vg2O37j6MpB+YJaCUPbq+iwc5KNDBcozHedG6HmoAfYqdi1U+K20gIpU56oBtbpEO30p8w95ITDVDbjLFtDDwsdKCH2DxgBP3rQY4upXCTFccfWuDC1AmpWCTzNkUYg2bcIOS7HHbuioOpFryJvzDmmRRjkq8rOVMBwHVQRmSVjWANE+gue8epStwcqNWTY4GMj6j24nn7Z1H5peG1X9EVemje+7cAZcYcsYRhwWXq9Ad7DOJL4D9ZLOAGoBiEqtXi3FSDVIVSSq2Q4NSjjyhRIEudEO2CKtxjFe5IUNu5ldWjo9QDe1O9q+t1/540BcptfSKkrdUeHNBnoPm2lP77XMq6z/YMaMefZt00JGgKI4DHEHBg4+IFE/79Zqzx7VqDWHnRESQwTvERKrKygpgZ5UKybHcH0VABMDr59W1ke95VnBNz+SYiIaHNvoqWCogHcKE1Ih24gkc8/H6U1VhcsoWcGlLir+NEjSq8plMa3oOzuXmWI2mHb2CthO257GJleGjTdRP1vr1i2E7PqRY5YVVgj/YFbZ3gQH1PbVPiBYbMoopdTfbPDlsjQTL+PSgZ3t9oJJuSk/N+PQIi6hevdlWpI+KjlACzOK529seMbvZOJQOPNliI1cwI92VQs0G1mKmMOh8pDVueeORcqk/YuvzrneLHKh/mx4n5Qd7eMp/KWliASco8Q22YyZm2rrwnPjafh1WIRTQK+vqQMNTvZfh0Vbg3hhW34SyH7Ao08DrS+P6eOD79r32Yp9DNMUAh25dNmjdIRSuU/BTdR5iveyDCsxPjRAjr4qvEtK3KtDMLr7hmJUdVeO6RwmPvIpe9EOtZBcXuhBxnkzSdqeQpNdOcDOngFjSY1LFI0WzfylsXCpkW/bWh+QM9lYqLNKIvL3p6U2xU+zhKufIWadMzv2DKqcQh4md6bTAtk5K7CijuwB5yXtV+4rWOKYD/4o2AeCYDScDgzP7jbtg+uC1MKFaLt9pMOIKN64/P0FSOo8D3mUT7Aq+jJVnotIXUNgPPk5MTOf0PmZGpkEJzVRHSIjDOAF1vf/AjhS1/PzOy1P8/2UR+/Mf+JB5EufBA2GfHYiD0D4OZKvgtZwHpTpzYNfGP8lkbusIsHt2/xbR8UnhRyszR9VBf4AUInoI/rrOIzqFuh5DJZEp+cEGwqzPg77Jxkh+A1x1dsXx6chzDoi+7p18cEgwXqsSvjoWluCCcbOTxnnIIGP5X8+YAAAAADfJTbsJuDOII7M7K47YLxSAm2Mz292FIXGj6Ht96n1DSfnPyEOgKgz4uJeMSscRLuWyelacXJ6F5WJ5lznuVQ5B6Ccq8gQ47osaYyu3HCrUeKl2Li27w38HE20zQC7FvTAfjgQu8DTUlB/YxpJV+y8yYzn/kkaGu9d1Yto5ZF8mjuvy4PGjMjuR5chz/dRhfwhz6ab4B2NdLTZnEl1WGfRc28QIf1J+zkdvsqRrx1l/l6a4OCGS7qvAP+wA4zQj34ekNpECrKcvNtE/5dBC+Cy+5bhgMcnvN0SX3Zcy9aTyYbV1zcNIE98S2ww+PDL11QYHfCc1yvUBMrMXsjVZ/IlqK1WU1r3kI+C+T5o9aRo/iE5Uc+mv3y5qYkQz5rBWSxCNhuWMq5zKhsr6tzjoSnWtg3FfgeYikZkYt85syx3nCmyCm9MWFbVXVIG7NOZr8bi4YtU6ZILih++0dRd/c44hDrQWGplP6yRvEcH08YdbKnD22hT/dWw6w46cLafoF2cB5obf6UuTp9bYDVKgt3h+gh5sC2BDdw7oAn36pyZ/EIC6Y1F+ZX0gyPyRIL9qPNkPqRB5Ic8qU76QgXsAHRHjWa0gV5STE3Qw7WlfSIY+uAZ/eDVcEWM0syapx/0rHf2rJWDfXm0JEOM+7QyzDeF/ryat0veGyGBFM4dg2sifZV1nXIQ2PIJeOnZczwfv7eLTdfPHxOPXnZ5ObQI4XgpQa0lut0/VEPZUJLN9KchhLSVdCLgs5C4C1YFj752iv9uID00BwashC8EHXsMeRYPitcv6QYN26cLS5Y5ssxhaP0UFi55FsaorTAtXiZmTDzqMJaplIVMXqolVvCELm/JyaK6u+JtnNXSxtzVPjhn3z/WGH+S+us61HNHUprUVUloUOIvCVEfycijjr5/kSKNPFJfVK/4uP9G8+0LI94u0wVWPjkaxUI2mE0/WQy2A5EImym2f3J3tujHme1sAEnAAAAAAAAA==";
 
-const poses:Record<string,[Pose,Pose]>={
-"CHE-PIE-001":[{hip:118,knee:194,torso:0,arms:"front",box:true},{hip:154,knee:164,torso:8,arms:"front",box:true}],
-"CHE-PIE-002":[{hip:118,knee:194,torso:0,arms:"bar"},{hip:154,knee:164,torso:8,arms:"bar"}],
-"CHE-PIE-003":[{hip:122,knee:192,torso:0,arms:"down"},{hip:150,knee:166,torso:3,arms:"down"}],
-"CHE-PIE-004":[{hip:118,knee:194,torso:0,arms:"bar"},{hip:142,knee:188,torso:42,arms:"bar"}],
-"CHE-PIE-006":[{hip:126,knee:192,torso:0,arms:"down",box:true},{hip:108,knee:174,torso:0,arms:"down",box:true}],
-"CHE-PIE-007":[{hip:118,knee:194,torso:0,arms:"front"},{hip:158,knee:164,torso:10,arms:"front"}],
-"CHE-PIE-008":[{hip:118,knee:194,torso:0,arms:"bar"},{hip:158,knee:164,torso:10,arms:"bar"}],
-"CHE-PIE-009":[{hip:118,knee:194,torso:0,arms:"bar"},{hip:156,knee:165,torso:7,arms:"bar"}],
-"CHE-PIE-010":[{hip:145,knee:166,torso:-18,arms:"down",seated:true,machine:"press"},{hip:145,knee:188,torso:-18,arms:"down",seated:true,machine:"press"}],
-"CHE-PIE-011":[{hip:142,knee:176,torso:0,arms:"down",seated:true,machine:"extension"},{hip:142,knee:162,torso:0,arms:"down",seated:true,machine:"extension"}],
-"CHE-PIE-012":[{hip:142,knee:182,torso:18,arms:"down",seated:true,machine:"curl"},{hip:142,knee:166,torso:18,arms:"down",seated:true,machine:"curl"}],
-"CHE-PIE-013":[{hip:142,knee:180,torso:0,arms:"down",seated:true,machine:"curl"},{hip:142,knee:164,torso:0,arms:"down",seated:true,machine:"curl"}],
-"CHE-PIE-014":[{hip:142,knee:188,torso:42,arms:"bar"},{hip:118,knee:194,torso:0,arms:"bar"}],
-"CHE-PIE-015":[{hip:142,knee:184,torso:38,arms:"bar",wide:true},{hip:118,knee:192,torso:0,arms:"bar",wide:true}],
-"CHE-PIE-016":[{hip:122,knee:192,torso:0,arms:"down"},{hip:150,knee:166,torso:2,arms:"down"}],
-"CHE-PIE-017":[{hip:120,knee:194,torso:0,arms:"front",wide:true},{hip:146,knee:174,torso:4,arms:"front",wide:true}],
-"CHE-PIE-018":[{hip:124,knee:192,torso:0,arms:"down",bench:true},{hip:150,knee:165,torso:3,arms:"down",bench:true}],
-"CHE-PIE-019":[{hip:118,knee:194,torso:0,arms:"bar"},{hip:138,knee:190,torso:38,arms:"bar"}],
-"CHE-PIE-020":[{hip:118,knee:194,torso:0,arms:"down"},{hip:108,knee:184,torso:0,arms:"down"}],
-"CHE-PIE-021":[{hip:145,knee:180,torso:0,arms:"down",bench:true,seated:true},{hip:137,knee:172,torso:0,arms:"down",bench:true,seated:true}],
-};
-
-export default function LegExerciseVisual({code,name}:{code?:string|null;name:string}){
- const pair=(code&&poses[code])||poses["CHE-PIE-007"];
- return <div className="relative h-full w-full overflow-hidden bg-gradient-to-b from-white to-[#f6f7f4]">
-  <div className="grid h-full grid-cols-2">
-   <Frame pose={pair[0]} label="Inicio"/>
-   <Frame pose={pair[1]} label="Ejecución" right/>
-  </div>
-  <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/95 to-transparent px-3 pb-1.5 pt-5 text-center text-[9px] font-bold text-slate-700">{name}</div>
- </div>
+function normalize(value:string){
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 }
 
-function Frame({pose,label,right=false}:{pose:Pose;label:string;right?:boolean}){
- const cx=80;const shoulderY=pose.hip-58;const headY=shoulderY-26;const rad=pose.torso*Math.PI/180;const shoulderX=cx-Math.sin(rad)*35;const hipY=pose.hip;const kneeY=pose.knee;const footY=218;
- const leftKneeX=pose.wide?47:61,rightKneeX=pose.wide?113:99,leftFootX=pose.wide?34:51,rightFootX=pose.wide?126:109;
- return <div className={right?"border-l border-slate-200":""}><svg viewBox="0 0 160 240" className="h-full w-full" aria-label={label}>
-  <defs><linearGradient id="skinLeg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#efb181"/><stop offset="1" stopColor="#c97a4d"/></linearGradient><linearGradient id="shirtLeg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#151a22"/><stop offset="1" stopColor="#252b35"/></linearGradient></defs>
-  <ellipse cx="80" cy="220" rx="43" ry="6" fill="#d8d8d2" opacity=".55"/>
-  <Equipment pose={pose}/>
-  <g>
-   <Head x={shoulderX} y={headY}/>
-   <Torso x={shoulderX} y={shoulderY+24} hipX={cx} hipY={hipY}/>
-   <Shorts x={cx} y={hipY}/>
-   <Leg x1={cx-7} y1={hipY+4} x2={leftKneeX} y2={kneeY} x3={leftFootX} y3={footY}/>
-   <Leg x1={cx+7} y1={hipY+4} x2={rightKneeX} y2={kneeY} x3={rightFootX} y3={footY} flip/>
-   <Arms mode={pose.arms||"front"} shoulderX={shoulderX} shoulderY={shoulderY}/>
-  </g>
-  <text x="80" y="237" textAnchor="middle" fontSize="10" fontWeight="800" fill="#334155">{label}</text>
- </svg></div>
+function tileFor(name:string){
+  const n=normalize(name);
+  if(n.includes("prensa")) return 2;
+  if(n.includes("peso muerto rumano")) return 3;
+  if(n.includes("hip thrust")) return 4;
+  if(n.includes("bulgar")) return 5;
+  if(n.includes("extension")&&n.includes("pierna")) return 6;
+  if(n.includes("curl femoral")) return 7;
+  if(n.includes("step up")||n.includes("step-up")) return 8;
+  if(n.includes("goblet")) return 9;
+  if(n.includes("talones")||n.includes("gemelos")) return 10;
+  if(n.includes("sumo")) return 11;
+  if(n.includes("zancada")) return 1;
+  if(n.includes("sentadilla")) return 0;
+  return -1;
 }
 
-function Head({x,y}:{x:number;y:number}){return <g><ellipse cx={x} cy={y} rx="11" ry="13" fill="url(#skinLeg)"/><path d={`M${x-10} ${y-3} Q${x-8} ${y-14} ${x+2} ${y-14} Q${x+11} ${y-11} ${x+10} ${y-2} Q${x+2} ${y-6} ${x-4} ${y-5}Z`} fill="#101722"/><path d={`M${x+9} ${y} q5 2 1 5`} fill="none" stroke="#9d5f3d" strokeWidth="1.2"/><circle cx={x+4} cy={y-1} r="1" fill="#111827"/></g>}
-function Torso({x,y,hipX,hipY}:{x:number;y:number;hipX:number;hipY:number}){return <g><path d={`M${x-16} ${y-20} Q${x} ${y-28} ${x+16} ${y-20} L${hipX+15} ${hipY-8} Q${hipX} ${hipY+2} ${hipX-15} ${hipY-8}Z`} fill="url(#shirtLeg)"/><path d={`M${x-11} ${y-8} Q${x} ${y-2} ${x+11} ${y-8}`} fill="none" stroke="#374151" strokeWidth="1.5"/><path d={`M${hipX-11} ${hipY-16} Q${hipX} ${hipY-10} ${hipX+11} ${hipY-16}`} fill="none" stroke="#0f766e" strokeWidth="2.2" opacity=".55"/></g>}
-function Shorts({x,y}:{x:number;y:number}){return <path d={`M${x-16} ${y-7} L${x+16} ${y-7} L${x+13} ${y+15} L${x+2} ${y+12} L${x} ${y+4} L${x-2} ${y+12} L${x-13} ${y+15}Z`} fill="#171b22"/>}
-function Leg({x1,y1,x2,y2,x3,y3,flip=false}:{x1:number;y1:number;x2:number;y2:number;x3:number;y3:number;flip?:boolean}){return <g><line x1={x1} y1={y1} x2={x2} y2={y2} stroke="url(#skinLeg)" strokeWidth="10" strokeLinecap="round"/><line x1={x2} y1={y2} x2={x3} y2={y3-6} stroke="url(#skinLeg)" strokeWidth="8.5" strokeLinecap="round"/><ellipse cx={x2} cy={y2} rx="5.4" ry="5" fill="#d28a5c"/><Shoe x={x3} y={y3} flip={flip}/></g>}
-function Shoe({x,y,flip=false}:{x:number;y:number;flip?:boolean}){return <path d={flip?`M${x+7} ${y-6} Q${x+1} ${y-8} ${x-10} ${y-2} Q${x-12} ${y+4} ${x+8} ${y+4}Z`:`M${x-7} ${y-6} Q${x-1} ${y-8} ${x+10} ${y-2} Q${x+12} ${y+4} ${x-8} ${y+4}Z`} fill="#111827" stroke="#334155" strokeWidth="1"/>}
-
-function Arms({mode,shoulderX,shoulderY}:{mode:"front"|"down"|"bar";shoulderX:number;shoulderY:number}){
- if(mode==="down")return <><Arm x1={shoulderX-9} y1={shoulderY+8} x2={shoulderX-14} y2={shoulderY+30} x3={shoulderX-11} y3={shoulderY+48}/><Arm x1={shoulderX+9} y1={shoulderY+8} x2={shoulderX+14} y2={shoulderY+30} x3={shoulderX+11} y3={shoulderY+48}/></>;
- if(mode==="bar")return <><Barbell y={shoulderY+5}/><Arm x1={shoulderX-10} y1={shoulderY+8} x2={61} y2={shoulderY+10} x3={58} y3={shoulderY+5}/><Arm x1={shoulderX+10} y1={shoulderY+8} x2={99} y2={shoulderY+10} x3={102} y3={shoulderY+5}/></>;
- return <><Arm x1={shoulderX-9} y1={shoulderY+8} x2={52} y2={shoulderY+9} x3={34} y3={shoulderY+11}/><Arm x1={shoulderX+9} y1={shoulderY+8} x2={108} y2={shoulderY+9} x3={126} y3={shoulderY+11}/></>}
-function Arm({x1,y1,x2,y2,x3,y3}:{x1:number;y1:number;x2:number;y2:number;x3:number;y3:number}){return <g><line x1={x1} y1={y1} x2={x2} y2={y2} stroke="url(#skinLeg)" strokeWidth="7.5" strokeLinecap="round"/><line x1={x2} y1={y2} x2={x3} y2={y3} stroke="url(#skinLeg)" strokeWidth="6.5" strokeLinecap="round"/></g>}
-function Barbell({y}:{y:number}){return <g><line x1="22" y1={y} x2="138" y2={y} stroke="#1f2937" strokeWidth="4"/><circle cx="31" cy={y} r="11" fill="#2d333c"/><circle cx="31" cy={y} r="5" fill="#151922"/><circle cx="129" cy={y} r="11" fill="#2d333c"/><circle cx="129" cy={y} r="5" fill="#151922"/></g>}
-
-function Equipment({pose}:{pose:Pose}){return <>{pose.box?<><rect x="111" y="178" width="35" height="31" rx="3" fill="#2f3338"/><rect x="111" y="178" width="35" height="5" fill="#4b5563"/></>:null}{pose.bench?<><rect x="104" y="169" width="48" height="9" rx="4" fill="#30353c"/><rect x="111" y="178" width="6" height="33" fill="#59616d"/><rect x="140" y="178" width="6" height="33" fill="#59616d"/></>:null}{pose.seated?<><rect x="46" y="157" width="52" height="10" rx="4" fill="#2b3037"/><rect x="49" y="167" width="7" height="45" fill="#5d6672"/><rect x="88" y="167" width="7" height="45" fill="#5d6672"/></>:null}{pose.machine==="press"?<><path d="M100 94 L140 68 L149 79 L109 105Z" fill="#39414a"/><rect x="135" y="74" width="7" height="74" rx="3" fill="#68717e"/><circle cx="141" cy="63" r="12" fill="#252a31"/><circle cx="141" cy="63" r="5" fill="#111827"/></>:null}{pose.machine==="extension"?<><rect x="103" y="166" width="10" height="50" rx="4" fill="#5d6672"/><rect x="96" y="205" width="37" height="10" rx="5" fill="#2b3037"/><circle cx="126" cy="206" r="12" fill="#3b424b"/></>:null}{pose.machine==="curl"?<><rect x="99" y="179" width="10" height="37" rx="4" fill="#5d6672"/><rect x="91" y="207" width="38" height="9" rx="5" fill="#2b3037"/><circle cx="122" cy="206" r="11" fill="#3b424b"/></>:null}</>}
+export default function LegExerciseVisual({name}:{code?:string|null;name:string}){
+  const index=tileFor(name);
+  if(index<0) return <div className="flex h-full w-full items-center justify-center bg-gradient-to-b from-white to-[#f4f7ef] p-5 text-center">
+    <div><div className="mx-auto mb-3 h-12 w-12 rounded-full border-2 border-lime-500/40 bg-lime-500/10"/><p className="text-xs font-black uppercase tracking-[.14em] text-lime-700">Chetesaí Fitness+</p><p className="mt-2 text-sm font-bold text-slate-800">{name}</p><p className="mt-1 text-[11px] text-slate-500">Ilustración específica en preparación</p></div>
+  </div>;
+  const col=index%3,row=Math.floor(index/3);
+  const x=col===0?"0%":col===1?"50%":"100%";
+  const y=row===0?"0%":row===1?"33.333%":row===2?"66.667%":"100%";
+  return <div className="relative h-full w-full overflow-hidden bg-white" aria-label={`Ilustración de ${name}`}>
+    <div className="absolute inset-0 bg-white bg-no-repeat" style={{backgroundImage:`url("${LEG_SPRITE}")`,backgroundSize:"300% 400%",backgroundPosition:`${x} ${y}`}}/>
+  </div>;
+}
