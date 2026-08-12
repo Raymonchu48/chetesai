@@ -1,76 +1,29 @@
-import Link from "next/link";
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 import AppSidebar from "@/components/AppSidebar";
-import { ArrowRight, Dumbbell, Gauge, Target, TriangleAlert } from "lucide-react";
+import ShoulderExerciseVisual from "@/components/exercises/ShoulderExerciseVisual";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Dumbbell, PlayCircle, Target, TriangleAlert, TrendingUp, RotateCcw, Sparkles } from "lucide-react";
 
-const zones = [
-  { title: "Deltoides anterior", text: "Participa en flexión de hombro y patrones de empuje por encima de la cabeza." },
-  { title: "Deltoides lateral", text: "Principal responsable de la abducción y del desarrollo visual de la anchura del hombro." },
-  { title: "Deltoides posterior", text: "Clave en extensión horizontal, estabilidad escapular y equilibrio del complejo del hombro." },
-];
+type Exercise={_id:string;codigo_interno?:string|null;nombre:string;grupo_muscular:string;dificultad:string;material?:string|null;descripcion?:string|null;tecnica?:string|null;errores_frecuentes?:string|null;consejos?:string|null;progresion?:string|null;regresion?:string|null;variante_facil?:string|null;variante_avanzada?:string|null;video_url?:string|null};
+function list(v?:string|null){return String(v||"").split(/;|\n/).map(x=>x.trim()).filter(Boolean)}
+const vertical=["CHE-HOM-002","CHE-HOM-004","CHE-HOM-007","CHE-HOM-011"];
+const isolation=["CHE-HOM-001","CHE-HOM-003","CHE-HOM-005","CHE-HOM-006","CHE-HOM-010"];
+const control=["CHE-HOM-008","CHE-HOM-009"];
 
-const patterns = ["Press vertical", "Elevaciones laterales", "Pájaros / reverse fly", "Rotación externa y control escapular"];
-
-export default function HombrosPage() {
-  return (
-    <AppSidebar>
-      <main className="mx-auto max-w-7xl p-5 md:p-8">
-        <section className="overflow-hidden rounded-[2rem] border bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900 text-white shadow-xl">
-          <div className="grid items-center gap-8 p-6 md:grid-cols-[1.05fr_.95fr] md:p-10">
-            <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[.18em] text-emerald-100">
-                <Dumbbell className="h-3.5 w-3.5" /> Chetesaí Fitness+ · Hombros
-              </div>
-              <h1 className="text-4xl font-black tracking-tight md:text-6xl">Hombros fuertes, móviles y equilibrados</h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 md:text-lg">
-                Siguiente bloque visual de Chetesaí Fitness+: deltoides, control escapular, patrones de empuje y trabajo preventivo del complejo del hombro.
-              </p>
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Link href="/ejercicios/entrenamiento?grupo=hombros" className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 transition hover:scale-[1.02]">
-                  Ver ejercicios <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link href="/ejercicios" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/15">
-                  Gestionar biblioteca
-                </Link>
-              </div>
-            </div>
-
-            <div className="relative mx-auto aspect-[4/5] w-full max-w-sm rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur">
-              <svg viewBox="0 0 320 400" className="h-full w-full" role="img" aria-label="Mapa anatómico estilizado de hombros">
-                <defs>
-                  <linearGradient id="torso" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#f8fafc" stopOpacity="0.95" /><stop offset="100%" stopColor="#94a3b8" stopOpacity="0.72" /></linearGradient>
-                  <linearGradient id="deltoid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#6ee7b7" /><stop offset="100%" stopColor="#10b981" /></linearGradient>
-                </defs>
-                <circle cx="160" cy="56" r="38" fill="url(#torso)" />
-                <path d="M111 98 C83 108 67 129 63 160 L74 302 C78 329 101 351 128 357 L192 357 C219 351 242 329 246 302 L257 160 C253 129 237 108 209 98 C194 92 180 88 160 88 C140 88 126 92 111 98Z" fill="url(#torso)" />
-                <path d="M110 101 C84 109 67 127 63 151 C67 172 82 184 102 186 C112 160 119 128 110 101Z" fill="url(#deltoid)" />
-                <path d="M210 101 C236 109 253 127 257 151 C253 172 238 184 218 186 C208 160 201 128 210 101Z" fill="url(#deltoid)" />
-                <path d="M118 106 C128 98 143 94 160 94 C177 94 192 98 202 106 C194 119 181 127 160 127 C139 127 126 119 118 106Z" fill="#34d399" opacity="0.55" />
-                <circle cx="98" cy="143" r="31" fill="#22c55e" opacity="0.35" />
-                <circle cx="222" cy="143" r="31" fill="#22c55e" opacity="0.35" />
-              </svg>
-              <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/10 bg-slate-950/70 p-3 text-center text-xs font-semibold text-white/75 backdrop-blur">
-                Deltoides anterior · lateral · posterior
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-7 grid gap-5 lg:grid-cols-3">
-          {zones.map((zone) => <article key={zone.title} className="rounded-3xl border bg-card p-6 shadow-sm"><div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary"><Target className="h-5 w-5" /></div><h2 className="text-xl font-black">{zone.title}</h2><p className="mt-2 text-sm leading-6 text-muted-foreground">{zone.text}</p></article>)}
-        </section>
-
-        <section className="mt-7 grid gap-5 lg:grid-cols-[1.1fr_.9fr]">
-          <div className="rounded-3xl border bg-card p-6 md:p-7">
-            <div className="mb-5 flex items-center gap-3"><Gauge className="h-5 w-5 text-primary" /><h2 className="text-2xl font-black">Patrones prioritarios</h2></div>
-            <div className="grid gap-3 sm:grid-cols-2">{patterns.map((pattern, index) => <div key={pattern} className="rounded-2xl border bg-muted/30 p-4"><span className="text-xs font-black text-primary">0{index + 1}</span><p className="mt-1 font-bold">{pattern}</p></div>)}</div>
-          </div>
-          <div className="rounded-3xl border bg-card p-6 md:p-7">
-            <div className="mb-5 flex items-center gap-3"><TriangleAlert className="h-5 w-5 text-primary" /><h2 className="text-2xl font-black">Puntos de control</h2></div>
-            <p className="text-sm leading-7 text-muted-foreground">Evitar compensaciones cervicales, controlar la rotación escapular y ajustar la amplitud a la movilidad individual. En ejercicios por encima de la cabeza, priorizar trayectoria estable, carga progresiva y ausencia de dolor.</p>
-            <Link href="/ejercicios/entrenamiento?grupo=hombros" className="mt-5 inline-flex items-center gap-2 text-sm font-black text-primary">Abrir biblioteca de hombros <ArrowRight className="h-4 w-4" /></Link>
-          </div>
-        </section>
-      </main>
-    </AppSidebar>
-  );
+export default function HombrosVisualPage(){
+ const[items,setItems]=useState<Exercise[]>([]);const[selected,setSelected]=useState<Exercise|null>(null);const[loading,setLoading]=useState(true);const[filter,setFilter]=useState("todos");
+ useEffect(()=>{(async()=>{try{const r=await fetch("/api/ejercicios?activo=true");const d=await r.json();setItems((d.data||[]).filter((x:Exercise)=>x.grupo_muscular==="hombros"))}finally{setLoading(false)}})()},[]);
+ const visible=useMemo(()=>items.filter(x=>{if(filter==="todos")return true;const c=x.codigo_interno||"";if(filter==="press")return vertical.includes(c);if(filter==="aislamiento")return isolation.includes(c);if(filter==="control")return control.includes(c);return true}),[items,filter]);
+ return <AppSidebar><main className="mx-auto max-w-7xl p-5 md:p-8">
+  <section className="mb-7 overflow-hidden rounded-[2rem] border bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900 p-7 text-white shadow-xl md:p-10"><div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[.18em] text-emerald-200"><Dumbbell className="h-3.5 w-3.5"/> Chetesaí Fitness+ · Hombros</div><h1 className="mt-4 text-4xl font-black md:text-6xl">Guías visuales de hombros</h1><p className="mt-4 max-w-3xl text-white/70">Press vertical, elevaciones, deltoides posterior y control escapular con posición inicial, ejecución, técnica, errores frecuentes y progresiones.</p><div className="mt-6 flex flex-wrap gap-2">{[["todos","Todos"],["press","Press vertical"],["aislamiento","Elevaciones / aislamiento"],["control","Control escapular"]].map(([v,l])=><button key={v} onClick={()=>setFilter(v)} className={`rounded-full px-4 py-2 text-sm font-black transition ${filter===v?"bg-emerald-400 text-slate-950":"border border-white/15 bg-white/10 text-white"}`}>{l}</button>)}</div></section>
+  {loading?<div className="py-20 text-center text-muted-foreground">Cargando ejercicios...</div>:<div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{visible.map(item=><Card key={item._id} className="overflow-hidden rounded-[1.7rem] border-0 shadow-sm ring-1 ring-border transition hover:-translate-y-1 hover:shadow-xl"><button className="block w-full text-left" onClick={()=>setSelected(item)}><div className="h-64"><ShoulderExerciseVisual code={item.codigo_interno} name={item.nombre}/></div><CardContent className="p-5"><div className="flex items-center justify-between gap-3"><div><h2 className="text-xl font-black">{item.nombre}</h2><p className="mt-1 text-sm text-muted-foreground">{item.material||"Sin material"}</p></div><span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-black text-emerald-700 dark:text-emerald-300">{item.dificultad}</span></div><div className="mt-4 flex items-center justify-between text-xs font-bold uppercase tracking-[.12em] text-primary"><span>Ver guía completa</span><PlayCircle className="h-5 w-5"/></div></CardContent></button></Card>)}</div>}
+  <Dialog open={!!selected} onOpenChange={o=>!o&&setSelected(null)}><DialogContent className="max-h-[94vh] max-w-5xl overflow-y-auto p-0">{selected?<Detail item={selected}/>:null}</DialogContent></Dialog>
+ </main></AppSidebar>
 }
+
+function Detail({item}:{item:Exercise}){const errors=list(item.errores_frecuentes),tips=list(item.consejos);return <div><div className="grid md:grid-cols-[1.1fr_.9fr]"><div className="min-h-[420px]"><ShoulderExerciseVisual code={item.codigo_interno} name={item.nombre}/></div><div className="p-7"><DialogHeader><DialogTitle className="text-left text-3xl font-black">{item.nombre}</DialogTitle></DialogHeader><div className="mt-4 flex gap-2"><span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-black text-emerald-700 dark:text-emerald-300">Hombros</span><span className="rounded-full bg-muted px-3 py-1 text-xs font-bold">{item.dificultad}</span></div><p className="mt-5 text-sm leading-6 text-muted-foreground">{item.descripcion||item.tecnica}</p>{item.video_url?<Button asChild className="mt-5 w-full"><a href={item.video_url} target="_blank" rel="noreferrer"><PlayCircle className="mr-2 h-4 w-4"/>Ver vídeo</a></Button>:null}</div></div><div className="grid gap-5 p-6 md:grid-cols-2 md:p-8"><Panel icon={<Target/>} title="Técnica"><p>{item.tecnica||"Pendiente"}</p></Panel><Panel icon={<TriangleAlert/>} title="Errores frecuentes">{errors.length?<ul>{errors.map(x=><li key={x}>• {x}</li>)}</ul>:<p>Sin errores registrados.</p>}</Panel><Panel icon={<TrendingUp/>} title="Progresión"><p>{item.progresion||item.variante_avanzada||"Pendiente"}</p></Panel><Panel icon={<RotateCcw/>} title="Regresión"><p>{item.regresion||item.variante_facil||"Pendiente"}</p></Panel><Panel icon={<Sparkles/>} title="Consejos del entrenador" className="md:col-span-2">{tips.length?<ul>{tips.map(x=><li key={x}>• {x}</li>)}</ul>:<p>Sin consejos registrados.</p>}</Panel></div></div>}
+function Panel({icon,title,children,className=""}:{icon:React.ReactNode;title:string;children:React.ReactNode;className?:string}){return <section className={`rounded-3xl border bg-muted/20 p-5 ${className}`}><div className="mb-3 flex items-center gap-2 font-black text-primary"><span className="h-5 w-5">{icon}</span><h3 className="text-foreground">{title}</h3></div><div className="text-sm leading-6 text-muted-foreground">{children}</div></section>}
