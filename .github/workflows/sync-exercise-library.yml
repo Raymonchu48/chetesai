@@ -27,6 +27,23 @@ jobs:
         run: |
           test -n "$SUPABASE_DB_URL" || (echo "Missing SUPABASE_DB_URL" && exit 1)
 
+      - name: Prepare unique exercise code index
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          docker run --rm \
+            -e SUPABASE_DB_URL \
+            postgres:17 \
+            sh -lc 'psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 <<"SQL"
+          DELETE FROM public.ejercicios a
+          USING public.ejercicios b
+          WHERE a.codigo_interno IS NOT NULL
+            AND a.codigo_interno = b.codigo_interno
+            AND a.ctid < b.ctid;
+          CREATE UNIQUE INDEX IF NOT EXISTS ejercicios_codigo_interno_unique
+            ON public.ejercicios (codigo_interno);
+          SQL'
+
       - name: Apply idempotent exercise seeds
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
