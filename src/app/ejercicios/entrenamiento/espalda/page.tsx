@@ -1,89 +1,30 @@
-import Link from "next/link";
+"use client";
+
+import { useEffect, useState } from "react";
 import AppSidebar from "@/components/AppSidebar";
-import { ArrowRight, Dumbbell, ShieldCheck, Target, TrendingUp } from "lucide-react";
+import BackExerciseVisual from "@/components/exercises/BackExerciseVisual";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Dumbbell, PlayCircle, Target, TriangleAlert, TrendingUp, RotateCcw, Sparkles } from "lucide-react";
 
-const zones = [
-  { title: "Dorsal ancho", text: "Anchura de espalda, tracciones verticales y control escapular." },
-  { title: "Trapecio y romboides", text: "Retracción escapular, estabilidad y trabajo de la zona media-alta." },
-  { title: "Erectores espinales", text: "Control lumbopélvico, bisagra de cadera y estabilidad del tronco." },
-];
+type Exercise={_id:string;codigo_interno?:string|null;nombre:string;grupo_muscular:string;dificultad:string;material?:string|null;descripcion?:string|null;tecnica?:string|null;errores_frecuentes?:string|null;consejos?:string|null;progresion?:string|null;regresion?:string|null;variante_facil?:string|null;variante_avanzada?:string|null;video_url?:string|null;tipo_movimiento?:string|null;plano_movimiento?:string|null};
+function list(v?:string|null){return String(v||"").split(/;|\n/).map(x=>x.trim()).filter(Boolean)}
 
-const patterns = ["Dominadas y jalones", "Remos horizontales", "Pullover y extensión de hombro", "Bisagras y estabilidad lumbar"];
-
-export default function EspaldaPage() {
-  return (
-    <AppSidebar>
-      <main className="mx-auto max-w-7xl p-5 md:p-8">
-        <section className="overflow-hidden rounded-[2rem] border bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900 text-white shadow-xl">
-          <div className="grid items-center gap-8 p-6 md:grid-cols-[1.05fr_.95fr] md:p-10">
-            <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[.18em] text-emerald-100">
-                <Dumbbell className="h-3.5 w-3.5" /> Chetesaí Fitness+ · Espalda
-              </div>
-              <h1 className="text-4xl font-black tracking-tight md:text-6xl">Espalda fuerte, estable y funcional</h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 md:text-lg">
-                Vista visual del grupo muscular para seleccionar patrones de tracción, mejorar la técnica y acceder directamente a la biblioteca de ejercicios de espalda.
-              </p>
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Link href="/ejercicios/entrenamiento?grupo=espalda" className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 transition hover:scale-[1.02]">
-                  Ver ejercicios <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link href="/ejercicios" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/15">
-                  Gestionar biblioteca
-                </Link>
-              </div>
-            </div>
-
-            <div className="relative mx-auto aspect-[4/5] w-full max-w-sm rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur">
-              <svg viewBox="0 0 320 400" className="h-full w-full" role="img" aria-label="Mapa anatómico estilizado de la espalda">
-                <defs>
-                  <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#f8fafc" stopOpacity="0.95" />
-                    <stop offset="100%" stopColor="#94a3b8" stopOpacity="0.72" />
-                  </linearGradient>
-                  <linearGradient id="muscle" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#6ee7b7" />
-                    <stop offset="100%" stopColor="#10b981" />
-                  </linearGradient>
-                </defs>
-                <circle cx="160" cy="55" r="38" fill="url(#body)" />
-                <path d="M113 93 C88 111 80 153 88 188 L103 271 C108 303 121 333 139 364 L181 364 C199 333 212 303 217 271 L232 188 C240 153 232 111 207 93 C194 84 181 79 160 79 C139 79 126 84 113 93Z" fill="url(#body)" />
-                <path d="M112 114 C95 143 98 195 111 232 C124 220 136 205 143 184 L146 116 C134 113 123 112 112 114Z" fill="url(#muscle)" opacity="0.95" />
-                <path d="M208 114 C225 143 222 195 209 232 C196 220 184 205 177 184 L174 116 C186 113 197 112 208 114Z" fill="url(#muscle)" opacity="0.95" />
-                <path d="M143 101 L160 88 L177 101 L185 148 L160 162 L135 148Z" fill="#34d399" opacity="0.9" />
-                <path d="M132 152 C145 164 175 164 188 152 L184 190 C174 201 146 201 136 190Z" fill="#22c55e" opacity="0.8" />
-                <path d="M144 205 C151 215 169 215 176 205 L181 295 C174 315 146 315 139 295Z" fill="#16a34a" opacity="0.72" />
-                <line x1="160" y1="92" x2="160" y2="325" stroke="#052e16" strokeOpacity="0.45" strokeWidth="3" strokeDasharray="5 6" />
-              </svg>
-              <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/10 bg-slate-950/70 p-3 text-center text-xs font-semibold text-white/75 backdrop-blur">
-                Dorsal · trapecio · romboides · erectores espinales
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-7 grid gap-5 lg:grid-cols-3">
-          {zones.map((zone) => (
-            <article key={zone.title} className="rounded-3xl border bg-card p-6 shadow-sm">
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary"><Target className="h-5 w-5" /></div>
-              <h2 className="text-xl font-black">{zone.title}</h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">{zone.text}</p>
-            </article>
-          ))}
-        </section>
-
-        <section className="mt-7 grid gap-5 lg:grid-cols-[1.1fr_.9fr]">
-          <div className="rounded-3xl border bg-card p-6 md:p-7">
-            <div className="mb-5 flex items-center gap-3"><TrendingUp className="h-5 w-5 text-primary" /><h2 className="text-2xl font-black">Patrones prioritarios</h2></div>
-            <div className="grid gap-3 sm:grid-cols-2">{patterns.map((pattern, index) => <div key={pattern} className="rounded-2xl border bg-muted/30 p-4"><span className="text-xs font-black text-primary">0{index + 1}</span><p className="mt-1 font-bold">{pattern}</p></div>)}</div>
-          </div>
-          <div className="rounded-3xl border bg-card p-6 md:p-7">
-            <div className="mb-5 flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-primary" /><h2 className="text-2xl font-black">Criterios técnicos</h2></div>
-            <p className="text-sm leading-7 text-muted-foreground">Priorizar posición neutra de columna, control escapular, amplitud de movimiento útil y progresión de carga sin sacrificar la técnica. La biblioteca visual permite revisar errores y regresiones antes de prescribir cada ejercicio.</p>
-            <Link href="/ejercicios/entrenamiento?grupo=espalda" className="mt-5 inline-flex items-center gap-2 text-sm font-black text-primary">Abrir biblioteca de espalda <ArrowRight className="h-4 w-4" /></Link>
-          </div>
-        </section>
-      </main>
-    </AppSidebar>
-  );
+export default function EspaldaVisualPage(){
+ const[items,setItems]=useState<Exercise[]>([]); const[selected,setSelected]=useState<Exercise|null>(null); const[loading,setLoading]=useState(true); const[filter,setFilter]=useState("todos");
+ useEffect(()=>{(async()=>{try{const r=await fetch("/api/ejercicios?activo=true");const d=await r.json();setItems((d.data||[]).filter((x:Exercise)=>x.grupo_muscular==="espalda"))}finally{setLoading(false)}})()},[]);
+ const visible=filter==="todos"?items:items.filter(x=>filter==="vertical"?x.plano_movimiento==="vertical":filter==="horizontal"?x.plano_movimiento==="horizontal":x.tipo_movimiento==="aislamiento"||x.plano_movimiento==="sagital");
+ return <AppSidebar><main className="mx-auto max-w-7xl p-5 md:p-8">
+   <section className="mb-7 overflow-hidden rounded-[2rem] border bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900 p-7 text-white shadow-xl md:p-10">
+     <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[.18em] text-emerald-100"><Dumbbell className="h-3.5 w-3.5"/> Chetesaí Fitness+ · Espalda</div>
+     <h1 className="mt-4 text-4xl font-black md:text-6xl">Guías visuales de espalda</h1><p className="mt-4 max-w-3xl text-white/70">Tracciones verticales y horizontales, remos, dominadas y control escapular con posición inicial, ejecución, técnica y progresiones dentro del sistema visual Chetesaí.</p>
+     <div className="mt-6 flex flex-wrap gap-2">{[["todos","Todos"],["vertical","Tracción vertical"],["horizontal","Remos"],["aislamiento","Aislamiento / control"]].map(([v,l])=><button key={v} onClick={()=>setFilter(v)} className={`rounded-full px-4 py-2 text-sm font-black transition ${filter===v?"bg-lime-400 text-slate-950":"border border-white/15 bg-white/10 text-white"}`}>{l}</button>)}</div>
+   </section>
+   {loading?<div className="py-20 text-center text-muted-foreground">Cargando ejercicios...</div>:<div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{visible.map(item=><Card key={item._id} className="overflow-hidden rounded-[1.7rem] border-0 shadow-sm ring-1 ring-border transition hover:-translate-y-1 hover:shadow-xl"><button className="block w-full text-left" onClick={()=>setSelected(item)}><div className="h-64"><BackExerciseVisual code={item.codigo_interno} name={item.nombre}/></div><CardContent className="p-5"><div className="flex items-center justify-between gap-3"><div><h2 className="text-xl font-black">{item.nombre}</h2><p className="mt-1 text-sm text-muted-foreground">{item.material||"Sin material"}</p></div><span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-black text-emerald-700 dark:text-emerald-300">{item.dificultad}</span></div><div className="mt-4 flex items-center justify-between text-xs font-bold uppercase tracking-[.12em] text-primary"><span>Ver guía completa</span><PlayCircle className="h-5 w-5"/></div></CardContent></button></Card>)}</div>}
+   <Dialog open={!!selected} onOpenChange={o=>!o&&setSelected(null)}><DialogContent className="max-h-[94vh] max-w-5xl overflow-y-auto p-0">{selected?<Detail item={selected}/>:null}</DialogContent></Dialog>
+ </main></AppSidebar>
 }
+
+function Detail({item}:{item:Exercise}){const errors=list(item.errores_frecuentes),tips=list(item.consejos);return <div><div className="grid md:grid-cols-[1.1fr_.9fr]"><div className="min-h-[420px]"><BackExerciseVisual code={item.codigo_interno} name={item.nombre}/></div><div className="p-7"><DialogHeader><DialogTitle className="text-left text-3xl font-black">{item.nombre}</DialogTitle></DialogHeader><div className="mt-4 flex gap-2"><span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-black text-emerald-700 dark:text-emerald-300">Espalda</span><span className="rounded-full bg-muted px-3 py-1 text-xs font-bold">{item.dificultad}</span></div><p className="mt-5 text-sm leading-6 text-muted-foreground">{item.descripcion||item.tecnica}</p>{item.video_url?<Button asChild className="mt-5 w-full"><a href={item.video_url} target="_blank" rel="noreferrer"><PlayCircle className="mr-2 h-4 w-4"/>Ver vídeo</a></Button>:null}</div></div><div className="grid gap-5 p-6 md:grid-cols-2 md:p-8"><Panel icon={<Target/>} title="Técnica"><p>{item.tecnica||"Pendiente"}</p></Panel><Panel icon={<TriangleAlert/>} title="Errores frecuentes">{errors.length?<ul>{errors.map(x=><li key={x}>• {x}</li>)}</ul>:<p>Sin errores registrados.</p>}</Panel><Panel icon={<TrendingUp/>} title="Progresión"><p>{item.progresion||item.variante_avanzada||"Pendiente"}</p></Panel><Panel icon={<RotateCcw/>} title="Regresión"><p>{item.regresion||item.variante_facil||"Pendiente"}</p></Panel><Panel icon={<Sparkles/>} title="Consejos del entrenador" className="md:col-span-2">{tips.length?<ul>{tips.map(x=><li key={x}>• {x}</li>)}</ul>:<p>Sin consejos registrados.</p>}</Panel></div></div>}
+function Panel({icon,title,children,className=""}:{icon:React.ReactNode;title:string;children:React.ReactNode;className?:string}){return <section className={`rounded-3xl border bg-muted/20 p-5 ${className}`}><div className="mb-3 flex items-center gap-2 font-black text-primary"><span className="h-5 w-5">{icon}</span><h3 className="text-foreground">{title}</h3></div><div className="text-sm leading-6 text-muted-foreground">{children}</div></section>}
