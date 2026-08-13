@@ -13,12 +13,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+    "plugins": [{"name": "next"}],
     "paths": {
+      "@/components/exercises/LegExerciseVisual": ["./src/components/exercises/LegCardVisual.tsx"],
       "@/*": ["./src/*"]
     },
     "types": ["./env.d.ts", "node"],
