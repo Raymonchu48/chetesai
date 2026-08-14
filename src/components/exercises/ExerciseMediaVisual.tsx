@@ -11,21 +11,47 @@ type ExerciseMediaItem = {
   miniatura_url?: string | null;
 };
 
+const LEG_CARD_PATTERNS = [
+  "sentadilla",
+  "squat",
+  "zancada",
+  "prensa",
+  "peso muerto rumano",
+  "extension de piernas",
+  "extension de cuadriceps",
+  "hip thrust",
+  "curl femoral",
+  "step up",
+  "step-up",
+  "elevacion de talones",
+  "gemelos"
+];
+
+function normalize(value: string) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+function hasApprovedLegCard(name: string) {
+  const n = normalize(name);
+  return LEG_CARD_PATTERNS.some((pattern) => n.includes(pattern));
+}
+
 export default function ExerciseMediaVisual({ item }: { item: ExerciseMediaItem }) {
-  // Piernas usa siempre el banco visual aprobado de Chetesaí para que
-  // la biblioteca general y la vista específica muestren el mismo recurso.
-  if (item.grupo_muscular === "piernas") {
+  const uploaded = item.gif_url || item.imagen_url || item.miniatura_url;
+
+  // Las tarjetas anatómicas aprobadas solo se usan para ejercicios que tienen
+  // una correspondencia real en el banco LEG. Estiramientos, movilidad y otros
+  // ejercicios de pierna no deben reutilizar una tarjeta de fuerza incorrecta.
+  if (item.grupo_muscular === "piernas" && hasApprovedLegCard(item.nombre)) {
     return <LegCardSpriteVisual code={item.codigo_interno} name={item.nombre} />;
   }
 
-  const uploaded = item.gif_url || item.imagen_url || item.miniatura_url;
-
-  // En el resto del catálogo, el contenido multimedia propio sigue teniendo prioridad.
+  // Para ejercicios sin tarjeta LEG aprobada, respetamos primero el multimedia
+  // específico incorporado por el entrenador.
   if (uploaded) {
     return <img src={uploaded} alt={item.nombre} className="h-full w-full object-contain bg-white" />;
   }
 
-  // Cobertura visual automática para el resto del catálogo maestro.
   return (
     <ProfessionalExerciseVisual
       code={item.codigo_interno}
