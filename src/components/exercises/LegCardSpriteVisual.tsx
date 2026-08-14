@@ -4,22 +4,18 @@ import ProfessionalExerciseVisual from "@/components/exercises/ProfessionalExerc
 
 type Props = { code?: string | null; name: string };
 
+// El catálogo CHE-PIE ha evolucionado y algunos códigos históricos ya no
+// representan el mismo ejercicio. El nombre es la fuente primaria para evitar
+// mostrar una tarjeta anatómica incorrecta. Los códigos quedan solo como fallback.
 const tiles: Record<string, number> = {
   "CHE-PIE-001": 0,
-  "CHE-PIE-002": 9,
   "CHE-PIE-003": 1,
   "CHE-PIE-004": 3,
   "CHE-PIE-005": 5,
   "CHE-PIE-006": 8,
-  "CHE-PIE-007": 0,
-  "CHE-PIE-008": 0,
-  "CHE-PIE-009": 0,
   "CHE-PIE-010": 2,
   "CHE-PIE-011": 4,
   "CHE-PIE-012": 7,
-  "CHE-PIE-013": 7,
-  "CHE-PIE-016": 1,
-  "CHE-PIE-017": 1,
   "CHE-PIE-018": 6,
   "CHE-PIE-020": 10,
   "CHE-PIE-021": 11
@@ -39,16 +35,20 @@ function byName(name: string) {
   if (n.includes("hip thrust")) return 5;
   if (n.includes("curl femoral")) return 7;
   if (n.includes("step up") || n.includes("step-up")) return 8;
-  if ((n.includes("talon") || n.includes("gemelo")) && n.includes("sentad")) return 11;
-  if (n.includes("talon") || n.includes("gemelo")) return 10;
+  if ((n.includes("elevacion de talones") || n.includes("gemelo")) && n.includes("sentad")) return 11;
+  if (n.includes("elevacion de talones") || n.includes("gemelos de pie")) return 10;
   if (n.includes("zancada")) return 1;
-  if (n.includes("sentadilla")) return 0;
+  if (n.includes("sentadilla") || n.includes("squat")) return 0;
   return -1;
 }
 
 export default function LegCardSpriteVisual({ code, name }: Props) {
-  const index = code && tiles[code] !== undefined ? tiles[code] : byName(name);
-  if (index < 0) return <ProfessionalExerciseVisual code={code} name={name} group="piernas" material={null} />;
+  const nameIndex = byName(name);
+  const index = nameIndex >= 0 ? nameIndex : code && tiles[code] !== undefined ? tiles[code] : -1;
+
+  if (index < 0) {
+    return <ProfessionalExerciseVisual code={code} name={name} group="piernas" material={null} />;
+  }
 
   const col = index % 3;
   const row = Math.floor(index / 3);
