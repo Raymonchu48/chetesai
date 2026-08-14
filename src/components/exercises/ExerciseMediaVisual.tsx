@@ -1,3 +1,4 @@
+import LegCardSpriteVisual from "@/components/exercises/LegCardSpriteVisual";
 import ProfessionalExerciseVisual from "@/components/exercises/ProfessionalExerciseVisual";
 
 type ExerciseMediaItem = {
@@ -11,15 +12,20 @@ type ExerciseMediaItem = {
 };
 
 export default function ExerciseMediaVisual({ item }: { item: ExerciseMediaItem }) {
+  // Piernas usa siempre el banco visual aprobado de Chetesaí para que
+  // la biblioteca general y la vista específica muestren el mismo recurso.
+  if (item.grupo_muscular === "piernas") {
+    return <LegCardSpriteVisual code={item.codigo_interno} name={item.nombre} />;
+  }
+
   const uploaded = item.gif_url || item.imagen_url || item.miniatura_url;
 
-  // Si el entrenador ha incorporado contenido multimedia propio, siempre tiene prioridad.
+  // En el resto del catálogo, el contenido multimedia propio sigue teniendo prioridad.
   if (uploaded) {
     return <img src={uploaded} alt={item.nombre} className="h-full w-full object-contain bg-white" />;
   }
 
-  // Cobertura visual automática para todo el catálogo maestro, incluidos
-  // fuerza, core, cardio, movilidad, calentamiento y estiramientos.
+  // Cobertura visual automática para el resto del catálogo maestro.
   return (
     <ProfessionalExerciseVisual
       code={item.codigo_interno}
