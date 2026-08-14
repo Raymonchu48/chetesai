@@ -39,17 +39,17 @@ function hasApprovedLegCard(name: string) {
 export default function ExerciseMediaVisual({ item }: { item: ExerciseMediaItem }) {
   const uploaded = item.gif_url || item.imagen_url || item.miniatura_url;
 
-  // Las tarjetas anatómicas aprobadas solo se usan para ejercicios que tienen
-  // una correspondencia real en el banco LEG. Estiramientos, movilidad y otros
-  // ejercicios de pierna no deben reutilizar una tarjeta de fuerza incorrecta.
-  if (item.grupo_muscular === "piernas" && hasApprovedLegCard(item.nombre)) {
-    return <LegCardSpriteVisual code={item.codigo_interno} name={item.nombre} />;
-  }
-
-  // Para ejercicios sin tarjeta LEG aprobada, respetamos primero el multimedia
-  // específico incorporado por el entrenador.
+  // El contenido multimedia real incorporado por el entrenador siempre tiene
+  // prioridad. De esta forma una tarjeta final subida nunca queda oculta por
+  // un recurso automático o por un sprite histórico.
   if (uploaded) {
     return <img src={uploaded} alt={item.nombre} className="h-full w-full object-contain bg-white" />;
+  }
+
+  // El banco LEG se utiliza únicamente como fallback para ejercicios de Piernas
+  // que tienen una correspondencia real con una tarjeta aprobada.
+  if (item.grupo_muscular === "piernas" && hasApprovedLegCard(item.nombre)) {
+    return <LegCardSpriteVisual code={item.codigo_interno} name={item.nombre} />;
   }
 
   return (
