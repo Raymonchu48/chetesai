@@ -51,7 +51,7 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen bg-[#f7f4ee] flex items-center justify-center px-5 py-10">
       <section className="w-full max-w-md rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-8 shadow-xl shadow-black/5">
-        <div className="mb-8 flex items-center gap-4">
+        <div className="mb-9 flex items-center gap-4">
           <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-[#07111f] p-2 shadow-md ring-1 ring-black/10">
             <img src={BRAND_MARK} alt="Chetesaí Fitness+" className="h-full w-full object-contain" />
           </div>
@@ -63,7 +63,6 @@ export default function LoginPage() {
 
         <div className="mb-7">
           <h1 className="text-3xl font-bold tracking-tight text-[#29312e]">Iniciar sesión</h1>
-          <p className="mt-2 text-sm leading-6 text-[#707872]">Accede al panel profesional o al portal de cliente según el rol asignado.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -83,8 +82,6 @@ export default function LoginPage() {
             {loading ? "Comprobando acceso..." : "Entrar"}
           </Button>
         </form>
-
-        <p className="mt-7 text-center text-xs leading-5 text-[#707872]">El acceso y los permisos dependen del rol asignado a cada cuenta.</p>
       </section>
     </main>
   );
