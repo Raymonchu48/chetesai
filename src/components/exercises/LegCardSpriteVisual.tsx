@@ -5,9 +5,6 @@ import { LEG_CARD_SPRITE } from "@/components/exercises/legSprite";
 
 type Props = { code?: string | null; name: string };
 
-// El catálogo CHE-PIE ha evolucionado y algunos códigos históricos ya no
-// representan el mismo ejercicio. El nombre es la fuente primaria para evitar
-// mostrar una tarjeta anatómica incorrecta. Los códigos quedan solo como fallback.
 const tiles: Record<string, number> = {
   "CHE-PIE-001": 0,
   "CHE-PIE-003": 1,
@@ -47,6 +44,22 @@ const X_POSITIONS = ["9.09%", "50%", "90.91%"];
 const Y_POSITIONS = ["5.88%", "35.29%", "64.71%", "94.12%"];
 
 export default function LegCardSpriteVisual({ code, name }: Props) {
+  const normalizedName = normalize(name);
+
+  // LEG-007: recurso final aprobado e independiente.
+  // Se usa directamente para evitar cualquier error de recorte o asignación del sprite.
+  if (normalizedName.includes("bulgar")) {
+    return (
+      <div className="h-full w-full overflow-hidden bg-white" aria-label={`Ejecución visual de ${name}`}>
+        <img
+          src="/exercises/legs/LEG-007_Sentadilla_Bulgara.webp"
+          alt="Sentadilla Búlgara - Chetesaí Fitness+"
+          className="h-full w-full object-cover object-[center_48%]"
+        />
+      </div>
+    );
+  }
+
   const nameIndex = byName(name);
   const index = nameIndex >= 0 ? nameIndex : code && tiles[code] !== undefined ? tiles[code] : -1;
 
@@ -58,16 +71,11 @@ export default function LegCardSpriteVisual({ code, name }: Props) {
   const row = Math.floor(index / 3);
 
   return (
-    <div
-      className="h-full w-full overflow-hidden bg-white"
-      aria-label={`Ejecución visual de ${name}`}
-    >
+    <div className="h-full w-full overflow-hidden bg-white" aria-label={`Ejecución visual de ${name}`}>
       <div
         className="h-full w-full bg-white bg-no-repeat"
         style={{
           backgroundImage: `url(${LEG_CARD_SPRITE})`,
-          // Zoom sobre el área central de cada tarjeta Canva para que el atleta
-          // y las fases Inicio/Ejecución llenen la tarjeta de la biblioteca.
           backgroundSize: "540% 720%",
           backgroundPosition: `${X_POSITIONS[col]} ${Y_POSITIONS[row]}`
         }}
