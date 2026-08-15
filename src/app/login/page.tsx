@@ -12,6 +12,8 @@ type LoginResponse = {
   redirectTo?: string;
 };
 
+const BRAND_MARK = "/brand/chetesai-logo-mark.svg";
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -50,7 +52,9 @@ export default function LoginPage() {
     <main className="min-h-screen bg-[#f7f4ee] flex items-center justify-center px-5 py-10">
       <section className="w-full max-w-md rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-8 shadow-xl shadow-black/5">
         <div className="mb-8 flex items-center gap-4">
-          <div className="grid h-14 w-14 place-items-center rounded-full bg-[#46624f] text-lg font-black text-white ring-4 ring-[#dbe4d8]">C+</div>
+          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-[#07111f] p-2 shadow-md ring-1 ring-black/10">
+            <img src={BRAND_MARK} alt="Chetesaí Fitness+" className="h-full w-full object-contain" />
+          </div>
           <div>
             <p className="text-2xl font-bold tracking-tight text-[#1e2824]">Chetesaí Fitness+</p>
             <p className="mt-1 text-xs font-bold tracking-[0.22em] text-[#c9653b]">ACCESO SEGURO</p>
