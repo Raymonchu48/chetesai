@@ -20,8 +20,9 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { files } from "@/assets/files";
 import LogoutButton from "@/components/LogoutButton";
+
+const BRAND_MARK = "/brand/chetesai-logo-mark.svg";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -50,7 +51,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen bg-background md:flex md:h-screen md:overflow-hidden">
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-sidebar-border bg-sidebar px-4 text-sidebar-foreground shadow-sm md:hidden">
         <Link href="/dashboard" className="flex min-w-0 items-center gap-3">
-          <img src={files.logo.url} alt="ChetesaíFitness+ Logo" className="h-10 w-10 shrink-0 rounded-xl bg-white p-0.5 object-contain" />
+          <img src={BRAND_MARK} alt="Chetesaí Fitness+" className="h-11 w-11 shrink-0 object-contain" />
           <div className="min-w-0">
             <p className="truncate font-bold">ChetesaíFitness+</p>
             <p className="truncate text-[11px] text-sidebar-foreground/60">Panel profesional</p>
@@ -66,7 +67,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
       <aside className={`fixed inset-y-0 left-0 z-50 flex w-[min(86vw,300px)] shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground shadow-2xl transition-transform duration-300 md:static md:z-auto md:translate-x-0 md:shadow-none ${mobileOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "md:w-[72px]" : "md:w-64"}`}>
         <div className="flex min-h-[65px] items-center border-b border-sidebar-border">
           <Link href="/dashboard" className="flex min-w-0 flex-1 items-center gap-3 p-4 transition-colors hover:bg-sidebar-accent/50">
-            <img src={files.logo.url} alt="ChetesaíFitness+ Logo" className="h-10 w-10 shrink-0 rounded-lg bg-white p-0.5 object-contain" />
+            <img src={BRAND_MARK} alt="Chetesaí Fitness+" className="h-11 w-11 shrink-0 object-contain" />
             {!collapsed ? <div className="min-w-0 overflow-hidden"><h1 className="truncate text-lg font-bold leading-tight tracking-tight">ChetesaíFitness+</h1><p className="truncate text-[11px] leading-tight text-sidebar-foreground/60">Panel profesional</p></div> : null}
           </Link>
           <button type="button" onClick={() => setMobileOpen(false)} className="mr-3 grid h-10 w-10 place-items-center rounded-lg text-sidebar-foreground/70 transition hover:bg-sidebar-accent hover:text-white md:hidden" aria-label="Cerrar menú"><X className="h-5 w-5" /></button>
