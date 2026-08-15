@@ -17,7 +17,7 @@ type LoginResponse = {
   };
 };
 
-const BRAND_LOCKUP = "/brand/chetesai-login-lockup.webp";
+const BRAND_LOCKUP = "/brand/chetesai-login-lockup.svg";
 
 export default function LoginPage() {
   const router = useRouter();
