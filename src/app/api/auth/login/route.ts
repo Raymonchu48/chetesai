@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+type AccessRole = "profesional" | "cliente";
+
 export async function POST(request: NextRequest) {
   try {
     if (!supabaseUrl || !anonKey) {
@@ -12,14 +14,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password } = (await request.json()) as {
+    const { email, password, accessRole } = (await request.json()) as {
       email?: string;
       password?: string;
+      accessRole?: AccessRole;
     };
 
     if (!email?.trim() || !password) {
       return NextResponse.json(
         { ok: false, error: "Correo y contraseña son obligatorios" },
+        { status: 400 }
+      );
+    }
+
+    if (accessRole && accessRole !== "profesional" && accessRole !== "cliente") {
+      return NextResponse.json(
+        { ok: false, error: "Tipo de acceso no válido" },
         { status: 400 }
       );
     }
@@ -37,7 +47,7 @@ export async function POST(request: NextRequest) {
       }
     );
 
-  const authData = (await authResponse.json()) as any;
+    const authData = (await authResponse.json()) as any;
 
     if (!authResponse.ok) {
       return NextResponse.json(
@@ -68,7 +78,23 @@ export async function POST(request: NextRequest) {
     }
 
     const role = profile?.role || "cliente";
-    const redirectTo = role === "cliente" ? "/portal" : "/dashboard";
+    const isClientAccount = role === "cliente";
+
+    if (accessRole === "cliente" && !isClientAccount) {
+      return NextResponse.json(
+        { ok: false, error: "Esta cuenta corresponde al acceso profesional. Selecciona Profesional." },
+        { status: 403 }
+      );
+    }
+
+    if (accessRole === "profesional" && isClientAccount) {
+      return NextResponse.json(
+        { ok: false, error: "Esta cuenta corresponde al acceso de cliente. Selecciona Cliente." },
+        { status: 403 }
+      );
+    }
+
+    const redirectTo = isClientAccount ? "/portal" : "/dashboard";
 
     const response = NextResponse.json({
       ok: true,
