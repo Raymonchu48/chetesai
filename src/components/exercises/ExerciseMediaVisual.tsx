@@ -1,4 +1,4 @@
-import LegCardSpriteVisual from "@/components/exercises/LegCardSpriteVisual";
+import LegCardSpriteVisual, { getFinalLegTile } from "@/components/exercises/LegCardSpriteVisual";
 import ProfessionalExerciseVisual from "@/components/exercises/ProfessionalExerciseVisual";
 
 type ExerciseMediaItem = {
@@ -11,45 +11,21 @@ type ExerciseMediaItem = {
   miniatura_url?: string | null;
 };
 
-const LEG_CARD_PATTERNS = [
-  "sentadilla",
-  "squat",
-  "zancada",
-  "prensa",
-  "peso muerto rumano",
-  "extension de piernas",
-  "extension de cuadriceps",
-  "hip thrust",
-  "curl femoral",
-  "step up",
-  "step-up",
-  "elevacion de talones",
-  "gemelos"
-];
-
-function normalize(value: string) {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-}
-
-function hasApprovedLegCard(name: string) {
-  const n = normalize(name);
-  return LEG_CARD_PATTERNS.some((pattern) => n.includes(pattern));
-}
-
 export default function ExerciseMediaVisual({ item }: { item: ExerciseMediaItem }) {
   const uploaded = item.gif_url || item.imagen_url || item.miniatura_url;
+  const finalLegTile = item.grupo_muscular === "piernas"
+    ? getFinalLegTile(item.nombre, item.codigo_interno)
+    : -1;
 
-  // El contenido multimedia real incorporado por el entrenador siempre tiene
-  // prioridad. De esta forma una tarjeta final subida nunca queda oculta por
-  // un recurso automático o por un sprite histórico.
-  if (uploaded) {
-    return <img src={uploaded} alt={item.nombre} className="h-full w-full object-contain bg-white" />;
+  // Los 12 ejercicios aprobados de Piernas usan siempre el banco visual final.
+  // Esto sustituye miniaturas antiguas, imágenes genéricas y asociaciones erróneas.
+  if (finalLegTile >= 0) {
+    return <LegCardSpriteVisual code={item.codigo_interno} name={item.nombre} />;
   }
 
-  // El banco LEG se utiliza únicamente como fallback para ejercicios de Piernas
-  // que tienen una correspondencia real con una tarjeta aprobada.
-  if (item.grupo_muscular === "piernas" && hasApprovedLegCard(item.nombre)) {
-    return <LegCardSpriteVisual code={item.codigo_interno} name={item.nombre} />;
+  // El resto de ejercicios conserva cualquier multimedia específico subido.
+  if (uploaded) {
+    return <img src={uploaded} alt={item.nombre} className="h-full w-full object-contain bg-white" />;
   }
 
   return (
