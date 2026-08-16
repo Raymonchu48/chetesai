@@ -7,6 +7,7 @@ const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 type AppUser = { id: string };
 type Row = Record<string, unknown>;
+type CleanMeal = { nombre: string; hora: string; descripcion: string };
 
 async function assertProfessional(): Promise<AppUser> {
   if (!supabaseUrl || !anonKey || !serviceKey) throw new Error("Supabase no está configurado");
@@ -62,7 +63,7 @@ function optionalNumber(value: unknown) {
   return Number.isFinite(number) ? number : null;
 }
 
-function cleanMeals(value: unknown) {
+function cleanMeals(value: unknown): CleanMeal[] {
   if (!Array.isArray(value)) return [];
   return value
     .map((item) => {
@@ -74,6 +75,19 @@ function cleanMeals(value: unknown) {
       };
     })
     .filter((item) => item.nombre || item.descripcion);
+}
+
+function hasMeaningfulPlanContent(body: Record<string, unknown>, meals: CleanMeal[]) {
+  const hasMealProposal = meals.some((meal) => meal.descripcion.length > 0);
+  const hasText = [body.objetivo, body.recomendaciones].some((value) => String(value || "").trim().length > 0);
+  const hasTargets = [
+    body.calorias_objetivo,
+    body.proteinas_g,
+    body.carbohidratos_g,
+    body.grasas_g,
+    body.agua_ml,
+  ].some((value) => value !== "" && value !== null && value !== undefined && Number.isFinite(Number(value)));
+  return hasMealProposal || hasText || hasTargets;
 }
 
 export async function GET(request: NextRequest) {
@@ -112,6 +126,17 @@ export async function POST(request: NextRequest) {
     if (!clienteId) return NextResponse.json({ ok: false, error: "Selecciona un cliente" }, { status: 400 });
 
     if (action === "save_plan") {
+      const meals = cleanMeals(body.comidas);
+      if (!hasMeaningfulPlanContent(body, meals)) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: "El plan está vacío. Añade al menos una propuesta de comida, una recomendación, un objetivo o valores nutricionales antes de publicarlo.",
+          },
+          { status: 400 }
+        );
+      }
+
       const payload = {
         cliente_id: clienteId,
         nombre: String(body.nombre || "Plan nutricional personalizado").trim(),
@@ -122,7 +147,7 @@ export async function POST(request: NextRequest) {
         grasas_g: optionalNumber(body.grasas_g),
         agua_ml: optionalNumber(body.agua_ml),
         recomendaciones: String(body.recomendaciones || "").trim() || null,
-        comidas: cleanMeals(body.comidas),
+        comidas: meals,
         fecha_inicio: String(body.fecha_inicio || new Date().toISOString().slice(0, 10)),
         fecha_fin: String(body.fecha_fin || "").trim() || null,
         estado: "activo",
@@ -132,7 +157,7 @@ export async function POST(request: NextRequest) {
 
       const planId = String(body.id || "");
       const rows = planId
-        ? await serviceRequest<Row[]>(`planes_nutricionales?id=eq.${encodeURIComponent(planId)}`, {
+        ? await serviceRequest<Row[]>(`planes_nutricionales?id=eq.${encodeURIComponent(planId)}&cliente_id=eq.${encodeURIComponent(clienteId)}`, {
             method: "PATCH",
             headers: { Prefer: "return=representation" },
             body: JSON.stringify(payload),
@@ -143,7 +168,12 @@ export async function POST(request: NextRequest) {
             body: JSON.stringify(payload),
           });
 
-      return NextResponse.json({ ok: true, data: rows[0] || null });
+      const savedPlan = rows[0] || null;
+      if (!savedPlan) {
+        return NextResponse.json({ ok: false, error: "Supabase no confirmó la publicación del plan" }, { status: 500 });
+      }
+
+      return NextResponse.json({ ok: true, data: savedPlan, published: true });
     }
 
     if (action === "create_habit") {
