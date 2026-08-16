@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     const savedEmail = window.localStorage.getItem("chetesai_login_email");
@@ -65,13 +67,18 @@ export default function LoginPage() {
       setRememberMe(true);
     }
 
-    const oauthError = new URLSearchParams(window.location.search).get("oauthError");
+    const params = new URLSearchParams(window.location.search);
+    const oauthError = params.get("oauthError");
     if (oauthError) setError(oauthError);
+    if (params.get("passwordReset") === "1") {
+      setNotice("Contraseña actualizada correctamente. Ya puedes iniciar sesión con tu nueva contraseña.");
+    }
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setNotice("");
     setLoading(true);
 
     try {
@@ -101,9 +108,14 @@ export default function LoginPage() {
 
   function handleGoogleLogin() {
     setError("");
+    setNotice("");
     setGoogleLoading(true);
     window.location.assign(`/api/auth/google/start?role=${accessRole}`);
   }
+
+  const forgotPasswordHref = email.trim()
+    ? `/forgot-password?email=${encodeURIComponent(email.trim())}`
+    : "/forgot-password";
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f7f6f1] px-4 py-7 text-[#07182b] sm:px-6 sm:py-10">
@@ -158,11 +170,17 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <label className="flex cursor-pointer items-center gap-3 text-sm text-[#6f7988]">
-              <input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-5 w-5 rounded border-[#b6bec8] accent-[#8ee500]" />
-              Recordarme
-            </label>
+            <div className="flex items-center justify-between gap-4 text-sm">
+              <label className="flex cursor-pointer items-center gap-3 text-[#6f7988]">
+                <input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-5 w-5 rounded border-[#b6bec8] accent-[#8ee500]" />
+                Recordarme
+              </label>
+              <Link href={forgotPasswordHref} className="font-bold text-[#07182b] underline decoration-[#8ee500] decoration-2 underline-offset-4 transition hover:text-[#4d7900]">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
 
+            {notice ? <div className="rounded-xl border border-[#cbd9b4] bg-[#f7fbef] px-4 py-3 text-sm font-medium text-[#315f22]">{notice}</div> : null}
             {error ? <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</div> : null}
 
             <Button type="submit" disabled={loading || googleLoading} className="h-16 w-full rounded-xl bg-[#8ef000] text-lg font-black text-[#07182b] shadow-[0_12px_28px_rgba(142,229,0,0.22)] transition hover:bg-[#82df00] hover:shadow-[0_14px_32px_rgba(142,229,0,0.28)]">
