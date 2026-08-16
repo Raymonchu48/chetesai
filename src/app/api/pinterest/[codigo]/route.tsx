@@ -20,10 +20,10 @@ const paletteByGroup: Record<string, { accent: string; soft: string; ink: string
 };
 
 function fitTitle(name: string) {
-  if (name.length > 46) return 54;
-  if (name.length > 34) return 62;
-  if (name.length > 24) return 70;
-  return 80;
+  if (name.length > 46) return 48;
+  if (name.length > 34) return 54;
+  if (name.length > 24) return 62;
+  return 72;
 }
 
 function compact(text?: string | null, max = 165) {
@@ -93,7 +93,16 @@ export async function GET(_request: Request, { params }: RouteContext) {
           </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", marginTop: "70px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            flexShrink: 0,
+            height: "300px",
+            marginTop: "42px",
+            overflow: "hidden",
+          }}
+        >
           <div style={{ color: palette.accent, fontSize: "21px", fontWeight: 900, letterSpacing: "4px" }}>{group}</div>
           <div
             style={{
@@ -102,14 +111,27 @@ export async function GET(_request: Request, { params }: RouteContext) {
               maxWidth: "880px",
               fontSize: `${fitTitle(exercise.nombre)}px`,
               fontWeight: 900,
-              lineHeight: 0.98,
-              letterSpacing: "-2.8px",
+              lineHeight: 1,
+              letterSpacing: "-2.2px",
+              maxHeight: "150px",
+              overflow: "hidden",
             }}
           >
             {exercise.nombre}
           </div>
-          <div style={{ display: "flex", marginTop: "26px", maxWidth: "840px", color: "#667069", fontSize: "25px", lineHeight: 1.45 }}>
-            {compact(exercise.descripcion)}
+          <div
+            style={{
+              display: "flex",
+              marginTop: "20px",
+              maxWidth: "860px",
+              maxHeight: "62px",
+              overflow: "hidden",
+              color: "#667069",
+              fontSize: "22px",
+              lineHeight: 1.35,
+            }}
+          >
+            {compact(exercise.descripcion, 120)}
           </div>
         </div>
 
@@ -118,8 +140,9 @@ export async function GET(_request: Request, { params }: RouteContext) {
             position: "relative",
             display: "flex",
             flexDirection: "column",
-            flex: 1,
-            marginTop: "44px",
+            flexShrink: 0,
+            height: "580px",
+            marginTop: "28px",
             overflow: "hidden",
             borderRadius: "42px",
             background: "#18211d",
@@ -153,7 +176,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: "14px", marginTop: "24px" }}>
+        <div style={{ display: "flex", flexShrink: 0, height: "88px", gap: "14px", marginTop: "18px" }}>
           <InfoPill label="NIVEL" value={labelFor(exercise.dificultad)} />
           <InfoPill label="MATERIAL" value={exercise.material || "Sin material"} />
           <InfoPill label="TIPO" value={labelFor(exercise.categoria)} />
@@ -164,7 +187,9 @@ export async function GET(_request: Request, { params }: RouteContext) {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            marginTop: "30px",
+            flexShrink: 0,
+            height: "90px",
+            marginTop: "24px",
             borderTop: "2px solid #dcd5c9",
             paddingTop: "25px",
           }}
