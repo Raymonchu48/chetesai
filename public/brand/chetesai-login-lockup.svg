@@ -1,41 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="title desc">
   <title id="title">Chetesaí Fitness+ · Carga tus energías</title>
-  <desc id="desc">Identidad visual Chetesaí Fitness+ con símbolo orbital deportivo y lema.</desc>
-  <defs>
-    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#A9F51E"/>
-      <stop offset="1" stop-color="#79C900"/>
-    </linearGradient>
-  </defs>
+  <desc id="desc">Identidad Chetesaí Fitness+ en azul noche y dorado con monograma F, media luna y lema.</desc>
 
-  <g transform="translate(38 18)">
-    <ellipse cx="235" cy="165" rx="158" ry="58" fill="none" stroke="#07182B" stroke-width="7" transform="rotate(-15 235 165)"/>
-    <ellipse cx="235" cy="165" rx="160" ry="60" fill="none" stroke="#07182B" stroke-width="6" transform="rotate(70 235 165)"/>
-    <ellipse cx="235" cy="165" rx="150" ry="54" fill="none" stroke="#8EE500" stroke-width="5" transform="rotate(17 235 165)"/>
-
-    <g stroke="url(#green)" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="248" cy="116" r="15" fill="#8EE500" stroke="none"/>
-      <path d="M246 139 C260 143 270 151 277 165" stroke-width="18"/>
-      <path d="M258 149 L223 174" stroke-width="12"/>
-      <path d="M273 158 L309 146" stroke-width="11"/>
-      <path d="M271 170 L239 211" stroke-width="15"/>
-      <path d="M276 172 L314 207" stroke-width="15"/>
-    </g>
-
-    <g fill="#07182B">
-      <circle cx="108" cy="157" r="6"/><path d="M105 166h6v23h-6zM96 174h24v5H96zM106 188l-8 16 5 3 6-11 6 11 5-3-8-16z"/>
-      <circle cx="232" cy="29" r="6"/><path d="M229 38h6v23h-6zM219 45h26v5h-26zM230 60l-8 16 5 3 6-11 6 11 5-3-8-16z"/>
-      <circle cx="365" cy="154" r="6"/><path d="M362 163h6v23h-6zM352 170h26v5h-26zM363 185l-8 16 5 3 6-11 6 11 5-3-8-16z"/>
-      <circle cx="238" cy="292" r="6"/><path d="M235 301h6v22h-6zM226 307h24v5h-24zM236 322l-8 14 5 3 6-10 6 10 5-3-8-14z"/>
-    </g>
+  <g transform="translate(38 22)">
+    <path d="M236 24C126 10 53 77 53 159c0 87 73 143 173 132-78-16-130-61-130-132 0-65 50-113 140-135z" fill="#07182B"/>
+    <path d="M237 38c-73-8-124 29-151 79 33-42 78-63 143-55 26 3 48 11 67 23-14-22-33-39-59-47z" fill="#C69A39"/>
+    <path d="M214 42C130 41 78 92 78 160c0 70 55 117 136 118-63-13-101-56-101-118 0-59 36-101 101-118z" fill="#F7F6F1"/>
+    <text x="112" y="221" font-family="Georgia,'Times New Roman',serif" font-size="150" font-weight="700" fill="#07182B">F</text>
+    <path d="M235 115l9 30 30 9-30 9-9 30-9-30-30-9 30-9z" fill="#C69A39"/>
   </g>
 
-  <g transform="translate(480 78)">
-    <text x="0" y="70" font-family="Arial,Helvetica,sans-serif" font-size="68" font-weight="800" letter-spacing="9" fill="#07182B">CHETESAÍ</text>
-    <text x="6" y="148" font-family="Arial,Helvetica,sans-serif" font-size="64" font-weight="800" letter-spacing="7" fill="#07182B">FITNESS</text>
-    <text x="355" y="148" font-family="Arial,Helvetica,sans-serif" font-size="72" font-weight="800" fill="#8EE500">+</text>
-    <line x1="0" y1="190" x2="58" y2="190" stroke="#8EE500" stroke-width="4"/>
-    <text x="76" y="203" font-family="Arial,Helvetica,sans-serif" font-size="34" font-weight="500" fill="#26364A">Carga tus energías</text>
-    <line x1="364" y1="190" x2="422" y2="190" stroke="#8EE500" stroke-width="4"/>
+  <line x1="332" y1="58" x2="332" y2="260" stroke="#C69A39" stroke-width="2"/>
+
+  <g transform="translate(382 54)">
+    <text x="0" y="78" font-family="Georgia,'Times New Roman',serif" font-size="72" font-weight="700" letter-spacing="3" fill="#07182B">CHETESAÍ</text>
+    <text x="8" y="150" font-family="Arial,Helvetica,sans-serif" font-size="58" font-weight="600" letter-spacing="15" fill="#07182B">FITNESS</text>
+    <text x="418" y="150" font-family="Arial,Helvetica,sans-serif" font-size="66" font-weight="700" fill="#C69A39">+</text>
+    <line x1="0" y1="196" x2="58" y2="196" stroke="#C69A39" stroke-width="3"/>
+    <text x="76" y="210" font-family="Georgia,'Times New Roman',serif" font-size="34" font-style="italic" fill="#26364A">Carga tus energías</text>
+    <line x1="392" y1="196" x2="450" y2="196" stroke="#C69A39" stroke-width="3"/>
   </g>
 </svg>
