@@ -11,6 +11,19 @@ function stringArray(value: unknown) {
   return String(value ?? "").split(",").map((item) => item.trim()).filter(Boolean);
 }
 
+function textList(value: unknown) {
+  if (Array.isArray(value)) {
+    const items = value.map((item) => String(item).trim()).filter(Boolean);
+    return items.length ? items.join(", ") : null;
+  }
+  return optionalText(value);
+}
+
+function iaContext(body: Record<string, unknown>) {
+  const value = body.contexto_ia ?? body.ia_contexto;
+  return typeof value === "object" && value ? value : {};
+}
+
 function normalizePayload(body: Record<string, unknown>) {
   return {
     nombre: String(body.nombre ?? "").trim(),
@@ -18,7 +31,7 @@ function normalizePayload(body: Record<string, unknown>) {
     codigo_interno: optionalText(body.codigo_interno),
     grupo_muscular: String(body.grupo_muscular ?? "").trim(),
     grupo_secundario: optionalText(body.grupo_secundario),
-    musculos_estabilizadores: stringArray(body.musculos_estabilizadores),
+    musculos_estabilizadores: textList(body.musculos_estabilizadores),
     categoria: String(body.categoria ?? "fuerza").trim(),
     subcategoria: optionalText(body.subcategoria),
     dificultad: String(body.dificultad ?? "principiante").trim(),
@@ -52,7 +65,7 @@ function normalizePayload(body: Record<string, unknown>) {
     progresion: optionalText(body.progresion),
     etiquetas: stringArray(body.etiquetas),
     objetivos: stringArray(body.objetivos),
-    ia_contexto: typeof body.ia_contexto === "object" && body.ia_contexto ? body.ia_contexto : {},
+    contexto_ia: iaContext(body),
     activo: body.activo !== false,
   };
 }
