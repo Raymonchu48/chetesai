@@ -141,7 +141,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
             display: "flex",
             flexDirection: "column",
             flexShrink: 0,
-            height: "580px",
+            height: "660px",
             marginTop: "28px",
             overflow: "hidden",
             borderRadius: "42px",
