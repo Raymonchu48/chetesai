@@ -1,30 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 430" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="title desc">
   <title id="title">Chetesaí Fitness+ · Carga tus energías</title>
   <desc id="desc">Identidad visual Chetesaí Fitness+ con símbolo orbital deportivo y lema.</desc>
   <defs>
-    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A9F51E"/><stop offset="1" stop-color="#79C900"/></linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#A9F51E"/>
+      <stop offset="1" stop-color="#79C900"/>
+    </linearGradient>
   </defs>
-  <g transform="translate(45 24)">
-    <ellipse cx="250" cy="190" rx="202" ry="82" fill="none" stroke="#07182B" stroke-width="8" transform="rotate(-14 250 190)"/>
-    <ellipse cx="250" cy="190" rx="205" ry="84" fill="none" stroke="#07182B" stroke-width="7" transform="rotate(72 250 190)"/>
-    <ellipse cx="250" cy="190" rx="188" ry="76" fill="none" stroke="#8EE500" stroke-width="6" transform="rotate(18 250 190)"/>
-    <circle cx="270" cy="125" r="25" fill="url(#green)"/>
-    <path d="M246 155c22-16 56-9 73 10 12 14 18 32 22 47l-31 8c-3-13-8-26-17-35-6-6-13-9-19-7-12 4-15 17-23 33-9 18-26 39-57 59l-22-24c27-18 39-35 46-50 8-17 13-31 28-41z" fill="url(#green)"/>
-    <path d="M231 207c-25 10-48 29-66 55l-29-18c21-34 50-58 85-72z" fill="#93E900"/>
-    <path d="M294 212c22 16 40 38 54 65l-30 16c-12-23-27-41-46-54z" fill="#93E900"/>
+
+  <g transform="translate(38 18)">
+    <ellipse cx="235" cy="165" rx="158" ry="58" fill="none" stroke="#07182B" stroke-width="7" transform="rotate(-15 235 165)"/>
+    <ellipse cx="235" cy="165" rx="160" ry="60" fill="none" stroke="#07182B" stroke-width="6" transform="rotate(70 235 165)"/>
+    <ellipse cx="235" cy="165" rx="150" ry="54" fill="none" stroke="#8EE500" stroke-width="5" transform="rotate(17 235 165)"/>
+
+    <g stroke="url(#green)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="248" cy="116" r="15" fill="#8EE500" stroke="none"/>
+      <path d="M246 139 C260 143 270 151 277 165" stroke-width="18"/>
+      <path d="M258 149 L223 174" stroke-width="12"/>
+      <path d="M273 158 L309 146" stroke-width="11"/>
+      <path d="M271 170 L239 211" stroke-width="15"/>
+      <path d="M276 172 L314 207" stroke-width="15"/>
+    </g>
+
     <g fill="#07182B">
-      <circle cx="120" cy="175" r="8"/><path d="M116 186h8v30h-8zM108 198h24v7h-24zM115 215l-10 20 7 4 8-14 8 14 7-4-10-20z"/>
-      <circle cx="248" cy="34" r="8"/><path d="M244 45h8v31h-8zM229 52h38v7h-38zM245 76l-10 20 7 4 7-14 8 14 7-4-11-20z"/>
-      <circle cx="391" cy="174" r="8"/><path d="M387 185h8v31h-8zM372 193h38v7h-38zM388 216l-10 20 7 4 7-14 8 14 7-4-11-20z"/>
-      <circle cx="256" cy="340" r="8"/><path d="M252 351h8v28h-8zM240 359h32v7h-32zM253 377l-10 18 7 4 7-13 7 13 7-4-10-18z"/>
+      <circle cx="108" cy="157" r="6"/><path d="M105 166h6v23h-6zM96 174h24v5H96zM106 188l-8 16 5 3 6-11 6 11 5-3-8-16z"/>
+      <circle cx="232" cy="29" r="6"/><path d="M229 38h6v23h-6zM219 45h26v5h-26zM230 60l-8 16 5 3 6-11 6 11 5-3-8-16z"/>
+      <circle cx="365" cy="154" r="6"/><path d="M362 163h6v23h-6zM352 170h26v5h-26zM363 185l-8 16 5 3 6-11 6 11 5-3-8-16z"/>
+      <circle cx="238" cy="292" r="6"/><path d="M235 301h6v22h-6zM226 307h24v5h-24zM236 322l-8 14 5 3 6-10 6 10 5-3-8-14z"/>
     </g>
   </g>
-  <g transform="translate(520 92)">
-    <text x="0" y="72" font-family="Arial,Helvetica,sans-serif" font-size="72" font-weight="800" letter-spacing="10" fill="#07182B">CHETESAÍ</text>
-    <text x="8" y="160" font-family="Arial,Helvetica,sans-serif" font-size="68" font-weight="800" letter-spacing="8" fill="#07182B">FITNESS</text>
-    <text x="380" y="160" font-family="Arial,Helvetica,sans-serif" font-size="76" font-weight="800" fill="#8EE500">+</text>
-    <line x1="0" y1="206" x2="66" y2="206" stroke="#8EE500" stroke-width="4"/>
-    <text x="86" y="220" font-family="Arial,Helvetica,sans-serif" font-size="36" font-weight="500" fill="#26364A">Carga tus energías</text>
-    <line x1="390" y1="206" x2="456" y2="206" stroke="#8EE500" stroke-width="4"/>
+
+  <g transform="translate(480 78)">
+    <text x="0" y="70" font-family="Arial,Helvetica,sans-serif" font-size="68" font-weight="800" letter-spacing="9" fill="#07182B">CHETESAÍ</text>
+    <text x="6" y="148" font-family="Arial,Helvetica,sans-serif" font-size="64" font-weight="800" letter-spacing="7" fill="#07182B">FITNESS</text>
+    <text x="355" y="148" font-family="Arial,Helvetica,sans-serif" font-size="72" font-weight="800" fill="#8EE500">+</text>
+    <line x1="0" y1="190" x2="58" y2="190" stroke="#8EE500" stroke-width="4"/>
+    <text x="76" y="203" font-family="Arial,Helvetica,sans-serif" font-size="34" font-weight="500" fill="#26364A">Carga tus energías</text>
+    <line x1="364" y1="190" x2="422" y2="190" stroke="#8EE500" stroke-width="4"/>
   </g>
 </svg>
