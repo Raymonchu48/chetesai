@@ -91,11 +91,14 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await supabaseRest<ClienteRow[]>(
+    const deletedRows = await supabaseRest<ClienteRow[]>(
       `clientes?id=eq.${encodeURIComponent(id)}`,
       { method: "DELETE", headers: { Prefer: "return=representation" } }
     );
-    return NextResponse.json({ ok: true });
+    if (!deletedRows[0]) {
+      return NextResponse.json({ ok: false, error: "Cliente no encontrado" }, { status: 404 });
+    }
+    return NextResponse.json({ ok: true, data: toCliente(deletedRows[0]) });
   } catch (error) {
     console.error("[API] DELETE /api/clientes/[id] error:", error);
     return NextResponse.json(
