@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Users } from "lucide-react";
+import { Copy, KeyRound, Pencil, Plus, Search, ShieldCheck, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 
 interface Cliente {
@@ -44,6 +44,12 @@ interface Cliente {
   fecha_alta: string;
   notas: string;
 }
+
+type AccessCredentials = {
+  email: string;
+  temporaryPassword: string;
+  loginUrl: string;
+};
 
 const objetivoLabels: Record<string, string> = {
   perdida_peso: "Perdida de Peso",
@@ -78,6 +84,10 @@ export default function ClientesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [accessDialogOpen, setAccessDialogOpen] = useState(false);
+  const [accessClient, setAccessClient] = useState<Cliente | null>(null);
+  const [creatingAccess, setCreatingAccess] = useState(false);
+  const [credentials, setCredentials] = useState<AccessCredentials | null>(null);
 
   const fetchClientes = useCallback(async () => {
     try {
@@ -156,6 +166,58 @@ export default function ClientesPage() {
     }
   };
 
+  const openAccessDialog = (cliente: Cliente) => {
+    if (!cliente.email?.trim()) {
+      toast.error("Añade primero un correo electrónico al cliente");
+      return;
+    }
+    setAccessClient(cliente);
+    setCredentials(null);
+    setAccessDialogOpen(true);
+  };
+
+  const createAccess = async () => {
+    if (!accessClient) return;
+    setCreatingAccess(true);
+    try {
+      const response = await fetch(`/api/clientes/${accessClient._id}/acceso`, {
+        method: "POST",
+      });
+      const result = (await response.json()) as {
+        ok: boolean;
+        data?: AccessCredentials;
+        error?: string;
+      };
+      if (!response.ok || !result.ok || !result.data) {
+        throw new Error(result.error || "No se pudo crear el acceso");
+      }
+      setCredentials(result.data);
+      toast.success("Acceso al portal creado");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error al crear el acceso");
+    } finally {
+      setCreatingAccess(false);
+    }
+  };
+
+  const copyCredentials = async () => {
+    if (!credentials) return;
+    const text = [
+      "Chetesaí Fitness+",
+      `Usuario: ${credentials.email}`,
+      `Contraseña temporal: ${credentials.temporaryPassword}`,
+      `Acceso: ${credentials.loginUrl}`,
+      "Selecciona Cliente al iniciar sesión.",
+    ].join("\n");
+
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Credenciales copiadas");
+    } catch {
+      toast.error("No se pudieron copiar las credenciales");
+    }
+  };
+
   const filtered = clientes.filter(
     (c) =>
       c.nombre?.toLowerCase().includes(search.toLowerCase()) ||
@@ -165,7 +227,6 @@ export default function ClientesPage() {
   return (
     <AppSidebar>
       <div className="p-6 md:p-8 max-w-7xl mx-auto">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center gap-3">
@@ -283,7 +344,6 @@ export default function ClientesPage() {
           </Dialog>
         </div>
 
-        {/* Search */}
         <div className="mb-6">
           <div className="relative max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -296,7 +356,6 @@ export default function ClientesPage() {
           </div>
         </div>
 
-        {/* Table */}
         <Card>
           <CardContent className="p-0">
             {loading ? (
@@ -338,7 +397,17 @@ export default function ClientesPage() {
                           <Button
                             variant="ghost"
                             size="sm"
+                            onClick={() => openAccessDialog(c)}
+                            className="text-[#46624f] hover:text-[#36513f]"
+                            title="Crear acceso al portal"
+                          >
+                            <KeyRound className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => handleEdit(c)}
+                            title="Editar cliente"
                           >
                             <Pencil className="w-4 h-4" />
                           </Button>
@@ -347,6 +416,7 @@ export default function ClientesPage() {
                             size="sm"
                             onClick={() => handleDelete(c._id)}
                             className="text-destructive hover:text-destructive"
+                            title="Eliminar cliente"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -359,6 +429,67 @@ export default function ClientesPage() {
             )}
           </CardContent>
         </Card>
+
+        <Dialog open={accessDialogOpen} onOpenChange={(open) => {
+          setAccessDialogOpen(open);
+          if (!open) {
+            setAccessClient(null);
+            setCredentials(null);
+          }
+        }}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{credentials ? "Acceso creado" : "Crear acceso al portal"}</DialogTitle>
+            </DialogHeader>
+
+            {!credentials ? (
+              <div className="space-y-5 pt-2">
+                <div className="rounded-2xl border bg-muted/30 p-4">
+                  <p className="font-semibold">{accessClient?.nombre}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{accessClient?.email}</p>
+                </div>
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+                  <p className="font-semibold">Se creará una cuenta de cliente</p>
+                  <p className="mt-1 leading-6">Chetesaí generará una contraseña temporal segura. Solo se mostrará una vez para que puedas entregársela al cliente.</p>
+                </div>
+                <Button onClick={createAccess} disabled={creatingAccess} className="w-full bg-[#46624f] hover:bg-[#3b5543]">
+                  <KeyRound className="mr-2 h-4 w-4" />
+                  {creatingAccess ? "Creando acceso..." : "Crear acceso al portal"}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-5 pt-2">
+                <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900">
+                  <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
+                  <div>
+                    <p className="font-semibold">Cuenta lista para usar</p>
+                    <p className="mt-1 text-sm leading-6">El cliente debe entrar seleccionando <strong>Cliente</strong>. Puede cambiar después la contraseña mediante “¿Olvidaste tu contraseña?”.</p>
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Usuario</Label>
+                  <Input className="mt-2" readOnly value={credentials.email} />
+                </div>
+                <div>
+                  <Label>Contraseña temporal</Label>
+                  <Input className="mt-2 font-mono" readOnly value={credentials.temporaryPassword} />
+                </div>
+                <div>
+                  <Label>Acceso</Label>
+                  <Input className="mt-2" readOnly value={credentials.loginUrl} />
+                </div>
+
+                <Button onClick={copyCredentials} className="w-full bg-[#46624f] hover:bg-[#3b5543]">
+                  <Copy className="mr-2 h-4 w-4" /> Copiar credenciales
+                </Button>
+                <p className="text-center text-xs leading-5 text-muted-foreground">
+                  Por seguridad, la contraseña temporal no se guarda en el panel y desaparecerá al cerrar esta ventana.
+                </p>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </AppSidebar>
   );
