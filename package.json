@@ -10,7 +10,8 @@
     "cloudflare-deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "setup:stripe-webhook": "ts-node scripts/setup-stripe-webhook.ts"
+    "setup:stripe-webhook": "ts-node scripts/setup-stripe-webhook.ts",
+    "export:pinterest": "node scripts/export-pinterest-library.mjs"
   },
   "cloudflare": {
     "label": "Totalum App",
