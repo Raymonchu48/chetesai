@@ -97,6 +97,19 @@ const categoryLabels: Record<string, string> = {
   otro: "Otro",
 };
 
+function hasMeaningfulPlan(plan: PlanForm) {
+  const hasMealProposal = plan.comidas.some((meal) => meal.descripcion.trim().length > 0);
+  const hasText = Boolean(plan.objetivo.trim() || plan.recomendaciones.trim());
+  const hasTargets = [
+    plan.calorias_objetivo,
+    plan.proteinas_g,
+    plan.carbohidratos_g,
+    plan.grasas_g,
+    plan.agua_ml,
+  ].some((value) => value.trim().length > 0);
+  return hasMealProposal || hasText || hasTargets;
+}
+
 export default function NutritionPage() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [clienteId, setClienteId] = useState("");
@@ -159,6 +172,7 @@ export default function NutritionPage() {
   const todayRecords = records.filter((item) => item.fecha === today && item.completado);
   const adherenceToday = habits.length ? Math.round((todayRecords.length / habits.length) * 100) : 0;
   const selectedClient = clientes.find((item) => item._id === clienteId);
+  const mealProposalCount = plan.comidas.filter((meal) => meal.descripcion.trim().length > 0).length;
 
   const weeklyCompletion = useMemo(() => {
     const start = new Date();
@@ -171,6 +185,10 @@ export default function NutritionPage() {
 
   async function savePlan() {
     if (!clienteId) return toast.error("Selecciona un cliente");
+    if (!hasMeaningfulPlan(plan)) {
+      return toast.error("Añade contenido real al plan antes de publicarlo al cliente");
+    }
+
     setSavingPlan(true);
     try {
       const response = await fetch("/api/nutricion", {
@@ -178,9 +196,16 @@ export default function NutritionPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "save_plan", cliente_id: clienteId, ...plan }),
       });
-      const result = (await response.json()) as { ok: boolean; error?: string };
-      if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo guardar el plan");
-      toast.success("Plan nutricional guardado");
+      const result = (await response.json()) as { ok: boolean; error?: string; data?: Plan };
+      if (!response.ok || !result.ok || !result.data) throw new Error(result.error || "No se pudo guardar el plan");
+
+      const verifyResponse = await fetch(`/api/nutricion?cliente_id=${encodeURIComponent(clienteId)}`, { cache: "no-store" });
+      const verifyResult = (await verifyResponse.json()) as { ok: boolean; data?: NutritionData; error?: string };
+      if (!verifyResponse.ok || !verifyResult.ok || !verifyResult.data?.plan) {
+        throw new Error(verifyResult.error || "El plan se guardó, pero no pudo verificarse como publicado");
+      }
+
+      toast.success("Plan guardado y publicado en el portal del cliente");
       await load();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error al guardar");
@@ -251,8 +276,8 @@ export default function NutritionPage() {
 
           <Card className="mb-6"><CardContent className="p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div><h2 className="text-xl font-bold">Plan nutricional activo</h2><p className="mt-1 text-sm text-muted-foreground">Objetivos y estructura diaria orientativa.</p></div>
-              <Button onClick={savePlan} disabled={savingPlan || !clienteId}><Save className="mr-2 h-4 w-4" />{savingPlan ? "Guardando..." : "Guardar plan"}</Button>
+              <div><h2 className="text-xl font-bold">Plan nutricional activo</h2><p className="mt-1 text-sm text-muted-foreground">Objetivos y estructura diaria orientativa. Al publicar, el cliente lo verá inmediatamente en Nutrición.</p></div>
+              <Button onClick={savePlan} disabled={savingPlan || !clienteId}><Save className="mr-2 h-4 w-4" />{savingPlan ? "Publicando..." : "Guardar y publicar"}</Button>
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-4">
@@ -269,12 +294,20 @@ export default function NutritionPage() {
 
             <div className="mt-6"><Label>Recomendaciones profesionales</Label><Textarea className="mt-2" rows={4} value={plan.recomendaciones} onChange={(event) => setPlan({ ...plan, recomendaciones: event.target.value })} placeholder="Prioridades, sustituciones, contexto y pautas generales..." /></div>
 
-            <div className="mt-8"><h3 className="text-lg font-bold">Estructura diaria de comidas</h3><p className="mt-1 text-sm text-muted-foreground">Orientación flexible; no sustituye una valoración clínica cuando sea necesaria.</p></div>
+            <div className="mt-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div><h3 className="text-lg font-bold">Estructura diaria de comidas</h3><p className="mt-1 text-sm text-muted-foreground">Escribe aquí los alimentos, cantidades y alternativas que verá el cliente.</p></div>
+              <span className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${mealProposalCount ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>{mealProposalCount}/{plan.comidas.length} comidas con propuesta</span>
+            </div>
             <div className="mt-4 grid gap-4 lg:grid-cols-2">
               {plan.comidas.map((meal, index) => <div key={`${meal.nombre}-${index}`} className="rounded-2xl border bg-muted/20 p-4">
                 <div className="grid gap-3 sm:grid-cols-[1fr_120px]"><Field label="Momento" type="text" value={meal.nombre} onChange={(value) => updateMeal(index, "nombre", value)} /><Field label="Hora" type="time" value={meal.hora} onChange={(value) => updateMeal(index, "hora", value)} /></div>
-                <div className="mt-3"><Label>Propuesta</Label><Textarea className="mt-2" rows={3} value={meal.descripcion} onChange={(event) => updateMeal(index, "descripcion", event.target.value)} placeholder="Alimentos, cantidades orientativas y alternativas..." /></div>
+                <div className="mt-3"><Label>Propuesta visible para el cliente</Label><Textarea className="mt-2" rows={4} value={meal.descripcion} onChange={(event) => updateMeal(index, "descripcion", event.target.value)} placeholder="Ej.: 60 g de avena + 250 ml de leche + fruta. Alternativa: yogur natural con avena y frutos rojos." /></div>
               </div>)}
+            </div>
+
+            <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div><p className="font-bold text-emerald-900">Publicación en el portal del cliente</p><p className="mt-1 text-sm text-emerald-800">Este botón guarda el plan en Supabase y verifica que haya quedado activo antes de confirmar.</p></div>
+              <Button onClick={savePlan} disabled={savingPlan || !clienteId} className="shrink-0 bg-[#46624f] hover:bg-[#3b5543]"><Save className="mr-2 h-4 w-4" />{savingPlan ? "Publicando..." : "Guardar y publicar al cliente"}</Button>
             </div>
           </CardContent></Card>
 
