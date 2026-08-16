@@ -155,14 +155,15 @@ export default function ClientesPage() {
     if (!confirm("Eliminar este cliente?")) return;
     try {
       const res = await fetch(`/api/clientes/${id}`, { method: "DELETE" });
-      const json = (await res.json()) as { ok: boolean };
-      if (json.ok) {
-        toast.success("Cliente eliminado");
-        fetchClientes();
+      const json = (await res.json()) as { ok: boolean; error?: string };
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || "No se pudo eliminar el cliente");
       }
+      toast.success("Cliente eliminado");
+      await fetchClientes();
     } catch (err) {
       console.error("Error deleting client:", err);
-      toast.error("Error al eliminar");
+      toast.error(err instanceof Error ? err.message : "Error al eliminar");
     }
   };
 
