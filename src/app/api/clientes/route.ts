@@ -21,6 +21,7 @@ type SolicitudRow = {
   objetivo: string | null;
   mensaje: string | null;
   cliente_id: string | null;
+  estado: string;
 };
 
 function toCliente(row: ClienteRow) {
@@ -45,7 +46,7 @@ function normalizeEmail(value: string | null | undefined) {
 
 async function synchronizeProspectiveClients(existingRows: ClienteRow[]) {
   const requests = await supabaseRest<SolicitudRow[]>(
-    "solicitudes_reserva?cliente_id=is.null&select=id,nombre,email,telefono,objetivo,mensaje,cliente_id&order=created_at.asc"
+    "solicitudes_reserva?cliente_id=is.null&estado=eq.nueva&select=id,nombre,email,telefono,objetivo,mensaje,cliente_id,estado&order=created_at.asc"
   );
 
   if (!requests.length) return existingRows;
@@ -98,7 +99,7 @@ async function synchronizeProspectiveClients(existingRows: ClienteRow[]) {
       `solicitudes_reserva?id=eq.${encodeURIComponent(request.id)}`,
       {
         method: "PATCH",
-        body: JSON.stringify({ cliente_id: client.id }),
+        body: JSON.stringify({ cliente_id: client.id, estado: "convertida" }),
       }
     );
   }
