@@ -64,8 +64,13 @@ export default function LoginPage() {
       <div aria-hidden="true" className="pointer-events-none absolute -right-32 top-48 h-[500px] w-[500px] rounded-full border border-[#a5e829]/15" />
 
       <section className="relative z-10 w-full max-w-[760px] rounded-[34px] border border-black/[0.06] bg-white/95 px-6 py-8 shadow-[0_25px_80px_rgba(5,22,38,0.10)] backdrop-blur sm:px-12 sm:py-10">
-        <header className="mb-7 flex justify-center">
-          <img src={BRAND_LOCKUP} alt="Chetesaí Fitness+ · Carga tus energías" className="h-auto w-full max-w-[560px] object-contain" />
+        <header className="mb-7 flex justify-center overflow-hidden">
+          <img
+            src={BRAND_LOCKUP}
+            alt="Chetesaí Fitness+ · Carga tus energías"
+            className="block h-auto w-[94%] max-w-[520px] object-contain sm:w-full"
+            style={{ aspectRatio: "1200 / 360" }}
+          />
         </header>
 
         <div className="mx-auto max-w-[560px]">
