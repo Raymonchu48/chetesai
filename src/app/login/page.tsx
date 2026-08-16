@@ -36,6 +36,17 @@ function ClientIcon() {
   );
 }
 
+function GoogleIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5">
+      <path fill="#4285F4" d="M21.6 12.227c0-.709-.064-1.391-.182-2.045H12v3.868h5.382a4.6 4.6 0 0 1-1.995 3.018v2.509h3.227c1.89-1.741 2.986-4.305 2.986-7.35Z" />
+      <path fill="#34A853" d="M12 22c2.7 0 4.964-.895 6.614-2.423l-3.227-2.509c-.895.6-2.041.955-3.387.955-2.605 0-4.809-1.759-5.6-4.123H3.064v2.591A9.997 9.997 0 0 0 12 22Z" />
+      <path fill="#FBBC05" d="M6.4 13.9A6.02 6.02 0 0 1 6.086 12c0-.659.114-1.3.314-1.9V7.509H3.064A9.997 9.997 0 0 0 2 12c0 1.614.386 3.141 1.064 4.491L6.4 13.9Z" />
+      <path fill="#EA4335" d="M12 5.977c1.468 0 2.786.505 3.823 1.495l2.864-2.863C16.959 2.995 14.695 2 12 2a9.997 9.997 0 0 0-8.936 5.509L6.4 10.1c.791-2.364 2.995-4.123 5.6-4.123Z" />
+    </svg>
+  );
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [accessRole, setAccessRole] = useState<AccessRole>("profesional");
@@ -44,6 +55,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -52,6 +64,9 @@ export default function LoginPage() {
       setEmail(savedEmail);
       setRememberMe(true);
     }
+
+    const oauthError = new URLSearchParams(window.location.search).get("oauthError");
+    if (oauthError) setError(oauthError);
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -84,6 +99,12 @@ export default function LoginPage() {
     }
   }
 
+  function handleGoogleLogin() {
+    setError("");
+    setGoogleLoading(true);
+    window.location.assign(`/api/auth/google/start?role=${accessRole}`);
+  }
+
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f7f6f1] px-4 py-7 text-[#07182b] sm:px-6 sm:py-10">
       <div aria-hidden="true" className="pointer-events-none absolute -left-52 bottom-[-260px] h-[650px] w-[650px] rounded-full border border-[#a5e829]/35" />
@@ -109,25 +130,11 @@ export default function LoginPage() {
           </div>
 
           <div className="mb-7 grid grid-cols-2 rounded-full bg-[#f0f1ed] p-1.5" role="tablist" aria-label="Tipo de acceso">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={accessRole === "profesional"}
-              onClick={() => { setAccessRole("profesional"); setError(""); }}
-              className={`flex items-center justify-center gap-2 rounded-full px-3 py-3.5 text-sm font-black transition-all sm:text-base ${accessRole === "profesional" ? "bg-[#98f21f] text-[#07182b] shadow-[0_8px_20px_rgba(142,229,0,0.22)]" : "text-[#6f7988]"}`}
-            >
-              <ProfessionalIcon active={accessRole === "profesional"} />
-              Profesional
+            <button type="button" role="tab" aria-selected={accessRole === "profesional"} onClick={() => { setAccessRole("profesional"); setError(""); }} className={`flex items-center justify-center gap-2 rounded-full px-3 py-3.5 text-sm font-black transition-all sm:text-base ${accessRole === "profesional" ? "bg-[#98f21f] text-[#07182b] shadow-[0_8px_20px_rgba(142,229,0,0.22)]" : "text-[#6f7988]"}`}>
+              <ProfessionalIcon active={accessRole === "profesional"} /> Profesional
             </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={accessRole === "cliente"}
-              onClick={() => { setAccessRole("cliente"); setError(""); }}
-              className={`flex items-center justify-center gap-2 rounded-full px-3 py-3.5 text-sm font-black transition-all sm:text-base ${accessRole === "cliente" ? "bg-[#98f21f] text-[#07182b] shadow-[0_8px_20px_rgba(142,229,0,0.22)]" : "text-[#6f7988]"}`}
-            >
-              <ClientIcon />
-              Cliente
+            <button type="button" role="tab" aria-selected={accessRole === "cliente"} onClick={() => { setAccessRole("cliente"); setError(""); }} className={`flex items-center justify-center gap-2 rounded-full px-3 py-3.5 text-sm font-black transition-all sm:text-base ${accessRole === "cliente" ? "bg-[#98f21f] text-[#07182b] shadow-[0_8px_20px_rgba(142,229,0,0.22)]" : "text-[#6f7988]"}`}>
+              <ClientIcon /> Cliente
             </button>
           </div>
 
@@ -158,9 +165,25 @@ export default function LoginPage() {
 
             {error ? <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</div> : null}
 
-            <Button type="submit" disabled={loading} className="h-16 w-full rounded-xl bg-[#8ef000] text-lg font-black text-[#07182b] shadow-[0_12px_28px_rgba(142,229,0,0.22)] transition hover:bg-[#82df00] hover:shadow-[0_14px_32px_rgba(142,229,0,0.28)]">
+            <Button type="submit" disabled={loading || googleLoading} className="h-16 w-full rounded-xl bg-[#8ef000] text-lg font-black text-[#07182b] shadow-[0_12px_28px_rgba(142,229,0,0.22)] transition hover:bg-[#82df00] hover:shadow-[0_14px_32px_rgba(142,229,0,0.28)]">
               {loading ? "Comprobando acceso..." : `Entrar como ${accessRole === "cliente" ? "cliente" : "profesional"}  →`}
             </Button>
+
+            <div className="flex items-center gap-4 py-1 text-xs font-medium text-[#98a0aa]">
+              <span className="h-px flex-1 bg-[#e3e5e7]" />
+              <span>o continúa con</span>
+              <span className="h-px flex-1 bg-[#e3e5e7]" />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={loading || googleLoading}
+              className="flex h-14 w-full items-center justify-center gap-3 rounded-xl border border-[#d9dde2] bg-white text-base font-bold text-[#07182b] shadow-sm transition hover:border-[#bfc5cc] hover:bg-[#fafafa] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <GoogleIcon />
+              {googleLoading ? "Conectando con Google..." : "Continúa con Google"}
+            </button>
 
             <div className="flex gap-3 rounded-2xl border border-[#cbd9b4] bg-[#f7fbef] px-4 py-4 text-sm leading-relaxed text-[#315f22]">
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-[#4b7b2c] font-black">i</span>
