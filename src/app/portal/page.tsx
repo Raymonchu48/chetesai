@@ -355,7 +355,7 @@ function ClientExerciseDetail({ exercise }: { exercise: NonNullable<Exercise["ej
 }
 
 function listFromText(value?: string | null) {
-  return String(value || "").split(/;|\\n/).map((item) => item.trim()).filter(Boolean);
+  return String(value || "").split(/;|\n/).map((item) => item.trim()).filter(Boolean);
 }
 
 function ClientMeta({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
