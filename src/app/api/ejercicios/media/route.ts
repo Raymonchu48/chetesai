@@ -7,6 +7,12 @@ const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const bucket = "exercise-media";
 
 const allowedKinds = new Set(["miniatura", "imagen", "gif", "video"]);
+const fieldByKind: Record<string, "miniatura_url" | "imagen_url" | "gif_url" | "video_url"> = {
+  miniatura: "miniatura_url",
+  imagen: "imagen_url",
+  gif: "gif_url",
+  video: "video_url",
+};
 const allowedMime = new Set([
   "image/jpeg",
   "image/png",
@@ -64,6 +70,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file");
     const kind = String(formData.get("kind") || "");
     const exerciseName = String(formData.get("exerciseName") || "ejercicio");
+    const exerciseId = String(formData.get("exerciseId") || "").trim();
 
     if (!(file instanceof File)) {
       return NextResponse.json({ ok: false, error: "Selecciona un archivo" }, { status: 400 });
@@ -105,7 +112,30 @@ export async function POST(request: NextRequest) {
     if (!uploadResponse.ok) throw new Error(text || "No se pudo subir el archivo");
 
     const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`;
-    return NextResponse.json({ ok: true, data: { kind, path, url: publicUrl } });
+
+    if (exerciseId) {
+      const field = fieldByKind[kind];
+      const saveResponse = await fetch(
+        `${supabaseUrl}/rest/v1/ejercicios?id=eq.${encodeURIComponent(exerciseId)}`,
+        {
+          method: "PATCH",
+          headers: {
+            apikey: serviceKey,
+            Authorization: `Bearer ${serviceKey}`,
+            "Content-Type": "application/json",
+            Prefer: "return=minimal",
+          },
+          body: JSON.stringify({ [field]: publicUrl }),
+          cache: "no-store",
+        }
+      );
+      if (!saveResponse.ok) {
+        const saveError = await saveResponse.text();
+        throw new Error(saveError || "La imagen se subió, pero no pudo vincularse al ejercicio");
+      }
+    }
+
+    return NextResponse.json({ ok: true, data: { kind, path, url: publicUrl, saved: Boolean(exerciseId) } });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al subir el archivo";
     const status = message === "No autenticado" ? 401 : message === "No autorizado" ? 403 : 500;

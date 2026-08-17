@@ -14,6 +14,8 @@ type Props = {
   exerciseName: string;
   value: string | null;
   onUploaded: (url: string) => void;
+  exerciseId?: string;
+  compact?: boolean;
 };
 
 const acceptByKind: Record<MediaKind, string> = {
@@ -23,7 +25,7 @@ const acceptByKind: Record<MediaKind, string> = {
   video: "video/mp4,video/webm,video/quicktime",
 };
 
-export default function ExerciseMediaUploader({ kind, label, exerciseName, value, onUploaded }: Props) {
+export default function ExerciseMediaUploader({ kind, label, exerciseName, value, onUploaded, exerciseId, compact = false }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -35,6 +37,7 @@ export default function ExerciseMediaUploader({ kind, label, exerciseName, value
       body.append("file", file);
       body.append("kind", kind);
       body.append("exerciseName", exerciseName || "ejercicio");
+      if (exerciseId) body.append("exerciseId", exerciseId);
 
       const response = await fetch("/api/ejercicios/media", { method: "POST", body });
       const result = (await response.json()) as { ok: boolean; data?: { url: string }; error?: string };
@@ -54,6 +57,34 @@ export default function ExerciseMediaUploader({ kind, label, exerciseName, value
   const isVideo = kind === "video";
   const isAnimated = kind === "gif";
 
+  const fileInput = (
+    <input
+      ref={inputRef}
+      type="file"
+      accept={acceptByKind[kind]}
+      className="hidden"
+      onChange={(event) => upload(event.target.files?.[0])}
+    />
+  );
+
+  if (compact) {
+    return (
+      <>
+        {fileInput}
+        <Button
+          type="button"
+          size="sm"
+          className="w-full border border-white/70 bg-white/95 text-slate-900 shadow-lg hover:bg-white sm:w-auto"
+          disabled={uploading}
+          onClick={() => inputRef.current?.click()}
+        >
+          {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+          {uploading ? "Subiendo..." : value ? "Cambiar imagen" : "Subir imagen"}
+        </Button>
+      </>
+    );
+  }
+
   return (
     <div className="space-y-2 rounded-2xl border border-dashed p-3">
       <Label>{label}</Label>
@@ -71,13 +102,7 @@ export default function ExerciseMediaUploader({ kind, label, exerciseName, value
         </div>
       )}
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept={acceptByKind[kind]}
-        className="hidden"
-        onChange={(event) => upload(event.target.files?.[0])}
-      />
+      {fileInput}
 
       <Button type="button" variant="outline" className="w-full" disabled={uploading} onClick={() => inputRef.current?.click()}>
         {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
