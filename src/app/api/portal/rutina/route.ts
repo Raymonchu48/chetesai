@@ -47,7 +47,7 @@ export async function GET() {
     const rutinaId = String(rutina?.id || asignacion.rutina_id || "");
     const ejercicios = rutinaId
       ? await serviceRest<Array<Record<string, unknown>>>(
-          `rutina_ejercicios?rutina_id=eq.${encodeURIComponent(rutinaId)}&visible_cliente=eq.true&select=*,ejercicios(id,nombre,grupo_muscular,grupo_secundario,categoria,dificultad,material,imagen_url,miniatura_url,gif_url,video_url,descripcion,tecnica,errores_frecuentes,consejos,tipo_movimiento,lateralidad,plano_movimiento,articulacion_principal,etiquetas)&order=dia.asc,orden.asc`
+          `rutina_ejercicios?rutina_id=eq.${encodeURIComponent(rutinaId)}&visible_cliente=eq.true&select=*,ejercicios(id,codigo_interno,nombre,grupo_muscular,grupo_secundario,categoria,dificultad,material,imagen_url,miniatura_url,gif_url,video_url,descripcion,tecnica,errores_frecuentes,consejos,tipo_movimiento,lateralidad,plano_movimiento,articulacion_principal,progresion,regresion,variante_facil,variante_avanzada,etiquetas)&order=dia.asc,orden.asc`
         )
       : [];
 
