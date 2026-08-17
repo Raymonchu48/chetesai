@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import LogoutButton from "@/components/LogoutButton";
+import ExerciseMediaVisual from "@/components/exercises/ExerciseMediaVisual";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, Clock3, Dumbbell, History, PlayCircle, SkipForward, Square } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Activity, CheckCircle2, CircleCheck, CircleX, Clock3, Dumbbell, History, Lightbulb, PlayCircle, RotateCcw, SkipForward, Square, Target, TrendingUp, TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
 
 type Exercise = {
@@ -23,13 +25,31 @@ type Exercise = {
   tipo_serie: string;
   rol_ejercicio: string;
   ejercicios?: {
+    id: string;
+    codigo_interno: string | null;
     nombre: string;
     grupo_muscular: string;
+    grupo_secundario: string | null;
+    categoria: string;
+    dificultad: string;
     material: string | null;
+    descripcion: string | null;
+    tecnica: string | null;
+    errores_frecuentes: string | null;
+    consejos: string | null;
     imagen_url: string | null;
     miniatura_url: string | null;
     gif_url: string | null;
     video_url: string | null;
+    tipo_movimiento: string | null;
+    lateralidad: string | null;
+    plano_movimiento: string | null;
+    articulacion_principal: string | null;
+    progresion: string | null;
+    regresion: string | null;
+    variante_facil: string | null;
+    variante_avanzada: string | null;
+    etiquetas: string[];
   };
 };
 
@@ -86,6 +106,7 @@ export default function PortalPage() {
   const [sessionRpe, setSessionRpe] = useState("");
   const [sessionComment, setSessionComment] = useState("");
   const [restSeconds, setRestSeconds] = useState(0);
+  const [selectedExercise, setSelectedExercise] = useState<NonNullable<Exercise["ejercicios"]> | null>(null);
 
   const loadHistory = useCallback(async () => {
     try {
@@ -243,9 +264,8 @@ export default function PortalPage() {
 
             <div className="space-y-4">{dayExercises.map((item, index) => {
               const exercise = item.ejercicios;
-              const media = exercise?.miniatura_url || exercise?.imagen_url || exercise?.gif_url;
               const rows = session?.series.filter((row) => row.rutina_ejercicio_id === item.id) || [];
-              return <article key={item.id} className="rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-5 shadow-sm"><div className="flex flex-col gap-5 md:flex-row"><div className="h-28 w-full overflow-hidden rounded-2xl bg-[#f0ede7] md:w-36">{media ? <img src={media} alt={exercise?.nombre || "Ejercicio"} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center"><Dumbbell className="h-8 w-8 text-[#707872]" /></div>}</div><div className="min-w-0 flex-1"><p className="text-xs font-bold uppercase tracking-[0.15em] text-[#c9653b]">Ejercicio {index + 1} · {item.tipo_serie.replace("_", " ")}</p><h3 className="mt-1 text-xl font-bold">{exercise?.nombre || "Ejercicio"}</h3><p className="mt-1 text-sm text-[#707872]">{exercise?.grupo_muscular}{exercise?.material ? ` · ${exercise.material}` : ""}</p>{item.instrucciones_cliente ? <p className="mt-4 rounded-2xl bg-[#f7f4ee] p-4 text-sm leading-6 text-[#56605a]">{item.instrucciones_cliente}</p> : null}{rows.length ? <div className="mt-5 space-y-3">{rows.map((row) => <div key={row.id} className={`rounded-2xl border p-3 ${row.completada ? "border-[#bcd3c0] bg-[#eef5ef]" : "border-[#e7dfd3]"}`}><div className="mb-3 flex items-center justify-between"><span className="font-bold">Serie {row.numero_serie}</span><span className="text-xs text-[#707872]">Objetivo: {row.repeticiones_objetivo || "—"} reps · {row.peso_objetivo ?? "—"} kg</span></div><div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto_48px]"><Input type="number" min={0} placeholder="Repeticiones reales" value={row.repeticiones_realizadas ?? ""} onChange={(e) => patchLocalSet(row.id, { repeticiones_realizadas: e.target.value ? Number(e.target.value) : null })} /><Input type="number" min={0} step="0.5" placeholder="Peso real (kg)" value={row.peso_real ?? ""} onChange={(e) => patchLocalSet(row.id, { peso_real: e.target.value ? Number(e.target.value) : null })} /><div className="flex gap-1">{rpeValues.map((value) => <button key={value} type="button" onClick={() => patchLocalSet(row.id, { rpe_real: value })} className={`h-10 min-w-10 rounded-xl border px-2 text-sm font-bold ${row.rpe_real === value ? "border-[#46624f] bg-[#46624f] text-white" : "border-[#e7dfd3] bg-white"}`}>{value}</button>)}</div><Button size="icon" variant={row.completada ? "default" : "outline"} onClick={() => saveSet(row, !row.completada, item.descanso_segundos)}>{row.completada ? <CheckCircle2 className="h-5 w-5" /> : <Square className="h-5 w-5" />}</Button></div></div>)}</div> : null}{exercise?.video_url ? <a href={exercise.video_url} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#46624f]"><PlayCircle className="h-4 w-4" />Ver vídeo</a> : null}</div></div></article>;
+              return <article key={item.id} role="button" tabIndex={0} onClick={() => exercise && setSelectedExercise(exercise)} onKeyDown={(event) => { if ((event.key === "Enter" || event.key === " ") && exercise) setSelectedExercise(exercise); }} className="cursor-pointer rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-[#a9bea9] hover:shadow-lg"><div className="flex flex-col gap-5 md:flex-row"><div className="h-28 w-full overflow-hidden rounded-2xl bg-white md:w-36">{exercise ? <ExerciseMediaVisual item={exercise} /> : <div className="grid h-full place-items-center"><Dumbbell className="h-8 w-8 text-[#707872]" /></div>}</div><div className="min-w-0 flex-1"><p className="text-xs font-bold uppercase tracking-[0.15em] text-[#c9653b]">Ejercicio {index + 1} · {item.tipo_serie.replace("_", " ")}</p><h3 className="mt-1 text-xl font-bold">{exercise?.nombre || "Ejercicio"}</h3><p className="mt-1 text-sm text-[#707872]">{exercise?.grupo_muscular}{exercise?.material ? ` · ${exercise.material}` : ""}</p><span className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-[#46624f]"><Target className="h-3.5 w-3.5" />Pulsa para ver la técnica completa</span>{item.instrucciones_cliente ? <p className="mt-4 rounded-2xl bg-[#f7f4ee] p-4 text-sm leading-6 text-[#56605a]">{item.instrucciones_cliente}</p> : null}{rows.length ? <div className="mt-5 space-y-3" onClick={(event) => event.stopPropagation()}>{rows.map((row) => <div key={row.id} className={`rounded-2xl border p-3 ${row.completada ? "border-[#bcd3c0] bg-[#eef5ef]" : "border-[#e7dfd3]"}`}><div className="mb-3 flex items-center justify-between"><span className="font-bold">Serie {row.numero_serie}</span><span className="text-xs text-[#707872]">Objetivo: {row.repeticiones_objetivo || "—"} reps · {row.peso_objetivo ?? "—"} kg</span></div><div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto_48px]"><Input type="number" min={0} placeholder="Repeticiones reales" value={row.repeticiones_realizadas ?? ""} onChange={(e) => patchLocalSet(row.id, { repeticiones_realizadas: e.target.value ? Number(e.target.value) : null })} /><Input type="number" min={0} step="0.5" placeholder="Peso real (kg)" value={row.peso_real ?? ""} onChange={(e) => patchLocalSet(row.id, { peso_real: e.target.value ? Number(e.target.value) : null })} /><div className="flex gap-1">{rpeValues.map((value) => <button key={value} type="button" onClick={() => patchLocalSet(row.id, { rpe_real: value })} className={`h-10 min-w-10 rounded-xl border px-2 text-sm font-bold ${row.rpe_real === value ? "border-[#46624f] bg-[#46624f] text-white" : "border-[#e7dfd3] bg-white"}`}>{value}</button>)}</div><Button size="icon" variant={row.completada ? "default" : "outline"} onClick={() => saveSet(row, !row.completada, item.descanso_segundos)}>{row.completada ? <CheckCircle2 className="h-5 w-5" /> : <Square className="h-5 w-5" />}</Button></div></div>)}</div> : null}{exercise?.video_url ? <a href={exercise.video_url} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#46624f]"><PlayCircle className="h-4 w-4" />Ver vídeo</a> : null}</div></div></article>;
             })}</div>
 
             {session && sessionState === "en_curso" ? <section className="mt-6 rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-6"><h3 className="text-xl font-bold">Finalizar entrenamiento</h3><div className="mt-4 grid gap-4 md:grid-cols-3"><Input type="number" min={1} max={10} step="0.5" placeholder="RPE global" value={sessionRpe} onChange={(e) => setSessionRpe(e.target.value)} /><Textarea className="md:col-span-2" placeholder="¿Cómo te fue hoy?" value={sessionComment} onChange={(e) => setSessionComment(e.target.value)} /></div><Button className="mt-4 w-full bg-[#46624f] py-6" onClick={finishWorkout} disabled={finishing}>{finishing ? "Finalizando..." : `Finalizar sesión (${progress}%)`}</Button></section> : null}
@@ -256,8 +276,82 @@ export default function PortalPage() {
           </>
         )}
       </div>
+
+      <Dialog open={Boolean(selectedExercise)} onOpenChange={(open) => !open && setSelectedExercise(null)}>
+        <DialogContent className="max-h-[94vh] max-w-2xl overflow-y-auto p-0">
+          {selectedExercise ? <ClientExerciseDetail exercise={selectedExercise} /> : null}
+        </DialogContent>
+      </Dialog>
     </main>
   );
+}
+
+function ClientExerciseDetail({ exercise }: { exercise: NonNullable<Exercise["ejercicios"]> }) {
+  const technique = listFromText(exercise.tecnica);
+  const errors = listFromText(exercise.errores_frecuentes);
+  const tips = listFromText(exercise.consejos);
+
+  return (
+    <div className="bg-[#fffdf9] text-[#29312e]">
+      <div className="border-b border-[#e7dfd3] p-5 pr-12">
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#c9653b]">{exercise.codigo_interno || "GUÍA CHETESAÍ"}</p>
+        <h2 className="mt-1 text-2xl font-black">{exercise.nombre}</h2>
+        <p className="mt-1 text-xs font-bold uppercase text-[#62a900]">{labels[exercise.dificultad] || exercise.dificultad || "Nivel adaptado"}</p>
+      </div>
+
+      <div className="h-72 overflow-hidden border-b border-[#e7dfd3] bg-white p-3 sm:h-80">
+        <ExerciseMediaVisual item={exercise} />
+      </div>
+
+      <div className="grid grid-cols-3 border-b border-[#e7dfd3] bg-white py-4">
+        <ClientMeta icon={<Activity className="h-4 w-4" />} label="Grupo muscular" value={labels[exercise.grupo_muscular] || exercise.grupo_muscular} />
+        <ClientMeta icon={<Dumbbell className="h-4 w-4" />} label="Material" value={exercise.material || "Sin material"} />
+        <ClientMeta icon={<TrendingUp className="h-4 w-4" />} label="Nivel" value={labels[exercise.dificultad] || exercise.dificultad || "Adaptado"} />
+      </div>
+
+      <div className="px-5">
+        <ClientGuideSection icon={<Target className="h-4 w-4 text-[#62a900]" />} title="Claves técnicas">
+          <ClientBulletList items={technique.length ? technique : [exercise.descripcion || "Sigue las indicaciones de tu entrenador."]} positive />
+        </ClientGuideSection>
+        <ClientGuideSection icon={<TriangleAlert className="h-4 w-4 text-red-500" />} title="Errores frecuentes">
+          <ClientBulletList items={errors.length ? errors : ["No hay errores frecuentes registrados."]} />
+        </ClientGuideSection>
+        <ClientGuideSection icon={<Lightbulb className="h-4 w-4 text-[#62a900]" />} title="Consejos del entrenador">
+          <ClientBulletList items={tips.length ? tips : ["Prioriza la calidad de ejecución antes que la intensidad."]} dot />
+        </ClientGuideSection>
+        <ClientGuideSection icon={<TrendingUp className="h-4 w-4 text-[#62a900]" />} title="Progresión">
+          <p className="text-sm leading-6 text-[#65706a]">{exercise.progresion || exercise.variante_avanzada || "Aumentar gradualmente carga, rango, repeticiones o control."}</p>
+        </ClientGuideSection>
+        <ClientGuideSection icon={<RotateCcw className="h-4 w-4 text-red-500" />} title="Regresión">
+          <p className="text-sm leading-6 text-[#65706a]">{exercise.regresion || exercise.variante_facil || "Reducir carga, rango o complejidad."}</p>
+        </ClientGuideSection>
+      </div>
+
+      {exercise.video_url ? (
+        <div className="border-t border-[#e7dfd3] p-5">
+          <a href={exercise.video_url} target="_blank" rel="noreferrer" className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#46624f] px-5 py-3 text-sm font-black text-white">
+            <PlayCircle className="h-4 w-4" /> Ver vídeo de ejecución
+          </a>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function listFromText(value?: string | null) {
+  return String(value || "").split(/;|\\n/).map((item) => item.trim()).filter(Boolean);
+}
+
+function ClientMeta({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return <div className="flex min-w-0 flex-col items-center gap-1 border-r border-[#e7dfd3] px-2 text-center last:border-r-0"><span className="text-[#62a900]">{icon}</span><span className="text-[9px] text-[#8b938e]">{label}</span><strong className="max-w-full truncate text-xs">{value}</strong></div>;
+}
+
+function ClientGuideSection({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+  return <section className="border-b border-[#e7dfd3] py-5 last:border-b-0"><div className="mb-3 flex items-center gap-2 text-sm font-black uppercase">{icon}<h3>{title}</h3></div>{children}</section>;
+}
+
+function ClientBulletList({ items, positive = false, dot = false }: { items: string[]; positive?: boolean; dot?: boolean }) {
+  return <ul className="space-y-2">{items.map((item, index) => <li key={`${item}-${index}`} className="flex gap-2 text-sm leading-6 text-[#65706a]">{dot ? <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[#70b700]" /> : positive ? <CircleCheck className="mt-1 h-3.5 w-3.5 shrink-0 text-[#70b700]" /> : <CircleX className="mt-1 h-3.5 w-3.5 shrink-0 text-red-400" />}<span>{item}</span></li>)}</ul>;
 }
 
 function formatDuration(seconds: number | null) {
