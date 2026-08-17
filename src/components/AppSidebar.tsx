@@ -15,7 +15,6 @@ import {
   LayoutDashboard,
   Menu,
   PartyPopper,
-  PlayCircle,
   Users,
   X,
 } from "lucide-react";
@@ -27,8 +26,7 @@ const BRAND_MARK = "/brand/chetesai-logo-mark.svg";
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/clientes", label: "Clientes", icon: Users },
-  { href: "/ejercicios", label: "Ejercicios", icon: Dumbbell },
-  { href: "/ejercicios/entrenamiento", label: "Biblioteca visual", icon: PlayCircle },
+  { href: "/ejercicios/entrenamiento", label: "Ejercicios", icon: Dumbbell },
   { href: "/rutinas", label: "Rutinas", icon: ClipboardList },
   { href: "/progreso", label: "Progreso", icon: Activity },
   { href: "/nutricion", label: "Nutrición", icon: Apple },
