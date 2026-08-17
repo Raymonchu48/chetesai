@@ -12,20 +12,19 @@ type ExerciseMediaItem = {
 };
 
 export default function ExerciseMediaVisual({ item }: { item: ExerciseMediaItem }) {
-  const uploaded = item.gif_url || item.imagen_url || item.miniatura_url;
+  const uploaded = item.imagen_url || item.gif_url || item.miniatura_url;
   const finalLegTile = item.grupo_muscular === "piernas"
     ? getFinalLegTile(item.nombre, item.codigo_interno)
     : -1;
 
-  // Los 12 ejercicios aprobados de Piernas usan siempre el banco visual final.
-  // Esto sustituye miniaturas antiguas, imágenes genéricas y asociaciones erróneas.
-  if (finalLegTile >= 0) {
-    return <LegCardSpriteVisual code={item.codigo_interno} name={item.nombre} />;
-  }
-
-  // El resto de ejercicios conserva cualquier multimedia específico subido.
+  // Una imagen subida por el profesional siempre tiene prioridad en la galería.
   if (uploaded) {
     return <img src={uploaded} alt={item.nombre} className="h-full w-full object-contain bg-white" />;
+  }
+
+  // Los ejercicios de Piernas conservan el banco visual final como alternativa.
+  if (finalLegTile >= 0) {
+    return <LegCardSpriteVisual code={item.codigo_interno} name={item.nombre} />;
   }
 
   return (
