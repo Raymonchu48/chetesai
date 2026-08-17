@@ -197,7 +197,7 @@ export default function EjerciciosPage() {
             {filtered.map((item) => {
               const media = item.miniatura_url || item.imagen_url || item.gif_url;
               return <Card key={item._id} className="overflow-hidden transition-shadow hover:shadow-md">
-                {media ? <img src={media} alt={item.nombre} className="h-44 w-full object-cover" /> : null}
+                {media ? <div className="flex h-52 w-full items-center justify-center overflow-hidden border-b bg-gradient-to-br from-white via-slate-50 to-emerald-50/40 p-3 sm:h-56"><img src={media} alt={item.nombre} className="h-full w-full object-contain object-center" loading="lazy" /></div> : null}
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between gap-3"><div><h2 className="text-lg font-bold">{item.nombre}</h2><p className="text-sm text-muted-foreground">{labels[item.grupo_muscular] || item.grupo_muscular} · {labels[item.categoria] || item.categoria}</p></div><div className="flex"><Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Pencil className="h-4 w-4" /></Button><Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteExercise(item._id)}><Trash2 className="h-4 w-4" /></Button></div></div>
                   <div className="mt-3 flex flex-wrap gap-2 text-xs"><span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">{labels[item.dificultad] || item.dificultad}</span>{item.material ? <span className="rounded-full bg-muted px-2.5 py-1">{item.material}</span> : null}{item.tipo_movimiento ? <span className="rounded-full bg-muted px-2.5 py-1">{labels[item.tipo_movimiento] || item.tipo_movimiento}</span> : null}</div>
