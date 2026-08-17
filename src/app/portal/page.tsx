@@ -93,6 +93,22 @@ type HistoryRow = {
 
 const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 const rpeValues = [6, 7, 8, 9, 10];
+const labels: Record<string, string> = {
+  pecho: "Pecho",
+  espalda: "Espalda",
+  hombros: "Hombros",
+  brazos: "Brazos",
+  biceps: "Bíceps",
+  triceps: "Tríceps",
+  piernas: "Piernas",
+  gluteos: "Glúteos",
+  core: "Core",
+  cardio: "Cardio",
+  cuerpo_completo: "Cuerpo completo",
+  principiante: "Básico",
+  intermedio: "Intermedio",
+  avanzado: "Avanzado",
+};
 
 export default function PortalPage() {
   const [data, setData] = useState<PortalData | null>(null);
