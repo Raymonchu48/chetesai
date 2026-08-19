@@ -31,8 +31,8 @@ export async function GET() {
     const user = (await userResponse.json()) as { id: string; email?: string };
     if (!user.email) return NextResponse.json({ ok: true, data: null });
 
-    const clientes = await serviceRest<Array<{ id: string; nombre: string; email: string | null }>>(
-      `clientes?email=ilike.${encodeURIComponent(user.email)}&select=id,nombre,email&limit=1`
+    const clientes = await serviceRest<Array<{ id: string; nombre: string; email: string | null; modelo_visual: "hombre" | "mujer" }>>(
+      `clientes?email=ilike.${encodeURIComponent(user.email)}&select=id,nombre,email,modelo_visual&limit=1`
     );
     const cliente = clientes[0];
     if (!cliente) return NextResponse.json({ ok: true, data: null, reason: "cliente_no_vinculado" });

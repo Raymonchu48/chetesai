@@ -21,12 +21,18 @@ type Props = {
   name: string;
   group?: string | null;
   material?: string | null;
+  visualModel?: ExerciseVisualModel;
 };
+
+export type ExerciseVisualModel = "hombre" | "mujer";
 
 const SKIN = "#dfa071";
 const SKIN_DARK = "#c98255";
 const SHIRT = "#111827";
 const SHORTS = "#171f2d";
+const FEMALE_TOP = "#46624f";
+const LEGGINGS = "#27352e";
+const LEGGINGS_DARK = "#17201b";
 const SHOE = "#0b111b";
 const METAL = "#343c48";
 const METAL2 = "#687383";
@@ -179,20 +185,21 @@ function point(p: Point, len: number, angle: number): Point {
   return { x: p.x + Math.cos(r) * len, y: p.y + Math.sin(r) * len };
 }
 
-function Limb({ a, b, width=10 }: { a:Point; b:Point; width?:number }) {
-  return <g><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={SKIN_DARK} strokeWidth={width+2} strokeLinecap="round"/><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={SKIN} strokeWidth={width} strokeLinecap="round"/></g>;
+function Limb({ a, b, width=10, outer=SKIN_DARK, inner=SKIN }: { a:Point; b:Point; width?:number; outer?:string; inner?:string }) {
+  return <g><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={outer} strokeWidth={width+2} strokeLinecap="round"/><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={inner} strokeWidth={width} strokeLinecap="round"/></g>;
 }
 
 function Shoe({ p, flip=false }: { p:Point; flip?:boolean }) {
   return <path d={`M${p.x-7} ${p.y-3} q${flip?-8:8} 2 ${flip?-14:14} 8 q-2 7 -15 5 l-8 -2 q-3 -8 4 -11z`} fill={SHOE} transform={flip?`scale(-1 1) translate(${-2*p.x} 0)`:undefined}/>;
 }
 
-function Athlete({ pose, mode, phase }: { pose:Pose; mode:Mode; phase:0|1 }) {
+function Athlete({ pose, mode, phase, visualModel }: { pose:Pose; mode:Mode; phase:0|1; visualModel:ExerciseVisualModel }) {
+  const female = visualModel === "mujer";
   const shoulder = point(pose.hip, 48, pose.torso-90);
   const neck = point(shoulder, 7, pose.torso-90);
   const head = point(neck, 14, pose.torso-90);
-  const leftShoulder = point(shoulder, 12, pose.torso+180);
-  const rightShoulder = point(shoulder, 12, pose.torso);
+  const leftShoulder = point(shoulder, female ? 10.5 : 12, pose.torso+180);
+  const rightShoulder = point(shoulder, female ? 10.5 : 12, pose.torso);
   const elbowL = point(leftShoulder, 31, pose.upperArmL);
   const handL = point(elbowL, 28, pose.foreArmL);
   const elbowR = point(rightShoulder, 31, pose.upperArmR);
@@ -201,21 +208,34 @@ function Athlete({ pose, mode, phase }: { pose:Pose; mode:Mode; phase:0|1 }) {
   const ankleL = point(kneeL, 43, pose.shinL);
   const kneeR = point(pose.hip, 42, pose.thighR);
   const ankleR = point(kneeR, 43, pose.shinR);
-  const torsoL = point(shoulder, 16, pose.torso+180);
-  const torsoR = point(shoulder, 16, pose.torso);
-  const hipL = point(pose.hip, 12, pose.torso+180);
-  const hipR = point(pose.hip, 12, pose.torso);
+  const torsoL = point(shoulder, female ? 13.5 : 16, pose.torso+180);
+  const torsoR = point(shoulder, female ? 13.5 : 16, pose.torso);
+  const hipL = point(pose.hip, female ? 14 : 12, pose.torso+180);
+  const hipR = point(pose.hip, female ? 14 : 12, pose.torso);
   return <g>
-    <Limb a={hipL} b={kneeL} width={13}/><Limb a={kneeL} b={ankleL} width={11}/>
-    <Limb a={hipR} b={kneeR} width={13}/><Limb a={kneeR} b={ankleR} width={11}/>
+    {female ? (
+      <>
+        <Limb a={hipL} b={kneeL} width={13} outer={LEGGINGS_DARK} inner={LEGGINGS}/><Limb a={kneeL} b={ankleL} width={11} outer={LEGGINGS_DARK} inner={LEGGINGS}/>
+        <Limb a={hipR} b={kneeR} width={13} outer={LEGGINGS_DARK} inner={LEGGINGS}/><Limb a={kneeR} b={ankleR} width={11} outer={LEGGINGS_DARK} inner={LEGGINGS}/>
+      </>
+    ) : (
+      <>
+        <Limb a={hipL} b={kneeL} width={13}/><Limb a={kneeL} b={ankleL} width={11}/>
+        <Limb a={hipR} b={kneeR} width={13}/><Limb a={kneeR} b={ankleR} width={11}/>
+      </>
+    )}
     <Shoe p={ankleL}/><Shoe p={ankleR} flip/>
-    <path d={`M${torsoL.x} ${torsoL.y} Q${shoulder.x} ${shoulder.y-5} ${torsoR.x} ${torsoR.y} L${hipR.x+2} ${hipR.y} Q${pose.hip.x} ${pose.hip.y+7} ${hipL.x-2} ${hipL.y}Z`} fill={SHIRT}/>
-    <path d={`M${hipL.x-4} ${hipL.y-5} L${hipR.x+4} ${hipR.y-5} L${hipR.x+5} ${hipR.y+15} L${pose.hip.x} ${pose.hip.y+10} L${hipL.x-5} ${hipL.y+15}Z`} fill={SHORTS}/>
+    <path d={`M${torsoL.x} ${torsoL.y} Q${shoulder.x} ${shoulder.y-5} ${torsoR.x} ${torsoR.y} L${hipR.x+2} ${hipR.y} Q${pose.hip.x} ${pose.hip.y+7} ${hipL.x-2} ${hipL.y}Z`} fill={female ? FEMALE_TOP : SHIRT}/>
+    {female
+      ? <path d={`M${hipL.x-3} ${hipL.y-7} Q${pose.hip.x} ${pose.hip.y-2} ${hipR.x+3} ${hipR.y-7} L${hipR.x+4} ${hipR.y+10} Q${pose.hip.x} ${pose.hip.y+13} ${hipL.x-4} ${hipL.y+10}Z`} fill={LEGGINGS}/>
+      : <path d={`M${hipL.x-4} ${hipL.y-5} L${hipR.x+4} ${hipR.y-5} L${hipR.x+5} ${hipR.y+15} L${pose.hip.x} ${pose.hip.y+10} L${hipL.x-5} ${hipL.y+15}Z`} fill={SHORTS}/>
+    }
     <Limb a={leftShoulder} b={elbowL} width={9}/><Limb a={elbowL} b={handL} width={8}/>
     <Limb a={rightShoulder} b={elbowR} width={9}/><Limb a={elbowR} b={handR} width={8}/>
     <circle cx={handL.x} cy={handL.y} r="5" fill={SKIN}/><circle cx={handR.x} cy={handR.y} r="5" fill={SKIN}/>
+    {female ? <g transform={`rotate(${pose.torso} ${head.x} ${head.y})`}><path d={`M${head.x-11} ${head.y-5} q-5 14 2 27 q8 7 15 0 q5 -8 2 -22z`} fill="#241b18"/><ellipse cx={head.x-13} cy={head.y+14} rx="7" ry="15" fill="#241b18" transform={`rotate(18 ${head.x-13} ${head.y+14})`}/></g> : null}
     <ellipse cx={head.x} cy={head.y} rx="12" ry="14" fill={SKIN}/>
-    <path d={`M${head.x-11} ${head.y-5} q4 -13 15 -11 q10 2 10 10 q-8 -5 -18 -2z`} fill="#111827"/>
+    <path d={female ? `M${head.x-12} ${head.y-5} q4 -14 15 -12 q10 1 11 10 q-9 -5 -18 -3 q-4 5 -5 12z` : `M${head.x-11} ${head.y-5} q4 -13 15 -11 q10 2 10 10 q-8 -5 -18 -2z`} fill={female ? "#241b18" : "#111827"}/>
     <circle cx={head.x+5} cy={head.y-1} r="1.2" fill="#111827"/>
     <path d={`M${head.x+5} ${head.y+6} q4 2 7 -1`} fill="none" stroke={SKIN_DARK} strokeWidth="1.4" strokeLinecap="round"/>
     <Equipment mode={mode} pose={pose} handL={handL} handR={handR} phase={phase}/>
@@ -244,24 +264,24 @@ function Equipment({mode, pose, handL, handR, phase}:{mode:Mode;pose:Pose;handL:
   return null;
 }
 
-function Frame({ pose, mode, phase, right=false }: {pose:Pose;mode:Mode;phase:0|1;right?:boolean}) {
+function Frame({ pose, mode, phase, visualModel, right=false }: {pose:Pose;mode:Mode;phase:0|1;visualModel:ExerciseVisualModel;right?:boolean}) {
   return <div className={right?"border-l border-slate-200":""}>
     <svg viewBox="0 0 180 230" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
-      <defs><linearGradient id={`floor-${mode}-${phase}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ffffff" stopOpacity="0"/><stop offset="1" stopColor="#e9e6df" stopOpacity=".9"/></linearGradient></defs>
-      <rect width="180" height="230" fill="#fff"/><rect y="178" width="180" height="52" fill={`url(#floor-${mode}-${phase})`}/>
+      <defs><linearGradient id={`floor-${visualModel}-${mode}-${phase}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ffffff" stopOpacity="0"/><stop offset="1" stopColor="#e9e6df" stopOpacity=".9"/></linearGradient></defs>
+      <rect width="180" height="230" fill="#fff"/><rect y="178" width="180" height="52" fill={`url(#floor-${visualModel}-${mode}-${phase})`}/>
       <ellipse cx="92" cy="211" rx="54" ry="7" fill="#c9c7c2" opacity=".45"/>
-      <Athlete pose={pose} mode={mode} phase={phase}/>
+      <Athlete pose={pose} mode={mode} phase={phase} visualModel={visualModel}/>
     </svg>
   </div>;
 }
 
-export default function ProfessionalExerciseVisual({code,name,group,material}:Props) {
+export default function ProfessionalExerciseVisual({code,name,group,material,visualModel="hombre"}:Props) {
   const mode=modeFor(name,group);
   const [start,end]=poses[mode];
   const groupLabel=(group||"Ejercicio").replaceAll("_"," ");
   return <div className="relative h-full w-full overflow-hidden bg-white">
     <div className="absolute left-3 top-3 z-10 rounded-full border border-emerald-200 bg-white/95 px-2.5 py-1 text-[9px] font-black uppercase tracking-[.12em] text-emerald-700 shadow-sm">{code||groupLabel}</div>
-    <div className="grid h-full grid-cols-2 pt-7"><Frame pose={start} mode={mode} phase={0}/><Frame pose={end} mode={mode} phase={1} right/></div>
+    <div className="grid h-full grid-cols-2 pt-7"><Frame pose={start} mode={mode} phase={0} visualModel={visualModel}/><Frame pose={end} mode={mode} phase={1} visualModel={visualModel} right/></div>
     <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-white via-white/95 to-transparent px-3 pb-2 pt-6 text-[9px] font-bold text-slate-600"><span>Inicio</span><span className="text-emerald-700">{material||"Ejecución"}</span><span>Ejecución</span></div>
   </div>;
 }

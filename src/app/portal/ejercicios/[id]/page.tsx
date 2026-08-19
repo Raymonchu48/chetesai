@@ -17,9 +17,12 @@ import {
   Repeat2,
   Target,
 } from "lucide-react";
+import ExerciseMediaVisual from "@/components/exercises/ExerciseMediaVisual";
+import type { ExerciseVisualModel } from "@/components/exercises/ProfessionalExerciseVisual";
 
 type ExerciseInfo = {
   id: string;
+  codigo_interno: string | null;
   nombre: string;
   grupo_muscular: string;
   grupo_secundario: string | null;
@@ -56,6 +59,7 @@ type AssignedExercise = {
 };
 
 type PortalData = {
+  cliente: { id: string; nombre: string; email: string | null; modelo_visual: ExerciseVisualModel };
   rutina?: { id: string; nombre: string; nivel: string };
   ejercicios: AssignedExercise[];
 };
@@ -99,7 +103,7 @@ export default function ExerciseGuideDetailPage() {
     [data, exerciseId]
   );
   const exercise = assignments[0]?.ejercicios;
-  const primaryMedia = exercise?.gif_url || exercise?.imagen_url || exercise?.miniatura_url;
+  const visualModel: ExerciseVisualModel = data?.cliente?.modelo_visual === "mujer" ? "mujer" : "hombre";
 
   if (loading) {
     return <main className="min-h-screen bg-[#f7f4ee] px-5 py-16 text-center text-[#707872]">Cargando guía...</main>;
@@ -130,11 +134,7 @@ export default function ExerciseGuideDetailPage() {
         <section className="overflow-hidden rounded-[32px] border border-[#e7dfd3] bg-[#fffdf9] shadow-sm">
           <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
             <div className="relative min-h-72 bg-[#18211d] lg:min-h-[520px]">
-              {primaryMedia ? (
-                <img src={primaryMedia} alt={`Ejecución de ${exercise.nombre}`} className="absolute inset-0 h-full w-full object-contain p-3 md:p-6" />
-              ) : (
-                <div className="absolute inset-0 grid place-items-center"><Dumbbell className="h-20 w-20 text-white/25" /></div>
-              )}
+              <div className="absolute inset-0 bg-white p-3 md:p-6"><ExerciseMediaVisual item={exercise} visualModel={visualModel} /></div>
               <div className="absolute left-5 top-5 rounded-full bg-black/60 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-white backdrop-blur">
                 {labels[exercise.grupo_muscular] || exercise.grupo_muscular}
               </div>

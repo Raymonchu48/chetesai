@@ -4,9 +4,12 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, BookOpen, Dumbbell, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import ExerciseMediaVisual from "@/components/exercises/ExerciseMediaVisual";
+import type { ExerciseVisualModel } from "@/components/exercises/ProfessionalExerciseVisual";
 
 type ExerciseInfo = {
   id: string;
+  codigo_interno: string | null;
   nombre: string;
   grupo_muscular: string;
   grupo_secundario: string | null;
@@ -33,7 +36,7 @@ type AssignedExercise = {
 };
 
 type PortalData = {
-  cliente: { id: string; nombre: string; email: string | null };
+  cliente: { id: string; nombre: string; email: string | null; modelo_visual: ExerciseVisualModel };
   rutina?: { id: string; nombre: string; dias_semana: number };
   ejercicios: AssignedExercise[];
 };
@@ -101,6 +104,7 @@ export default function ClientExerciseGuidesPage() {
       return matchGroup && (!term || searchable.includes(term));
     });
   }, [gallery, group, search]);
+  const visualModel: ExerciseVisualModel = data?.cliente?.modelo_visual === "mujer" ? "mujer" : "hombre";
 
   return (
     <main className="min-h-screen bg-[#f7f4ee] px-5 py-10 text-[#29312e]">
@@ -167,7 +171,6 @@ export default function ClientExerciseGuidesPage() {
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map(({ exercise, assignments }) => {
-              const media = exercise.miniatura_url || exercise.imagen_url || exercise.gif_url;
               const days = Array.from(new Set(assignments.map((item) => item.dia))).sort((a, b) => a - b);
               const totalSets = assignments.reduce((sum, item) => sum + Number(item.series || 0), 0);
               return (
@@ -176,12 +179,8 @@ export default function ClientExerciseGuidesPage() {
                   href={`/portal/ejercicios/${exercise.id}`}
                   className="group overflow-hidden rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
                 >
-                  <div className="relative h-52 overflow-hidden bg-[#ece9e2]">
-                    {media ? (
-                      <img src={media} alt={exercise.nombre} className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]" />
-                    ) : (
-                      <div className="grid h-full place-items-center"><Dumbbell className="h-12 w-12 text-[#8b938e]" /></div>
-                    )}
+                  <div className="relative h-52 overflow-hidden bg-white p-2">
+                    <ExerciseMediaVisual item={exercise} visualModel={visualModel} />
                     <span className="absolute left-4 top-4 rounded-full bg-[#18211d]/90 px-3 py-1 text-xs font-bold text-white backdrop-blur">
                       {labels[exercise.grupo_muscular] || exercise.grupo_muscular}
                     </span>

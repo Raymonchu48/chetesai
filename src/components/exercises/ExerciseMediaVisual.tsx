@@ -1,5 +1,5 @@
 import LegCardSpriteVisual, { getFinalLegTile } from "@/components/exercises/LegCardSpriteVisual";
-import ProfessionalExerciseVisual from "@/components/exercises/ProfessionalExerciseVisual";
+import ProfessionalExerciseVisual, { type ExerciseVisualModel } from "@/components/exercises/ProfessionalExerciseVisual";
 
 type ExerciseMediaItem = {
   codigo_interno?: string | null;
@@ -11,19 +11,25 @@ type ExerciseMediaItem = {
   miniatura_url?: string | null;
 };
 
-export default function ExerciseMediaVisual({ item }: { item: ExerciseMediaItem }) {
+type Props = {
+  item: ExerciseMediaItem;
+  visualModel?: ExerciseVisualModel;
+};
+
+export default function ExerciseMediaVisual({ item, visualModel = "hombre" }: Props) {
   const uploaded = item.imagen_url || item.gif_url || item.miniatura_url;
   const finalLegTile = item.grupo_muscular === "piernas"
     ? getFinalLegTile(item.nombre, item.codigo_interno)
     : -1;
 
-  // Una imagen subida por el profesional siempre tiene prioridad en la galería.
-  if (uploaded) {
+  // En el modelo femenino usamos la ilustración generada para evitar mostrar
+  // fotografías o bancos visuales masculinos que no tienen versión equivalente.
+  if (uploaded && visualModel === "hombre") {
     return <img src={uploaded} alt={item.nombre} className="h-full w-full object-contain bg-white" />;
   }
 
   // Los ejercicios de Piernas conservan el banco visual final como alternativa.
-  if (finalLegTile >= 0) {
+  if (finalLegTile >= 0 && visualModel === "hombre") {
     return <LegCardSpriteVisual code={item.codigo_interno} name={item.nombre} />;
   }
 
@@ -33,6 +39,7 @@ export default function ExerciseMediaVisual({ item }: { item: ExerciseMediaItem 
       name={item.nombre}
       group={item.grupo_muscular}
       material={item.material}
+      visualModel={visualModel}
     />
   );
 }
