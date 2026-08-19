@@ -18,6 +18,16 @@ type Props = {
   compact?: boolean;
 };
 
+type ApiResult = {
+  ok: boolean;
+  data?: {
+    signedUrl?: string;
+    path?: string;
+    url?: string;
+  };
+  error?: string;
+};
+
 const acceptByKind: Record<MediaKind, string> = {
   miniatura: "image/jpeg,image/png,image/webp",
   imagen: "image/jpeg,image/png,image/webp",
@@ -25,27 +35,103 @@ const acceptByKind: Record<MediaKind, string> = {
   video: "video/mp4,video/webm,video/quicktime",
 };
 
+function maxSizeFor(kind: MediaKind) {
+  return kind === "video" ? 50 * 1024 * 1024 : 12 * 1024 * 1024;
+}
+
+function formatUploadError(text: string, status: number, fallback: string) {
+  if (status === 413 || /request entity too large|payload too large|function_payload_too_large/i.test(text)) {
+    return "El archivo es demasiado grande para procesarlo. Elige otro archivo o reduce su tamaño.";
+  }
+
+  try {
+    const parsed = JSON.parse(text) as { error?: string; message?: string };
+    return parsed.error || parsed.message || fallback;
+  } catch {
+    return text.trim() || fallback;
+  }
+}
+
+async function readApiResult(response: Response, fallback: string): Promise<ApiResult> {
+  const text = await response.text();
+  if (!text) return { ok: false, error: fallback };
+
+  try {
+    return JSON.parse(text) as ApiResult;
+  } catch {
+    return { ok: false, error: formatUploadError(text, response.status, fallback) };
+  }
+}
+
 export default function ExerciseMediaUploader({ kind, label, exerciseName, value, onUploaded, exerciseId, compact = false }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
   async function upload(file?: File) {
     if (!file) return;
+
+    if (file.size > maxSizeFor(kind)) {
+      toast.error(kind === "video" ? "El vídeo supera el máximo de 50 MB" : "La imagen supera el máximo de 12 MB");
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
+
     setUploading(true);
     try {
-      const body = new FormData();
-      body.append("file", file);
-      body.append("kind", kind);
-      body.append("exerciseName", exerciseName || "ejercicio");
-      if (exerciseId) body.append("exerciseId", exerciseId);
+      const signResponse = await fetch("/api/ejercicios/media", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "sign",
+          kind,
+          exerciseName: exerciseName || "ejercicio",
+          exerciseId: exerciseId || "",
+          fileName: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+        }),
+      });
+      const signResult = await readApiResult(signResponse, "No se pudo preparar la subida");
+      const signedUrl = signResult.data?.signedUrl;
+      const path = signResult.data?.path;
 
-      const response = await fetch("/api/ejercicios/media", { method: "POST", body });
-      const result = (await response.json()) as { ok: boolean; data?: { url: string }; error?: string };
-      if (!response.ok || !result.ok || !result.data?.url) {
-        throw new Error(result.error || "No se pudo subir el archivo");
+      if (!signResponse.ok || !signResult.ok || !signedUrl || !path) {
+        throw new Error(signResult.error || "No se pudo preparar la subida");
       }
-      onUploaded(result.data.url);
-      toast.success(`${label} subida correctamente`);
+
+      const uploadBody = new FormData();
+      uploadBody.append("cacheControl", "3600");
+      uploadBody.append("", file);
+
+      const storageResponse = await fetch(signedUrl, {
+        method: "PUT",
+        headers: { "x-upsert": "false" },
+        body: uploadBody,
+      });
+      if (!storageResponse.ok) {
+        const storageText = await storageResponse.text();
+        throw new Error(formatUploadError(storageText, storageResponse.status, "No se pudo subir el archivo"));
+      }
+
+      const finalizeResponse = await fetch("/api/ejercicios/media", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "finalize",
+          kind,
+          path,
+          exerciseId: exerciseId || "",
+        }),
+      });
+      const finalizeResult = await readApiResult(finalizeResponse, "No se pudo guardar la imagen");
+      const url = finalizeResult.data?.url;
+
+      if (!finalizeResponse.ok || !finalizeResult.ok || !url) {
+        throw new Error(finalizeResult.error || "No se pudo guardar la imagen");
+      }
+
+      onUploaded(url);
+      toast.success(label + " subida correctamente");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error al subir");
     } finally {
@@ -106,7 +192,7 @@ export default function ExerciseMediaUploader({ kind, label, exerciseName, value
 
       <Button type="button" variant="outline" className="w-full" disabled={uploading} onClick={() => inputRef.current?.click()}>
         {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-        {uploading ? "Subiendo..." : value ? `Cambiar ${label.toLowerCase()}` : `Subir ${label.toLowerCase()}`}
+        {uploading ? "Subiendo..." : value ? "Cambiar " + label.toLowerCase() : "Subir " + label.toLowerCase()}
       </Button>
       <p className="text-xs text-muted-foreground">
         {isVideo ? "MP4, WebM o MOV · máximo 50 MB" : isAnimated ? "GIF o WebP animado · máximo 12 MB" : "JPG, PNG o WebP · máximo 12 MB"}
