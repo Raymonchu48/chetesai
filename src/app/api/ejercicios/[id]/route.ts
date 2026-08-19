@@ -107,15 +107,20 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await supabaseRest(`ejercicios?id=eq.${encodeURIComponent(id)}`, {
+    const rows = await supabaseRest<Array<Record<string, unknown>>>(`ejercicios?id=eq.${encodeURIComponent(id)}`, {
       method: "DELETE",
-      headers: { Prefer: "return=minimal" },
+      headers: { Prefer: "return=representation" },
     });
-    return NextResponse.json({ ok: true });
+    if (!rows[0]) {
+      return NextResponse.json({ ok: false, error: "Ejercicio no encontrado" }, { status: 404 });
+    }
+    return NextResponse.json({ ok: true, data: rows[0] });
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Error al eliminar ejercicio";
+    const referenced = message.includes("23503") || message.toLowerCase().includes("foreign key");
     return NextResponse.json(
-      { ok: false, error: error instanceof Error ? error.message : "Error al eliminar ejercicio" },
-      { status: 500 }
+      { ok: false, error: referenced ? "Este ejercicio está incluido en una rutina. Quítalo primero de las rutinas donde se utiliza." : message },
+      { status: referenced ? 409 : 500 }
     );
   }
 }

@@ -43,6 +43,7 @@ interface Cliente {
   estado: string;
   fecha_alta: string;
   notas: string;
+  modelo_visual: "hombre" | "mujer";
 }
 
 type AccessCredentials = {
@@ -75,6 +76,7 @@ const emptyForm = {
   estado: "activo",
   fecha_alta: new Date().toISOString().split("T")[0],
   notas: "",
+  modelo_visual: "hombre" as "hombre" | "mujer",
 };
 
 export default function ClientesPage() {
@@ -147,6 +149,7 @@ export default function ClientesPage() {
         ? new Date(cliente.fecha_alta).toISOString().split("T")[0]
         : "",
       notas: cliente.notas || "",
+      modelo_visual: cliente.modelo_visual === "mujer" ? "mujer" : "hombre",
     });
     setDialogOpen(true);
   };
@@ -329,6 +332,20 @@ export default function ClientesPage() {
                   </div>
                 </div>
                 <div>
+                  <Label>Modelo visual de los ejercicios</Label>
+                  <Select
+                    value={form.modelo_visual}
+                    onValueChange={(value) => setForm({ ...form, modelo_visual: value === "mujer" ? "mujer" : "hombre" })}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mujer">Mujer</SelectItem>
+                      <SelectItem value="hombre">Hombre</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="mt-1 text-xs text-muted-foreground">La galería del portal se adaptará automáticamente a este modelo.</p>
+                </div>
+                <div>
                   <Label>Notas</Label>
                   <Textarea
                     value={form.notas}
@@ -374,6 +391,7 @@ export default function ClientesPage() {
                     <TableHead>Telefono</TableHead>
                     <TableHead>Objetivo</TableHead>
                     <TableHead>Estado</TableHead>
+                    <TableHead>Modelo visual</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -392,6 +410,9 @@ export default function ClientesPage() {
                         <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${estadoColors[c.estado] || "bg-gray-100 text-gray-700"}`}>
                           {c.estado}
                         </span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-xs capitalize">{c.modelo_visual || "hombre"}</Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">

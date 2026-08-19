@@ -11,6 +11,7 @@ type ClienteRow = {
   estado: string;
   fecha_alta: string;
   notas: string | null;
+  modelo_visual: "hombre" | "mujer";
 };
 
 function toCliente(row: ClienteRow) {
@@ -26,6 +27,7 @@ function normalizeClientePayload(body: Record<string, unknown>) {
     fecha_nacimiento: body.fecha_nacimiento || null,
     fecha_alta: body.fecha_alta || new Date().toISOString().slice(0, 10),
     notas: body.notas ? String(body.notas).trim() : null,
+    modelo_visual: body.modelo_visual === "mujer" ? "mujer" : "hombre",
   };
 }
 
