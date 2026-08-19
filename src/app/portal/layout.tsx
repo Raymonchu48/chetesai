@@ -19,7 +19,6 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const activeItem = items.find((item) => item.href === "/portal" ? pathname === item.href : pathname.startsWith(item.href)) || items[0];
-  const ActiveIcon = activeItem.icon;
 
   return (
     <div className="min-h-screen bg-[#f3f0e8] pb-24 sm:pb-28">
@@ -43,7 +42,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         </div>
 
         <button type="button" onClick={() => setMenuOpen((value) => !value)} aria-expanded={menuOpen} aria-controls="client-mobile-menu" className="flex w-full items-center justify-between rounded-2xl border border-[#d7b86b]/35 bg-[#111a15]/98 px-4 py-3 text-white shadow-2xl backdrop-blur-xl md:hidden">
-          <span className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-xl bg-[#8cdb78] text-[#101713]"><ActiveIcon className="h-5 w-5" /></span><span className="text-left"><span className="block text-[9px] font-black uppercase tracking-[0.18em] text-[#d7b86b]">Zona cliente</span><span className="block text-sm font-bold">{activeItem.label}</span></span></span>
+          <span className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center overflow-hidden rounded-xl bg-[#8cdb78] p-1.5"><img src="/brand/chetesai-logo-mark.svg" alt="" aria-hidden="true" className="h-full w-full object-contain" /></span><span className="text-left"><span className="block text-[9px] font-black uppercase tracking-[0.18em] text-[#d7b86b]">Zona cliente</span><span className="block text-sm font-bold">{activeItem.label}</span></span></span>
           <span className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-bold"><Menu className="h-4 w-4" />Menú<ChevronDown className={`h-4 w-4 transition-transform duration-300 ${menuOpen ? "rotate-180" : ""}`} /></span>
         </button>
 
