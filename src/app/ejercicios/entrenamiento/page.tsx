@@ -31,6 +31,7 @@ import {
   Target,
   TrendingUp,
   TriangleAlert,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -77,6 +78,7 @@ const labels: Record<string, string> = {
   core: "Core",
   cardio: "Cardio",
   cuerpo_completo: "Cuerpo completo",
+  funcional: "Funcional",
   calentamiento: "Calentamiento",
   estiramientos: "Estiramientos",
   principiante: "Básico",
@@ -106,11 +108,26 @@ const groupDescriptions: Record<string, { subtitle: string; phrase: string }> = 
   core: { subtitle: "Control, estabilidad y transferencia.", phrase: "El centro conecta todo tu movimiento." },
   cardio: { subtitle: "Resistencia, ritmo y energía.", phrase: "Mejora tu capacidad paso a paso." },
   cuerpo_completo: { subtitle: "Coordinación, fuerza y eficiencia.", phrase: "Entrena el cuerpo como una unidad." },
+  funcional: { subtitle: "Fuerza útil, coordinación y resistencia.", phrase: "Muévete mejor para rendir dentro y fuera del gimnasio." },
   calentamiento: { subtitle: "Movilidad y activación.", phrase: "Prepara el cuerpo antes de exigirlo." },
   estiramientos: { subtitle: "Movilidad, descarga y recuperación.", phrase: "Recuperar también es entrenar." },
 };
 
-const grupos = ["todos", "calentamiento", "pecho", "espalda", "hombros", "brazos", "biceps", "triceps", "piernas", "gluteos", "core", "cardio", "cuerpo_completo", "estiramientos"];
+const grupos = ["todos", "funcional", "calentamiento", "pecho", "espalda", "hombros", "brazos", "biceps", "triceps", "piernas", "gluteos", "core", "cardio", "cuerpo_completo", "estiramientos"];
+const functionalExerciseCodes = new Set([
+  "CHE-CAR-001",
+  "CHE-CAR-002",
+  "CHE-COR-011",
+  "CHE-COR-014",
+  "CHE-FUN-001",
+  "CHE-FUN-002",
+  "CHE-FUN-003",
+  "CHE-FUN-004",
+  "CHE-FUN-005",
+  "CHE-PIE-006",
+  "CHE-PIE-016",
+  "CHE-PIE-017",
+]);
 const dificultades = ["todos", "principiante", "intermedio", "avanzado"];
 const PAGE_SIZE = 12;
 
@@ -121,6 +138,10 @@ function listFromText(value?: string | null) {
 function belongsToGroup(item: Ejercicio, group: string) {
   if (group === "todos") return true;
   if (group === "brazos") return ["biceps", "triceps", "brazos"].includes(item.grupo_muscular);
+  if (group === "funcional") {
+    const code = (item.codigo_interno || "").toUpperCase();
+    return code.startsWith("CHE-FUN-") || functionalExerciseCodes.has(code) || (item.etiquetas || []).includes("funcional");
+  }
   if (group === "calentamiento") return item.grupo_muscular === "calentamiento" || item.categoria === "calentamiento" || (item.etiquetas || []).includes("calentamiento");
   if (group === "estiramientos") return ["estiramientos", "estiramiento", "movilidad"].includes(item.grupo_muscular) || ["estiramientos", "estiramiento", "movilidad"].includes(item.categoria) || (item.etiquetas || []).some((tag) => ["estiramiento", "estiramientos", "movilidad", "vuelta_calma"].includes(tag));
   return item.grupo_muscular === group;
@@ -253,6 +274,7 @@ export default function EntrenamientoVisualPage() {
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap lg:justify-end">
               <div className="relative min-w-0 sm:w-72"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"/><Input className="h-11 rounded-xl border-slate-200 bg-white pl-9 shadow-sm" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar ejercicio..."/></div>
+              <Button asChild variant="outline" className={`h-11 rounded-xl bg-white ${grupo === "funcional" ? "border-[#66b512] bg-[#f2f9e9] text-[#559900]" : ""}`}><Link href="/ejercicios/entrenamiento?grupo=funcional"><Zap className="mr-2 h-4 w-4"/>Funcional</Link></Button>
               <Button variant="outline" className={`h-11 rounded-xl bg-white ${filterOpen ? "border-[#66b512] text-[#559900]" : ""}`} onClick={() => setFilterOpen((open) => !open)}><SlidersHorizontal className="mr-2 h-4 w-4"/>Filtros</Button>
               <Button variant="outline" className={`h-11 rounded-xl bg-white ${onlyFavorites ? "border-[#66b512] text-[#559900]" : ""}`} onClick={() => setOnlyFavorites((value) => !value)}><Star className={`mr-2 h-4 w-4 ${onlyFavorites ? "fill-[#72b900]" : ""}`}/>Favoritos</Button>
               <Button asChild className="h-11 rounded-xl bg-[#62b000] px-5 text-white shadow-md hover:bg-[#559b00]"><Link href="/ejercicios"><Plus className="mr-2 h-4 w-4"/>Nuevo ejercicio</Link></Button>
