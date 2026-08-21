@@ -65,7 +65,7 @@ type Membership = {
 
 type AlertItem = {
   id: string;
-  tipo: "solicitud" | "agenda" | "bono" | "pago";
+  tipo: "solicitud" | "agenda" | "bono" | "pago" | "coaching";
   nivel: "critico" | "aviso" | "info";
   titulo: string;
   detalle: string;
@@ -223,7 +223,7 @@ export async function GET() {
       }),
     ]);
 
-    const [clients, sessions, requests, payments, memberships] = await Promise.all([
+    const [clients, sessions, requests, payments, memberships, nutritionPlans, routineAssignments] = await Promise.all([
       serviceRequest<Client[]>(
         "clientes?select=id,nombre,email,estado,fecha_alta&order=fecha_alta.desc&limit=5000"
       ),
@@ -239,9 +239,20 @@ export async function GET() {
       serviceRequest<Membership[]>(
         "bonos_cliente?select=id,cliente_id,nombre,estado,sesiones_totales,sesiones_consumidas,fecha_inicio,fecha_fin,renovacion_automatica,created_at,clientes(id,nombre,email)&order=created_at.desc&limit=5000"
       ),
+      serviceRequest<Array<{ cliente_id: string }>>(
+        "planes_nutricionales?estado=eq.activo&select=cliente_id&limit=5000"
+      ),
+      serviceRequest<Array<{ cliente_id: string }>>(
+        "cliente_rutinas?estado=eq.activa&select=cliente_id&limit=5000"
+      ),
     ]);
 
     const activeClients = clients.filter((client) => client.estado === "activo").length;
+    const activeClientRows = clients.filter((client) => client.estado === "activo");
+    const clientsWithNutrition = new Set(nutritionPlans.map((plan) => plan.cliente_id));
+    const clientsWithRoutine = new Set(routineAssignments.map((routine) => routine.cliente_id));
+    const withoutNutrition = activeClientRows.filter((client) => !clientsWithNutrition.has(client.id));
+    const withoutRoutine = activeClientRows.filter((client) => !clientsWithRoutine.has(client.id));
     const prospectiveClients = clients.filter((client) => client.estado === "prueba").length;
     const newRequests = requests.filter((request) => request.estado === "nueva");
     const pendingSessions = sessions.filter((session) => session.estado === "pendiente");
@@ -276,6 +287,26 @@ export async function GET() {
     );
 
     const alerts: AlertItem[] = [];
+    for (const client of withoutNutrition.slice(0, 3)) {
+      alerts.push({
+        id: `coaching-nutricion-${client.id}`,
+        tipo: "coaching",
+        nivel: "aviso",
+        titulo: "Cliente sin plan nutricional",
+        detalle: `${client.nombre} · configura su planificación`,
+        href: `/clientes/${client.id}`,
+      });
+    }
+    for (const client of withoutRoutine.slice(0, 3)) {
+      alerts.push({
+        id: `coaching-rutina-${client.id}`,
+        tipo: "coaching",
+        nivel: "aviso",
+        titulo: "Cliente sin rutina activa",
+        detalle: `${client.nombre} · asigna su entrenamiento`,
+        href: `/clientes/${client.id}`,
+      });
+    }
     for (const request of newRequests.slice(0, 4)) {
       alerts.push({
         id: `solicitud-${request.id}`,
@@ -411,6 +442,8 @@ export async function GET() {
           clientes_total: clients.length,
           clientes_activos: activeClients,
           clientes_potenciales: prospectiveClients,
+          clientes_sin_nutricion: withoutNutrition.length,
+          clientes_sin_rutina: withoutRoutine.length,
           sesiones_hoy: sessionsToday.length,
           proximos_siete_dias: upcomingSeven.length,
           citas_pendientes: pendingSessions.length,
