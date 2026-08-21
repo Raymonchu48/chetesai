@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Apple, BookOpen, CalendarDays, ChevronDown, Dumbbell, Menu, PartyPopper, TrendingUp, WalletCards, X } from "lucide-react";
+import { Apple, BookOpen, CalendarDays, Dumbbell, Home, MoreHorizontal, PartyPopper, TrendingUp, WalletCards, X } from "lucide-react";
 
 const items = [
   { href: "/portal", label: "Entrenamiento", icon: Dumbbell },
@@ -15,10 +15,16 @@ const items = [
   { href: "/portal/pagos", label: "Pagos", icon: WalletCards },
 ];
 
+const primaryItems = [
+  { href: "/portal", label: "Inicio", icon: Home },
+  { href: "/portal/bienestar", label: "Nutrición", icon: Apple },
+  { href: "/portal/progreso", label: "Progreso", icon: TrendingUp },
+  { href: "/portal/citas", label: "Citas", icon: CalendarDays },
+];
+
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const activeItem = items.find((item) => item.href === "/portal" ? pathname === item.href : pathname.startsWith(item.href)) || items[0];
 
   return (
     <div className="min-h-screen bg-[#f3f0e8] pb-24 sm:pb-28">
@@ -41,10 +47,10 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           </div>
         </div>
 
-        <button type="button" onClick={() => setMenuOpen((value) => !value)} aria-expanded={menuOpen} aria-controls="client-mobile-menu" className="flex w-full items-center justify-between rounded-2xl border border-[#d7b86b]/35 bg-[#111a15]/98 px-4 py-3 text-white shadow-2xl backdrop-blur-xl md:hidden">
-          <span className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center overflow-hidden rounded-xl bg-[#8cdb78] p-1.5"><img src="/brand/chetesai-logo-mark.svg" alt="" aria-hidden="true" className="h-full w-full object-contain" /></span><span className="text-left"><span className="block text-[9px] font-black uppercase tracking-[0.18em] text-[#d7b86b]">Zona cliente</span><span className="block text-sm font-bold">{activeItem.label}</span></span></span>
-          <span className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-bold"><Menu className="h-4 w-4" />Menú<ChevronDown className={`h-4 w-4 transition-transform duration-300 ${menuOpen ? "rotate-180" : ""}`} /></span>
-        </button>
+        <div className="grid grid-cols-5 rounded-[22px] border border-[#d7b86b]/35 bg-[#111a15]/98 p-1.5 text-white shadow-2xl backdrop-blur-xl md:hidden">
+          {primaryItems.map((item) => { const Icon = item.icon; const active = item.href === "/portal" ? pathname === item.href : pathname.startsWith(item.href); return <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)} className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[10px] font-bold transition ${active ? "bg-[#8cdb78] text-[#101713]" : "text-white/65"}`}><Icon className="h-5 w-5" />{item.label}</Link>; })}
+          <button type="button" onClick={() => setMenuOpen((value) => !value)} aria-expanded={menuOpen} aria-controls="client-mobile-menu" className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[10px] font-bold transition ${menuOpen ? "bg-[#d7b86b] text-[#101713]" : "text-white/65"}`}><MoreHorizontal className="h-5 w-5" />Más</button>
+        </div>
 
         <div className="hidden items-center justify-around rounded-[24px] border border-[#d7b86b]/30 bg-[#111a15]/96 p-2 shadow-2xl backdrop-blur-xl md:flex">
           {items.map((item) => {
