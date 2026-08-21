@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import LogoutButton from "@/components/LogoutButton";
@@ -56,7 +57,7 @@ export default function ClientProgressPage() {
         <header className="relative mb-7 overflow-hidden rounded-[30px] border border-[#d7b86b]/30 bg-[#111a15] p-6 text-white shadow-[0_22px_70px_rgba(17,26,21,0.22)] sm:p-8">
           <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-[#8cdb78]/15 blur-3xl" /><div className="absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-[#d7b86b]/10 blur-3xl" />
           <div className="relative flex flex-col gap-7 sm:flex-row sm:items-center sm:justify-between">
-            <div><p className="text-[11px] font-black uppercase tracking-[0.24em] text-[#d7b86b]">Chetesaí Fitness+</p><h1 className="mt-3 flex items-center gap-3 text-3xl font-black tracking-tight sm:text-4xl"><span className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[#8cdb78] p-1.5"><img src="/brand/chetesai-logo-mark.svg" alt="Logotipo de Chetesaí Fitness+" className="h-full w-full object-contain" /></span>Mi progreso</h1><p className="mt-4 max-w-xl text-sm leading-6 text-white/65">{data?.cliente?.nombre ? `Hola, ${data.cliente.nombre}. Aquí puedes revisar tu evolución y registrar nuevos controles.` : "Tu evolución, reunida en un espacio claro y medible."}</p></div>
+            <div><p className="text-[11px] font-black uppercase tracking-[0.24em] text-[#d7b86b]">Chetesaí Fitness+</p><h1 className="mt-3 flex items-center gap-3 text-3xl font-black tracking-tight sm:text-4xl"><span className="grid h-13 w-13 shrink-0 place-items-center rounded-2xl border border-[#c7a254]/55 bg-[#07182b] p-1 shadow-[0_10px_28px_rgba(0,0,0,0.3)]"><Image src="/brand/chetesai-logo-mark.svg" alt="Símbolo oficial de Chetesaí Fitness+" width={52} height={52} className="h-full w-full object-contain" /></span>Mi progreso</h1><p className="mt-4 max-w-xl text-sm leading-6 text-white/65">{data?.cliente?.nombre ? `Hola, ${data.cliente.nombre}. Aquí puedes revisar tu evolución y registrar nuevos controles.` : "Tu evolución, reunida en un espacio claro y medible."}</p></div>
             <div className="flex flex-col gap-2 sm:w-52"><Button asChild variant="outline" className="h-12 rounded-xl border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"><Link href="/portal"><ArrowLeft className="mr-2 h-4 w-4" />Entrenamiento</Link></Button><div className="rounded-xl border border-[#8cdb78]/25 bg-[#8cdb78]/10 p-1 text-[#9fe68f]"><LogoutButton /></div></div>
           </div>
         </header>
