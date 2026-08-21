@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import FoodCategoryVisual from "@/components/nutrition/FoodCategoryVisual";
 
 export type PlanFood = {
   alimento_id: string;
@@ -19,6 +20,7 @@ export type PlanFood = {
   proteinas_g: number;
   carbohidratos_g: number;
   grasas_g: number;
+  categoria?: string;
 };
 
 export type StructuredMeal = {
@@ -142,6 +144,7 @@ export default function FoodPlanBuilder({ meals, onChange }: { meals: Structured
       proteinas_g: round(food.proteinas_g * factor),
       carbohidratos_g: round(food.carbohidratos_g * factor),
       grasas_g: round(food.grasas_g * factor),
+      categoria: food.categoria,
     };
     onChange(meals.map((meal, index) => index === mealIndex ? { ...meal, alimentos: [...(meal.alimentos || []), item] } : meal));
     toast.success(`${food.nombre} añadido a ${meals[mealIndex]?.nombre || "la comida"}`);
@@ -228,8 +231,8 @@ export default function FoodPlanBuilder({ meals, onChange }: { meals: Structured
 
       <div className="max-h-[430px] overflow-y-auto rounded-2xl border">
         {loading ? <p className="p-10 text-center text-sm text-muted-foreground">Cargando alimentos...</p> : !visibleFoods.length ? <p className="p-10 text-center text-sm text-muted-foreground">No se encontraron alimentos.</p> : <div className="divide-y">
-          {visibleFoods.map((food) => <div key={food.id} className="grid gap-3 p-4 transition hover:bg-muted/30 lg:grid-cols-[minmax(180px,1fr)_330px_100px_100px] lg:items-center">
-            <div><div className="flex flex-wrap items-center gap-2"><p className="font-semibold">{food.nombre}</p>{food.es_personalizado ? <Badge variant="secondary">Propio</Badge> : null}</div><p className="mt-1 text-xs text-muted-foreground">{categories[food.categoria] || food.categoria}{food.marca ? ` · ${food.marca}` : ""} · {food.fuente}</p></div>
+          {visibleFoods.map((food) => <div key={food.id} className="grid gap-3 p-4 transition hover:bg-muted/30 lg:grid-cols-[minmax(220px,1fr)_330px_100px_100px] lg:items-center">
+            <div className="flex items-center gap-3"><FoodCategoryVisual category={food.categoria} name={food.nombre} compact /><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><p className="font-semibold">{food.nombre}</p>{food.es_personalizado ? <Badge variant="secondary">Propio</Badge> : null}</div><p className="mt-1 text-xs text-muted-foreground">{categories[food.categoria] || food.categoria}{food.marca ? ` · ${food.marca}` : ""} · {food.fuente}</p></div></div>
             <div className="grid grid-cols-4 gap-2 text-center text-xs"><Nutrient label="kcal" value={food.energia_kcal} /><Nutrient label="Prot." value={`${food.proteinas_g} g`} /><Nutrient label="HC" value={`${food.carbohidratos_g} g`} /><Nutrient label="Grasa" value={`${food.grasas_g} g`} /></div>
             <div><Label className="text-xs">Cantidad (g)</Label><Input className="mt-1 h-9" type="number" min="1" step="1" value={quantities[food.id] ?? String(food.porcion_gramos || 100)} onChange={(event) => setQuantities((current) => ({ ...current, [food.id]: event.target.value }))} /></div>
             <Button size="sm" onClick={() => addFood(food)}><Plus className="mr-1 h-4 w-4" />Añadir</Button>
@@ -244,8 +247,8 @@ export default function FoodPlanBuilder({ meals, onChange }: { meals: Structured
             const mealTotals = totals(meal.alimentos || []);
             return <Card key={`${meal.nombre}-${mealIndex}`} className="overflow-hidden"><CardContent className="p-0">
               <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-3"><div><p className="font-bold">{meal.nombre}</p><p className="text-xs text-muted-foreground">{meal.hora}</p></div><p className="text-sm font-bold text-[#46624f]">{round(mealTotals.kcal)} kcal</p></div>
-              {!meal.alimentos?.length ? <p className="p-5 text-center text-sm text-muted-foreground">Sin alimentos seleccionados</p> : <div className="divide-y">{meal.alimentos.map((food, foodIndex) => <div key={`${food.alimento_id}-${foodIndex}`} className="grid grid-cols-[1fr_90px_80px_36px] items-center gap-2 px-4 py-3">
-                <div><p className="text-sm font-medium">{food.nombre}</p><p className="text-xs text-muted-foreground">P {food.proteinas_g} · HC {food.carbohidratos_g} · G {food.grasas_g}</p></div>
+              {!meal.alimentos?.length ? <p className="p-5 text-center text-sm text-muted-foreground">Sin alimentos seleccionados</p> : <div className="divide-y">{meal.alimentos.map((food, foodIndex) => <div key={`${food.alimento_id}-${foodIndex}`} className="grid grid-cols-[minmax(0,1fr)_90px_80px_36px] items-center gap-2 px-4 py-3">
+                <div className="flex min-w-0 items-center gap-3"><FoodCategoryVisual category={food.categoria} name={food.nombre} compact /><div className="min-w-0"><p className="truncate text-sm font-medium">{food.nombre}</p><p className="truncate text-xs text-muted-foreground">P {food.proteinas_g} · HC {food.carbohidratos_g} · G {food.grasas_g}</p></div></div>
                 <Input type="number" min="0" className="h-8" value={food.cantidad_g} onChange={(event) => changeQuantity(mealIndex, foodIndex, Number(event.target.value))} />
                 <p className="text-right text-xs font-semibold">{food.energia_kcal} kcal</p>
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => removeFood(mealIndex, foodIndex)} aria-label={`Eliminar ${food.nombre}`}><Trash2 className="h-4 w-4" /></Button>
