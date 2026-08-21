@@ -284,7 +284,7 @@ export default function PortalPage() {
           <div className="relative grid gap-8 p-6 sm:p-8 lg:grid-cols-[1fr_310px] lg:items-center lg:p-10">
             <div>
               <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#8cdb78] p-1.5"><Image src="/brand/chetesai-logo-mark.svg" alt="Chetesaí Fitness+" width={44} height={44} className="h-full w-full object-contain" /></span><div><p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#d7b86b]">Chetesaí Fitness+</p><p className="text-xs text-white/45">Tu espacio personal</p></div></div>
+                <div className="flex items-center gap-3"><span className="grid h-13 w-13 shrink-0 place-items-center rounded-2xl border border-[#c7a254]/55 bg-[#07182b] p-1 shadow-[0_10px_28px_rgba(0,0,0,0.3)]"><Image src="/brand/chetesai-logo-mark.svg" alt="Símbolo oficial de Chetesaí Fitness+" width={52} height={52} priority className="h-full w-full object-contain" /></span><div><p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#d7b86b]">Chetesaí Fitness+</p><p className="text-xs text-white/45">Tu espacio personal</p></div></div>
                 <div className="hidden w-44 rounded-xl border border-white/10 bg-white/5 p-1 text-white/75 sm:block"><LogoutButton /></div>
               </div>
               <p className="mt-10 inline-flex items-center gap-2 rounded-full border border-[#8cdb78]/20 bg-[#8cdb78]/10 px-3 py-1.5 text-xs font-bold text-[#a4e796]"><Sparkles className="h-3.5 w-3.5" /> Todo listo para avanzar</p>
