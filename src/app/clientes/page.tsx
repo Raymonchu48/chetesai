@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import AppSidebar from "@/components/AppSidebar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,7 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Copy, KeyRound, Pencil, Plus, Search, ShieldCheck, Trash2, Users } from "lucide-react";
+import { Copy, Eye, KeyRound, Pencil, Plus, Search, ShieldCheck, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 
 interface Cliente {
@@ -398,7 +399,7 @@ export default function ClientesPage() {
                 <TableBody>
                   {filtered.map((c) => (
                     <TableRow key={c._id}>
-                      <TableCell className="font-medium">{c.nombre}</TableCell>
+                      <TableCell className="font-medium"><Link href={`/clientes/${c._id}`} className="hover:text-primary hover:underline">{c.nombre}</Link></TableCell>
                       <TableCell className="text-muted-foreground">{c.email}</TableCell>
                       <TableCell className="text-muted-foreground">{c.telefono}</TableCell>
                       <TableCell>
@@ -416,6 +417,9 @@ export default function ClientesPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
+                          <Button asChild variant="ghost" size="sm" title="Abrir espacio del cliente">
+                            <Link href={`/clientes/${c._id}`}><Eye className="h-4 w-4" /></Link>
+                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"

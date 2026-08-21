@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Activity,
   AlertTriangle,
+  Apple,
   ArrowRight,
   BarChart3,
   CalendarClock,
@@ -17,6 +18,7 @@ import {
   CircleDollarSign,
   Clock3,
   CreditCard,
+  Dumbbell,
   Inbox,
   Plus,
   RefreshCw,
@@ -32,6 +34,8 @@ type Summary = {
   clientes_total: number;
   clientes_activos: number;
   clientes_potenciales: number;
+  clientes_sin_nutricion: number;
+  clientes_sin_rutina: number;
   sesiones_hoy: number;
   proximos_siete_dias: number;
   citas_pendientes: number;
@@ -207,6 +211,23 @@ export default function DashboardPage() {
                 icon={<WalletCards className="h-5 w-5" />}
                 href="/pagos"
                 attention={data.resumen.pendiente_total > 0}
+              />
+            </section>
+
+            <section className="mb-6 grid gap-4 lg:grid-cols-2">
+              <CoachingStatus
+                icon={<Apple className="h-5 w-5" />}
+                label="Planes nutricionales pendientes"
+                value={data.resumen.clientes_sin_nutricion}
+                detail={data.resumen.clientes_sin_nutricion ? "Clientes activos que todavía necesitan una dieta" : "Todos los clientes activos tienen planificación"}
+                href="/clientes"
+              />
+              <CoachingStatus
+                icon={<Dumbbell className="h-5 w-5" />}
+                label="Rutinas pendientes"
+                value={data.resumen.clientes_sin_rutina}
+                detail={data.resumen.clientes_sin_rutina ? "Clientes activos sin entrenamiento asignado" : "Todos los clientes activos tienen rutina"}
+                href="/clientes"
               />
             </section>
 
@@ -454,6 +475,16 @@ function ExecutiveMetric({
       </Card>
     </Link>
   );
+}
+
+function CoachingStatus({ icon, label, value, detail, href }: { icon: ReactNode; label: string; value: number; detail: string; href: string }) {
+  const pending = value > 0;
+  return <Link href={href} className={`group flex items-center gap-4 rounded-2xl border p-4 transition hover:-translate-y-0.5 hover:shadow-sm ${pending ? "border-amber-200 bg-amber-50/60" : "border-emerald-200 bg-emerald-50/60"}`}>
+    <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${pending ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>{icon}</div>
+    <div className="min-w-0 flex-1"><p className="font-bold">{label}</p><p className="mt-1 truncate text-sm text-muted-foreground">{detail}</p></div>
+    <span className={`grid h-10 min-w-10 place-items-center rounded-xl px-2 text-xl font-black ${pending ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>{value}</span>
+    <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5" />
+  </Link>;
 }
 
 function SectionHeader({

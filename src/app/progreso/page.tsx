@@ -80,7 +80,9 @@ export default function ProgresoPage() {
         if (result.ok) {
           const rows = result.data || [];
           setClientes(rows);
-          if (rows[0]) setClienteId(rows[0]._id);
+          const requested = new URLSearchParams(window.location.search).get("cliente_id");
+          const selected = rows.find((row) => row._id === requested) || rows[0];
+          if (selected) setClienteId(selected._id);
         }
       })
       .catch(() => toast.error("No se pudieron cargar los clientes"));
