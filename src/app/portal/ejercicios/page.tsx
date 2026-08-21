@@ -6,6 +6,7 @@ import { ArrowRight, BookOpen, Dumbbell, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import ExerciseMediaVisual from "@/components/exercises/ExerciseMediaVisual";
 import type { ExerciseVisualModel } from "@/components/exercises/ProfessionalExerciseVisual";
+import { getExerciseVisualVariants } from "@/lib/exercise-visual-variants";
 
 type ExerciseInfo = {
   id: string;
@@ -24,6 +25,12 @@ type ExerciseInfo = {
   miniatura_url: string | null;
   gif_url: string | null;
   video_url: string | null;
+  variante_facil?: string | null;
+  variante_avanzada?: string | null;
+  regresion?: string | null;
+  progresion?: string | null;
+  objetivos?: string[];
+  contexto_ia?: unknown;
 };
 
 type AssignedExercise = {
@@ -173,6 +180,7 @@ export default function ClientExerciseGuidesPage() {
             {filtered.map(({ exercise, assignments }) => {
               const days = Array.from(new Set(assignments.map((item) => item.dia))).sort((a, b) => a - b);
               const totalSets = assignments.reduce((sum, item) => sum + Number(item.series || 0), 0);
+              const variantCount = getExerciseVisualVariants(exercise).length;
               return (
                 <Link
                   key={exercise.id}
@@ -191,6 +199,7 @@ export default function ClientExerciseGuidesPage() {
                     <div className="mt-4 flex flex-wrap gap-2 text-xs">
                       <span className="rounded-full bg-[#eef5ef] px-3 py-1 font-semibold text-[#46624f]">Día {days.join(", ")}</span>
                       <span className="rounded-full bg-[#f0ede7] px-3 py-1 font-semibold">{totalSets} series planificadas</span>
+                      <span className="rounded-full bg-[#fff1e9] px-3 py-1 font-semibold text-[#b65a35]">{variantCount} {variantCount === 1 ? "vista" : "variantes"}</span>
                     </div>
                     <div className="mt-5 flex items-center justify-between border-t border-[#ece6dc] pt-4 text-sm font-black text-[#46624f]">
                       Ver guía de ejecución <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />

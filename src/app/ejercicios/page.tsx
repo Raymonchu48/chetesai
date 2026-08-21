@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AppSidebar from "@/components/AppSidebar";
 import ExerciseMediaUploader from "@/components/ExerciseMediaUploader";
+import ExerciseVariantEditor from "@/components/exercises/ExerciseVariantEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dumbbell, ExternalLink, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  defaultEditableExerciseVisualVariants,
+  withExerciseVisualVariants,
+  type ExerciseVisualVariant,
+} from "@/lib/exercise-visual-variants";
 
 type Ejercicio = {
   _id: string;
@@ -29,15 +35,22 @@ type Ejercicio = {
   gif_url: string | null;
   miniatura_url: string | null;
   video_url: string | null;
+  codigo_interno?: string | null;
   tipo_movimiento: string | null;
   lateralidad: string | null;
   plano_movimiento: string | null;
   articulacion_principal: string | null;
   etiquetas: string[];
+  objetivos?: string[];
+  variante_facil?: string | null;
+  variante_avanzada?: string | null;
+  regresion?: string | null;
+  progresion?: string | null;
+  contexto_ia: Record<string, unknown>;
   activo: boolean;
 };
 
-type FormState = Omit<Ejercicio, "_id"> & { etiquetasTexto: string };
+type FormState = Omit<Ejercicio, "_id"> & { etiquetasTexto: string; variantesVisuales: ExerciseVisualVariant[] };
 
 const grupos = ["pecho", "espalda", "hombros", "biceps", "triceps", "piernas", "gluteos", "core", "cardio", "cuerpo_completo"];
 const categorias = ["fuerza", "cardio", "movilidad", "estiramiento", "rehabilitacion", "tecnica"];
@@ -62,7 +75,7 @@ const emptyForm: FormState = {
   material: null, descripcion: null, tecnica: null, errores_frecuentes: null, consejos: null,
   imagen_url: null, gif_url: null, miniatura_url: null, video_url: null,
   tipo_movimiento: null, lateralidad: null, plano_movimiento: null, articulacion_principal: null,
-  etiquetas: [], etiquetasTexto: "", activo: true,
+  etiquetas: [], objetivos: [], contexto_ia: {}, etiquetasTexto: "", variantesVisuales: [], activo: true,
 };
 
 export default function EjerciciosPage() {
@@ -94,6 +107,18 @@ export default function EjerciciosPage() {
 
   useEffect(() => { fetchEjercicios(); }, [fetchEjercicios]);
 
+  useEffect(() => {
+    if (!ejercicios.length) return;
+    const url = new URL(window.location.href);
+    const editId = url.searchParams.get("editar");
+    if (!editId) return;
+    const requested = ejercicios.find((item) => item._id === editId);
+    if (!requested) return;
+    openEdit(requested);
+    url.searchParams.delete("editar");
+    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+  }, [ejercicios]);
+
   const materiales = useMemo(() => [...new Set(ejercicios.map((item) => item.material).filter(Boolean) as string[])].sort(), [ejercicios]);
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -112,13 +137,23 @@ export default function EjerciciosPage() {
   function openEdit(item: Ejercicio) {
     const { _id, ...values } = item;
     setEditingId(_id);
-    setForm({ ...values, etiquetasTexto: (values.etiquetas || []).join(", ") });
+    setForm({
+      ...values,
+      contexto_ia: values.contexto_ia || {},
+      etiquetasTexto: (values.etiquetas || []).join(", "),
+      variantesVisuales: defaultEditableExerciseVisualVariants(item),
+    });
     setDialogOpen(true);
   }
 
   async function saveExercise() {
     try {
-      const payload = { ...form, etiquetas: form.etiquetasTexto.split(",").map((tag) => tag.trim()).filter(Boolean) };
+      const { etiquetasTexto, variantesVisuales, ...values } = form;
+      const payload = {
+        ...values,
+        etiquetas: etiquetasTexto.split(",").map((tag) => tag.trim()).filter(Boolean),
+        contexto_ia: withExerciseVisualVariants(values.contexto_ia, variantesVisuales),
+      };
       const response = await fetch(editingId ? `/api/ejercicios/${editingId}` : "/api/ejercicios", {
         method: editingId ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
       });
@@ -172,6 +207,12 @@ export default function EjerciciosPage() {
                     <MediaBlock kind="video" label="Vídeo" value={form.video_url} exerciseName={form.nombre} onChange={(url) => updateField("video_url", url)} />
                   </div>
                 </div>
+
+                <ExerciseVariantEditor
+                  exerciseName={form.nombre || "ejercicio"}
+                  variants={form.variantesVisuales}
+                  onChange={(variants) => updateField("variantesVisuales", variants)}
+                />
 
                 <TextField label="Descripción" value={form.descripcion} onChange={(v) => updateField("descripcion", v)} />
                 <TextField label="Técnica de ejecución" value={form.tecnica} onChange={(v) => updateField("tecnica", v)} />

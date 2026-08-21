@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseRest } from "../../../../../lib/supabase-rest";
+import { parseExerciseVisualVariants, withExerciseVisualVariants } from "@/lib/exercise-visual-variants";
 
 function optionalText(value: unknown) {
   const text = String(value ?? "").trim();
@@ -21,7 +22,8 @@ function textList(value: unknown) {
 
 function iaContext(body: Record<string, unknown>) {
   const value = body.contexto_ia ?? body.ia_contexto;
-  return typeof value === "object" && value ? value : {};
+  const context = typeof value === "object" && value && !Array.isArray(value) ? value : {};
+  return withExerciseVisualVariants(context, parseExerciseVisualVariants(context));
 }
 
 function normalizePayload(body: Record<string, unknown>) {

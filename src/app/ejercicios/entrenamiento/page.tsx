@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import AppSidebar from "@/components/AppSidebar";
 import ExerciseMediaVisual from "@/components/exercises/ExerciseMediaVisual";
+import InteractiveExerciseViewer from "@/components/exercises/InteractiveExerciseViewer";
 import type { ExerciseVisualModel } from "@/components/exercises/ProfessionalExerciseVisual";
 import ExerciseMediaUploader from "@/components/ExerciseMediaUploader";
 import AssignExerciseToClient from "@/components/exercises/AssignExerciseToClient";
@@ -37,6 +38,7 @@ import {
   Zap,
 } from "lucide-react";
 import { toast } from "sonner";
+import { getExerciseVisualVariants } from "@/lib/exercise-visual-variants";
 
 type Ejercicio = {
   _id: string;
@@ -65,6 +67,7 @@ type Ejercicio = {
   progresion?: string | null;
   etiquetas?: string[];
   objetivos?: string[];
+  contexto_ia?: unknown;
   activo: boolean;
 };
 
@@ -383,11 +386,12 @@ function QuickFilter({ active, icon, label, count, onClick }: { active: boolean;
 }
 
 function ExerciseCard({ item, visualModel, selected, favorite, onSelect, onFavorite }: { item: Ejercicio; visualModel: ExerciseVisualModel; selected: boolean; favorite: boolean; onSelect: () => void; onFavorite: () => void }) {
+  const variantCount = getExerciseVisualVariants(item).length;
   return (
     <article role="button" tabIndex={0} onClick={onSelect} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onSelect(); }} className={`group cursor-pointer overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg ${selected ? "border-[#6bb300] ring-1 ring-[#6bb300]" : "border-slate-200"}`}>
       <div className="flex items-start justify-between p-3 pb-1"><div><p className="text-[11px] font-bold text-[#5ca800]">{item.codigo_interno || "CHE-EX"}</p><h3 className="mt-1 line-clamp-2 min-h-10 text-sm font-black leading-5">{item.nombre}</h3><p className={`mt-1 text-[10px] font-black uppercase ${difficultyStyle(item.dificultad)}`}>{labels[item.dificultad] || item.dificultad}</p></div><button type="button" aria-label={favorite ? "Quitar de favoritos" : "Añadir a favoritos"} onClick={(event) => { event.stopPropagation(); onFavorite(); }} className="rounded-full p-1.5 text-slate-400 transition hover:bg-[#f1f7e9] hover:text-[#65ad00]"><Star className={`h-4 w-4 ${favorite ? "fill-[#72b900] text-[#62a900]" : ""}`}/></button></div>
       <div className="h-48 overflow-hidden bg-white p-2"><MediaHero item={item} visualModel={visualModel}/></div>
-      <div className="flex items-center justify-between border-t border-slate-100 px-3 py-2.5"><span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-600"><PlayCircle className="h-4 w-4"/>Ver ejecución</span><Info className="h-4 w-4 text-slate-400"/></div>
+      <div className="flex items-center justify-between border-t border-slate-100 px-3 py-2.5"><span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-600"><PlayCircle className="h-4 w-4"/>Ver guía interactiva</span><span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#559900]">{variantCount} {variantCount === 1 ? "vista" : "variantes"}<Info className="h-3.5 w-3.5"/></span></div>
     </article>
   );
 }
@@ -401,7 +405,7 @@ function ExerciseDetail({ item, visualModel, favorite, deleting, onFavorite, onI
   return (
     <div>
       <div className="flex items-start justify-between p-5 pb-3"><div><p className="text-xs font-bold text-[#5ca800]">{item.codigo_interno || "CHE-EX"}</p><h2 className="mt-1 text-2xl font-black leading-tight">{item.nombre}</h2><p className={`mt-1 text-xs font-black uppercase ${difficultyStyle(item.dificultad)}`}>{labels[item.dificultad] || item.dificultad}</p></div><button type="button" onClick={onFavorite} className="rounded-full p-2 text-[#65ad00] hover:bg-[#f1f7e9]" aria-label="Favorito"><Star className={`h-5 w-5 ${favorite ? "fill-[#72b900]" : ""}`}/></button></div>
-      <div className="mx-5 h-64 overflow-hidden rounded-xl border border-slate-100 bg-[#fbfaf6] p-2"><MediaHero item={item} visualModel={visualModel}/></div>
+      <div className="mx-5"><InteractiveExerciseViewer item={item} visualModel={visualModel} compact /></div>
       <div className="grid grid-cols-3 border-b border-slate-100 p-4 text-center text-[11px]"><Meta icon={<Activity className="h-4 w-4"/>} label="Grupo muscular" value={labels[item.grupo_muscular] || item.grupo_muscular}/><Meta icon={<Dumbbell className="h-4 w-4"/>} label="Material" value={item.material || "Ninguno"}/><Meta icon={<TrendingUp className="h-4 w-4"/>} label="Nivel" value={labels[item.dificultad] || item.dificultad}/></div>
 
       <div className="space-y-0 px-5">
@@ -414,7 +418,7 @@ function ExerciseDetail({ item, visualModel, favorite, deleting, onFavorite, onI
       </div>
 
       <div className="space-y-3 p-5 pt-4">
-        {item.video_url ? <Button asChild variant="outline" className="w-full"><a href={item.video_url} target="_blank" rel="noreferrer"><PlayCircle className="mr-2 h-4 w-4"/>Ver vídeo explicativo</a></Button> : <div className="rounded-xl border border-dashed p-3 text-center text-xs text-slate-500">Vídeo Chetesaí pendiente de incorporar.</div>}
+        <Button asChild variant="outline" className="w-full"><Link href={`/ejercicios?editar=${item._id}`}><PlayCircle className="mr-2 h-4 w-4"/>Gestionar vídeos y variantes</Link></Button>
         <div className="rounded-xl border bg-[#f8faf6] p-3"><p className="mb-2 text-xs font-bold">Imagen del ejercicio</p><ExerciseMediaUploader kind="imagen" label="Imagen principal" exerciseName={item.nombre} exerciseId={item._id} value={item.imagen_url || null} onUploaded={onImageUploaded} compact/></div>
         <AssignExerciseToClient exerciseId={item._id} exerciseName={item.nombre}/>
         <Button variant="outline" onClick={onDelete} disabled={deleting} className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"><Trash2 className="mr-2 h-4 w-4"/>{deleting ? "Eliminando..." : "Eliminar ejercicio"}</Button>
