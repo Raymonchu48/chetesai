@@ -22,7 +22,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-type Meal = { nombre: string; hora: string; descripcion: string };
+type MealFood = { nombre: string; cantidad_g: number; energia_kcal: number; proteinas_g: number; carbohidratos_g: number; grasas_g: number };
+type Meal = { nombre: string; hora: string; descripcion: string; alimentos?: MealFood[] };
 type Plan = {
   id: string;
   nombre: string;
@@ -240,8 +241,14 @@ export default function ClientWellbeingPage() {
                                 <div className="p-5 sm:p-6">
                                   <h4 className="text-lg font-bold">{meal.nombre}</h4>
                                   <p className={`mt-2 whitespace-pre-line text-sm leading-7 ${meal.descripcion ? "text-[#4f5c55]" : "italic text-[#929891]"}`}>
-                                    {meal.descripcion || "Pendiente de propuesta profesional."}
+                                    {meal.descripcion || (meal.alimentos?.length ? "Selección preparada por tu profesional." : "Pendiente de propuesta profesional.")}
                                   </p>
+                                  {meal.alimentos?.length ? <div className="mt-4 overflow-hidden rounded-2xl border border-[#e3ddd3] bg-white">
+                                    {meal.alimentos.map((food, foodIndex) => <div key={`${food.nombre}-${foodIndex}`} className="flex items-center justify-between gap-4 border-b border-[#eee9e1] px-4 py-3 last:border-b-0">
+                                      <div><p className="text-sm font-semibold">{food.nombre}</p><p className="mt-0.5 text-xs text-[#707872]">{food.cantidad_g} g · P {food.proteinas_g} g · HC {food.carbohidratos_g} g · G {food.grasas_g} g</p></div>
+                                      <span className="shrink-0 rounded-full bg-[#eef5ef] px-3 py-1 text-xs font-bold text-[#46624f]">{food.energia_kcal} kcal</span>
+                                    </div>)}
+                                  </div> : null}
                                 </div>
                               </div>
                             </CardContent>
