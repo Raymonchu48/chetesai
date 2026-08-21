@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import LogoutButton from "@/components/LogoutButton";
+import FoodCategoryVisual from "@/components/nutrition/FoodCategoryVisual";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,7 +23,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-type MealFood = { nombre: string; cantidad_g: number; energia_kcal: number; proteinas_g: number; carbohidratos_g: number; grasas_g: number };
+type MealFood = { nombre: string; cantidad_g: number; energia_kcal: number; proteinas_g: number; carbohidratos_g: number; grasas_g: number; categoria?: string };
 type Meal = { nombre: string; hora: string; descripcion: string; alimentos?: MealFood[] };
 type Plan = {
   id: string;
@@ -245,7 +246,7 @@ export default function ClientWellbeingPage() {
                                   </p>
                                   {meal.alimentos?.length ? <div className="mt-4 overflow-hidden rounded-2xl border border-[#e3ddd3] bg-white">
                                     {meal.alimentos.map((food, foodIndex) => <div key={`${food.nombre}-${foodIndex}`} className="flex items-center justify-between gap-4 border-b border-[#eee9e1] px-4 py-3 last:border-b-0">
-                                      <div><p className="text-sm font-semibold">{food.nombre}</p><p className="mt-0.5 text-xs text-[#707872]">{food.cantidad_g} g · P {food.proteinas_g} g · HC {food.carbohidratos_g} g · G {food.grasas_g} g</p></div>
+                                      <div className="flex min-w-0 items-center gap-3"><FoodCategoryVisual category={food.categoria} name={food.nombre} compact /><div className="min-w-0"><p className="truncate text-sm font-semibold">{food.nombre}</p><p className="mt-0.5 truncate text-xs text-[#707872]">{food.cantidad_g} g · P {food.proteinas_g} g · HC {food.carbohidratos_g} g · G {food.grasas_g} g</p></div></div>
                                       <span className="shrink-0 rounded-full bg-[#eef5ef] px-3 py-1 text-xs font-bold text-[#46624f]">{food.energia_kcal} kcal</span>
                                     </div>)}
                                   </div> : null}
