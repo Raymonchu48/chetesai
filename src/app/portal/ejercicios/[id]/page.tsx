@@ -17,7 +17,7 @@ import {
   Repeat2,
   Target,
 } from "lucide-react";
-import ExerciseMediaVisual from "@/components/exercises/ExerciseMediaVisual";
+import InteractiveExerciseViewer from "@/components/exercises/InteractiveExerciseViewer";
 import type { ExerciseVisualModel } from "@/components/exercises/ProfessionalExerciseVisual";
 
 type ExerciseInfo = {
@@ -41,6 +41,12 @@ type ExerciseInfo = {
   lateralidad: string | null;
   plano_movimiento: string | null;
   articulacion_principal: string | null;
+  variante_facil?: string | null;
+  variante_avanzada?: string | null;
+  regresion?: string | null;
+  progresion?: string | null;
+  objetivos?: string[];
+  contexto_ia?: unknown;
   etiquetas: string[];
 };
 
@@ -133,11 +139,8 @@ export default function ExerciseGuideDetailPage() {
 
         <section className="overflow-hidden rounded-[32px] border border-[#e7dfd3] bg-[#fffdf9] shadow-sm">
           <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
-            <div className="relative min-h-72 bg-[#18211d] lg:min-h-[520px]">
-              <div className="absolute inset-0 bg-white p-3 md:p-6"><ExerciseMediaVisual item={exercise} visualModel={visualModel} /></div>
-              <div className="absolute left-5 top-5 rounded-full bg-black/60 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-white backdrop-blur">
-                {labels[exercise.grupo_muscular] || exercise.grupo_muscular}
-              </div>
+            <div className="bg-white p-3 md:p-6">
+              <InteractiveExerciseViewer item={exercise} visualModel={visualModel} />
             </div>
 
             <div className="p-6 md:p-9">
@@ -154,11 +157,7 @@ export default function ExerciseGuideDetailPage() {
                 <Info label="Nivel" value={labels[exercise.dificultad] || exercise.dificultad || "Adaptado"} icon={Gauge} />
               </div>
 
-              {exercise.video_url ? (
-                <a href={exercise.video_url} target="_blank" rel="noreferrer" className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#c9653b] px-5 py-3.5 text-sm font-black text-white transition hover:bg-[#b65a35]">
-                  <PlayCircle className="h-5 w-5" /> Ver vídeo de ejecución
-                </a>
-              ) : null}
+              <p className="mt-6 flex items-center gap-2 rounded-2xl bg-[#eef5ef] px-4 py-3 text-sm font-bold text-[#46624f]"><PlayCircle className="h-5 w-5" /> Selecciona una variante para consultar su ejecución y énfasis muscular.</p>
             </div>
           </div>
         </section>

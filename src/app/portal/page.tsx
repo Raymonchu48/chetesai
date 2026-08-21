@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import LogoutButton from "@/components/LogoutButton";
 import ExerciseMediaVisual from "@/components/exercises/ExerciseMediaVisual";
+import InteractiveExerciseViewer from "@/components/exercises/InteractiveExerciseViewer";
 import type { ExerciseVisualModel } from "@/components/exercises/ProfessionalExerciseVisual";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -53,6 +54,7 @@ type Exercise = {
     variante_facil: string | null;
     variante_avanzada: string | null;
     etiquetas: string[];
+    contexto_ia?: unknown;
   };
 };
 
@@ -376,8 +378,8 @@ function ClientExerciseDetail({ exercise, visualModel }: { exercise: NonNullable
         <p className="mt-1 text-xs font-bold uppercase text-[#62a900]">{labels[exercise.dificultad] || exercise.dificultad || "Nivel adaptado"}</p>
       </div>
 
-      <div className="h-72 overflow-hidden border-b border-[#e7dfd3] bg-white p-3 sm:h-80">
-        <ExerciseMediaVisual item={exercise} visualModel={visualModel} />
+      <div className="border-b border-[#e7dfd3] bg-white p-3 sm:p-5">
+        <InteractiveExerciseViewer item={exercise} visualModel={visualModel} compact />
       </div>
 
       <div className="grid grid-cols-3 border-b border-[#e7dfd3] bg-white py-4">
@@ -404,13 +406,6 @@ function ClientExerciseDetail({ exercise, visualModel }: { exercise: NonNullable
         </ClientGuideSection>
       </div>
 
-      {exercise.video_url ? (
-        <div className="border-t border-[#e7dfd3] p-5">
-          <a href={exercise.video_url} target="_blank" rel="noreferrer" className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#46624f] px-5 py-3 text-sm font-black text-white">
-            <PlayCircle className="h-4 w-4" /> Ver vídeo de ejecución
-          </a>
-        </div>
-      ) : null}
     </div>
   );
 }
