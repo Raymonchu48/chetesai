@@ -44,6 +44,50 @@ const categoryKeywords: Array<[string, string[]]> = [
   ["cereales", ["arroz", "avena", "pan", "pasta", "quinoa", "cereal"]],
 ];
 
+const foodSprites: Array<{ keywords: string[]; column: number; row: number }> = [
+  { keywords: ["avena"], column: 0, row: 0 },
+  { keywords: ["arroz"], column: 1, row: 0 },
+  { keywords: ["quinoa"], column: 2, row: 0 },
+  { keywords: ["pan integral", "pan"], column: 3, row: 0 },
+  { keywords: ["pasta"], column: 4, row: 0 },
+  { keywords: ["patata"], column: 5, row: 0 },
+  { keywords: ["boniato", "batata"], column: 0, row: 1 },
+  { keywords: ["pollo"], column: 1, row: 1 },
+  { keywords: ["pavo"], column: 2, row: 1 },
+  { keywords: ["ternera", "vacuno"], column: 3, row: 1 },
+  { keywords: ["salmón", "salmon"], column: 4, row: 1 },
+  { keywords: ["atún", "atun"], column: 5, row: 1 },
+  { keywords: ["merluza", "bacalao"], column: 0, row: 2 },
+  { keywords: ["clara"], column: 2, row: 2 },
+  { keywords: ["huevo de", "huevo entero", "huevo"], column: 1, row: 2 },
+  { keywords: ["leche"], column: 3, row: 2 },
+  { keywords: ["yogur", "kéfir", "kefir"], column: 4, row: 2 },
+  { keywords: ["queso fresco", "queso"], column: 5, row: 2 },
+  { keywords: ["lenteja"], column: 0, row: 3 },
+  { keywords: ["garbanzo"], column: 1, row: 3 },
+  { keywords: ["alubia", "judía", "judia"], column: 2, row: 3 },
+  { keywords: ["plátano", "platano", "banana"], column: 3, row: 3 },
+  { keywords: ["manzana"], column: 4, row: 3 },
+  { keywords: ["naranja", "mandarina"], column: 5, row: 3 },
+  { keywords: ["fresa"], column: 0, row: 4 },
+  { keywords: ["brócoli", "brocoli"], column: 1, row: 4 },
+  { keywords: ["espinaca"], column: 2, row: 4 },
+  { keywords: ["tomate"], column: 3, row: 4 },
+  { keywords: ["aguacate"], column: 4, row: 4 },
+  { keywords: ["almendra"], column: 5, row: 4 },
+];
+
+function foodSpriteStyle(name?: string | null) {
+  const normalizedName = String(name || "").toLocaleLowerCase("es");
+  const match = foodSprites.find(({ keywords }) => keywords.some((keyword) => normalizedName.includes(keyword)));
+  if (!match) return null;
+  return {
+    backgroundImage: "url('/brand/chetesai-food-sprite-v1.webp')",
+    backgroundPosition: `${match.column * 20}% ${match.row * 25}%`,
+    backgroundSize: "600% 500%",
+  };
+}
+
 function inferCategory(category?: string | null, name?: string | null) {
   if (category && themes[category]) return category;
   const normalizedName = String(name || "").toLocaleLowerCase("es");
@@ -53,8 +97,12 @@ function inferCategory(category?: string | null, name?: string | null) {
 export default function FoodCategoryVisual({ category, name, compact = false }: { category?: string | null; name?: string | null; compact?: boolean }) {
   const theme = themes[inferCategory(category, name)] || fallback;
   const Icon = theme.Icon;
+  const spriteStyle = foodSpriteStyle(name);
 
   if (compact) {
+    if (spriteStyle) {
+      return <span role="img" aria-label={`Ilustración de ${name || theme.label}`} className="h-11 w-11 shrink-0 rounded-2xl border border-[#e6dfd3] bg-[#fffdf9] bg-no-repeat shadow-sm" style={spriteStyle} />;
+    }
     return (
       <span aria-label={`Ilustración de ${theme.label}`} className={`relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br ${theme.background} ${theme.foreground}`}>
         <span className={`absolute -bottom-3 -right-3 h-7 w-7 rounded-full opacity-20 ${theme.accent}`} />
