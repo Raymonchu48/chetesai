@@ -7,7 +7,16 @@ const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 type AppUser = { id: string };
 type Row = Record<string, unknown>;
-type CleanMeal = { nombre: string; hora: string; descripcion: string };
+type CleanFood = {
+  alimento_id: string;
+  nombre: string;
+  cantidad_g: number;
+  energia_kcal: number;
+  proteinas_g: number;
+  carbohidratos_g: number;
+  grasas_g: number;
+};
+type CleanMeal = { nombre: string; hora: string; descripcion: string; alimentos: CleanFood[] };
 
 async function assertProfessional(): Promise<AppUser> {
   if (!supabaseUrl || !anonKey || !serviceKey) throw new Error("Supabase no está configurado");
@@ -68,17 +77,32 @@ function cleanMeals(value: unknown): CleanMeal[] {
   return value
     .map((item) => {
       const row = item as Record<string, unknown>;
+      const foods = Array.isArray(row.alimentos)
+        ? row.alimentos.map((food) => {
+            const item = food as Record<string, unknown>;
+            return {
+              alimento_id: String(item.alimento_id || ""),
+              nombre: String(item.nombre || "").trim(),
+              cantidad_g: Math.max(optionalNumber(item.cantidad_g) || 0, 0),
+              energia_kcal: Math.max(optionalNumber(item.energia_kcal) || 0, 0),
+              proteinas_g: Math.max(optionalNumber(item.proteinas_g) || 0, 0),
+              carbohidratos_g: Math.max(optionalNumber(item.carbohidratos_g) || 0, 0),
+              grasas_g: Math.max(optionalNumber(item.grasas_g) || 0, 0),
+            };
+          }).filter((food) => food.nombre && food.cantidad_g > 0)
+        : [];
       return {
         nombre: String(row.nombre || "").trim(),
         hora: String(row.hora || "").trim(),
         descripcion: String(row.descripcion || "").trim(),
+        alimentos: foods,
       };
     })
-    .filter((item) => item.nombre || item.descripcion);
+    .filter((item) => item.nombre || item.descripcion || item.alimentos.length);
 }
 
 function hasMeaningfulPlanContent(body: Record<string, unknown>, meals: CleanMeal[]) {
-  const hasMealProposal = meals.some((meal) => meal.descripcion.length > 0);
+  const hasMealProposal = meals.some((meal) => meal.descripcion.length > 0 || meal.alimentos.length > 0);
   const hasText = [body.objetivo, body.recomendaciones].some((value) => String(value || "").trim().length > 0);
   const hasTargets = [
     body.calorias_objetivo,

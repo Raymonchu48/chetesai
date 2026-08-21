@@ -10,9 +10,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Apple, CheckCircle2, Droplets, Plus, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import FoodPlanBuilder, { type StructuredMeal } from "@/components/nutrition/FoodPlanBuilder";
 
 type Cliente = { _id: string; nombre: string; email: string };
-type Meal = { nombre: string; hora: string; descripcion: string };
+type Meal = StructuredMeal;
 type Plan = {
   id: string;
   nombre: string;
@@ -55,11 +56,11 @@ type PlanForm = {
 };
 
 const defaultMeals: Meal[] = [
-  { nombre: "Desayuno", hora: "08:00", descripcion: "" },
-  { nombre: "Media mañana", hora: "11:00", descripcion: "" },
-  { nombre: "Comida", hora: "14:00", descripcion: "" },
-  { nombre: "Merienda", hora: "17:30", descripcion: "" },
-  { nombre: "Cena", hora: "21:00", descripcion: "" },
+  { nombre: "Desayuno", hora: "08:00", descripcion: "", alimentos: [] },
+  { nombre: "Media mañana", hora: "11:00", descripcion: "", alimentos: [] },
+  { nombre: "Comida", hora: "14:00", descripcion: "", alimentos: [] },
+  { nombre: "Merienda", hora: "17:30", descripcion: "", alimentos: [] },
+  { nombre: "Cena", hora: "21:00", descripcion: "", alimentos: [] },
 ];
 
 function newPlan(): PlanForm {
@@ -98,7 +99,7 @@ const categoryLabels: Record<string, string> = {
 };
 
 function hasMeaningfulPlan(plan: PlanForm) {
-  const hasMealProposal = plan.comidas.some((meal) => meal.descripcion.trim().length > 0);
+  const hasMealProposal = plan.comidas.some((meal) => meal.descripcion.trim().length > 0 || meal.alimentos.length > 0);
   const hasText = Boolean(plan.objetivo.trim() || plan.recomendaciones.trim());
   const hasTargets = [
     plan.calorias_objetivo,
@@ -113,7 +114,7 @@ function hasMeaningfulPlan(plan: PlanForm) {
 export default function NutritionPage() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [clienteId, setClienteId] = useState("");
-  const [plan, setPlan] = useState<PlanForm>(newPlan());
+  const [plan, setPlan] = useState<PlanForm>(newPlan);
   const [habits, setHabits] = useState<Habit[]>([]);
   const [records, setRecords] = useState<HabitRecord[]>([]);
   const [habitForm, setHabitForm] = useState(emptyHabit);
@@ -154,7 +155,7 @@ export default function NutritionPage() {
         fecha_inicio: current.fecha_inicio || new Date().toISOString().slice(0, 10),
         fecha_fin: current.fecha_fin || "",
         comidas: Array.isArray(current.comidas) && current.comidas.length
-          ? current.comidas.map((meal) => ({ ...meal }))
+          ? current.comidas.map((meal) => ({ ...meal, alimentos: Array.isArray(meal.alimentos) ? meal.alimentos : [] }))
           : defaultMeals.map((meal) => ({ ...meal })),
       } : newPlan());
       setHabits(result.data.habitos || []);
@@ -304,6 +305,8 @@ export default function NutritionPage() {
                 <div className="mt-3"><Label>Propuesta visible para el cliente</Label><Textarea className="mt-2" rows={4} value={meal.descripcion} onChange={(event) => updateMeal(index, "descripcion", event.target.value)} placeholder="Ej.: 60 g de avena + 250 ml de leche + fruta. Alternativa: yogur natural con avena y frutos rojos." /></div>
               </div>)}
             </div>
+
+            <FoodPlanBuilder meals={plan.comidas} onChange={(comidas) => setPlan((current) => ({ ...current, comidas }))} />
 
             <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div><p className="font-bold text-emerald-900">Publicación en el portal del cliente</p><p className="mt-1 text-sm text-emerald-800">Este botón guarda el plan en Supabase y verifica que haya quedado activo antes de confirmar.</p></div>
