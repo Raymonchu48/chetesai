@@ -97,7 +97,9 @@ export default function Main() {
 
   function goTo(section: string) {
     if (section !== "tarifas") setShowRates(false);
-    document.getElementById(section)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(() => {
+      document.getElementById(section)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
   }
 
   async function submitReservation(event: FormEvent<HTMLFormElement>) {
@@ -155,7 +157,7 @@ export default function Main() {
             <Link href="/login" className="transition hover:text-white">Acceso clientes</Link>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <Button className="rounded-xl bg-[#2f9e24] px-4 hover:bg-[#27891e] lg:px-5" onClick={() => goTo("contacto")}>
+            <Button className="rounded-xl bg-[#2f9e24] px-4 hover:bg-[#27891e] lg:px-5" onClick={() => goTo("formulario-valoracion")}>
               <CalendarDays className="mr-2 h-4 w-4" />
               <span className="hidden sm:inline">Reserva tu valoración</span>
               <span className="sm:hidden">Reserva</span>
@@ -240,7 +242,7 @@ export default function Main() {
           </div>
 
           <div className="mt-11 text-center">
-            <Button onClick={() => goTo("contacto")} className="rounded-xl bg-[#2f9e24] px-6 py-5 hover:bg-[#27891e]">
+            <Button onClick={() => goTo("formulario-valoracion")} className="rounded-xl bg-[#2f9e24] px-6 py-5 hover:bg-[#27891e]">
               Solicitar valoración <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -249,7 +251,7 @@ export default function Main() {
 
       {showRates ? <section id="tarifas" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Bonos mensuales</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Elige el ritmo que encaja contigo</h2><p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Planes flexibles, sin matrícula ni permanencia.</p></div>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">{personalPlans.map((plan) => <article key={plan.name} className={`relative rounded-3xl border bg-[#fffdf9] p-7 shadow-sm ${plan.popular ? "border-[#2f9e24] ring-2 ring-[#2f9e24]/10" : "border-[#ded8cd]"}`}>{plan.popular ? <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#2f9e24] px-4 py-1 text-xs font-bold uppercase text-white">Más popular</span> : null}<p className="text-center text-2xl font-black">{plan.name}</p><p className="mt-2 text-center text-sm font-semibold text-[#2f9e24]">{plan.sessions}</p><p className="mt-6 text-center text-4xl font-black">{plan.price}<span className="text-base font-medium text-[#67706b]"> / mes</span></p><p className="mt-1 text-center text-sm text-[#67706b]">{plan.perSession}</p><div className="mt-7 space-y-3">{plan.features.map((feature) => <p key={feature} className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-[#2f9e24]" />{feature}</p>)}</div><Button className={`mt-7 w-full rounded-xl ${plan.popular ? "bg-[#2f9e24] hover:bg-[#27891e]" : "bg-[#202724] hover:bg-[#303a35]"}`} onClick={() => goTo("contacto")}>Elegir {plan.name}</Button></article>)}</div>
+        <div className="mt-12 grid gap-6 md:grid-cols-3">{personalPlans.map((plan) => <article key={plan.name} className={`relative rounded-3xl border bg-[#fffdf9] p-7 shadow-sm ${plan.popular ? "border-[#2f9e24] ring-2 ring-[#2f9e24]/10" : "border-[#ded8cd]"}`}>{plan.popular ? <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#2f9e24] px-4 py-1 text-xs font-bold uppercase text-white">Más popular</span> : null}<p className="text-center text-2xl font-black">{plan.name}</p><p className="mt-2 text-center text-sm font-semibold text-[#2f9e24]">{plan.sessions}</p><p className="mt-6 text-center text-4xl font-black">{plan.price}<span className="text-base font-medium text-[#67706b]"> / mes</span></p><p className="mt-1 text-center text-sm text-[#67706b]">{plan.perSession}</p><div className="mt-7 space-y-3">{plan.features.map((feature) => <p key={feature} className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-[#2f9e24]" />{feature}</p>)}</div><Button className={`mt-7 w-full rounded-xl ${plan.popular ? "bg-[#2f9e24] hover:bg-[#27891e]" : "bg-[#202724] hover:bg-[#303a35]"}`} onClick={() => goTo("formulario-valoracion")}>Elegir {plan.name}</Button></article>)}</div>
         <div className="mt-10 rounded-3xl border border-[#ded8cd] bg-[#fffdf9] p-7"><div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-sm font-bold uppercase tracking-[0.16em] text-[#2f9e24]">Grupos reducidos 2–4</p><h3 className="mt-2 text-2xl font-black">Comparte el entrenamiento, no la atención</h3><p className="mt-2 text-[#67706b]">Puedes venir con tu grupo o solicitar plaza en uno compatible.</p></div><div className="grid gap-3 sm:grid-cols-3">{groupPlans.map((plan) => <div key={plan.name} className="rounded-2xl bg-[#f1eee7] px-5 py-4 text-center"><p className="font-bold">{plan.name}</p><p className="mt-1 text-xs text-[#67706b]">{plan.sessions}</p><p className="mt-2 text-xl font-black text-[#2f9e24]">{plan.price}</p></div>)}</div></div></div>
       </section> : null}
 
@@ -294,8 +296,9 @@ export default function Main() {
       </section>
 
       <section id="contacto" className="bg-[#18211d] text-white">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.92fr_1.08fr] lg:px-8">
-          <div>
+        <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+          <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#111612] shadow-2xl shadow-black/30 lg:grid lg:grid-cols-[0.92fr_1.08fr]">
+            <div className="p-7 sm:p-9 lg:p-10">
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8cdb78]">Primera valoración</p>
             <h2 className="mt-3 text-4xl font-black md:text-5xl">Cuéntame tu objetivo</h2>
             <p className="mt-5 max-w-lg leading-7 text-white/65">Envíame tus datos y te responderé para valorar tu punto de partida y encontrar la modalidad más adecuada.</p>
@@ -305,8 +308,32 @@ export default function Main() {
               <p className="flex items-center gap-3"><Clock className="h-5 w-5 text-[#8cdb78]" />Respuesta habitual en menos de 24 horas</p>
               <p className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-[#8cdb78]" />Tus datos se utilizarán únicamente para atender la solicitud</p>
             </div>
+          </div>
 
-            <article id="sobre-mi" className="mt-10 scroll-mt-24 rounded-[28px] border border-[#b38d45]/35 bg-[#0f1713]/75 p-5 shadow-2xl shadow-black/25 backdrop-blur-xl sm:p-6">
+            <form id="formulario-valoracion" onSubmit={submitReservation} className="scroll-mt-5 border-t border-[#ded8cd] bg-white p-7 text-[#202724] sm:p-9 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:border-l lg:border-t-0 lg:p-10">
+              <div className="mb-7">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#2f9e24]">Formulario de valoración</p>
+                <h3 className="mt-2 text-2xl font-black sm:text-3xl">Tu valoración empieza aquí</h3>
+                <p className="mt-2 text-sm leading-6 text-[#67706b]">Completa tus datos y te responderé para confirmar el mejor punto de partida.</p>
+              </div>
+              <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field name="nombre" label="Nombre" required />
+              <Field name="email" label="Email" type="email" required />
+              <Field name="telefono" label="Teléfono" type="tel" />
+              <label className="space-y-2 text-sm font-semibold">Modalidad<select name="modalidad" defaultValue="orientacion" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]"><option value="entrenamiento_personal">Entrenamiento personal</option><option value="grupo_reducido">Grupo reducido</option><option value="orientacion">Quiero orientación</option></select></label>
+              <Field name="fecha_preferida" label="Fecha preferida" type="date" required />
+              <Field name="franja_horaria" label="Hora aproximada" type="time" required />
+            </div>
+            <p className="mt-2 text-xs text-[#67706b]">La hora solicitada queda pendiente de confirmación según disponibilidad.</p>
+            <label className="mt-4 block space-y-2 text-sm font-semibold">Objetivo principal<input name="objetivo" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" placeholder="Mejorar condición física, ganar fuerza, perder grasa..." /></label>
+            <label className="mt-4 block space-y-2 text-sm font-semibold">Cuéntame un poco más<textarea name="mensaje" rows={4} className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" /></label>
+            <label className="mt-4 flex items-start gap-3 text-xs leading-5 text-[#67706b]"><input type="checkbox" name="consentimiento" required className="mt-1" />Acepto que mis datos sean utilizados para responder a esta solicitud de información.</label>
+            {formMessage ? <p className={`mt-4 rounded-xl px-4 py-3 text-sm ${formMessage.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{formMessage.text}</p> : null}
+            <Button type="submit" disabled={sending} className="mt-6 w-full rounded-xl bg-[#2f9e24] py-6 text-base hover:bg-[#27891e]">{sending ? "Enviando solicitud..." : "Solicitar valoración"}</Button>
+            </form>
+
+            <article id="sobre-mi" className="mx-7 mb-7 mt-7 scroll-mt-24 sm:mx-9 sm:mb-9 lg:col-start-1 lg:row-start-2 lg:mx-10 lg:mb-10 lg:mt-0 rounded-[28px] border border-[#b38d45]/35 bg-[#0f1713]/75 p-5 shadow-2xl shadow-black/25 backdrop-blur-xl sm:p-6">
               <div className="grid gap-5 sm:grid-cols-[132px_1fr] sm:items-center">
                 <div className="mx-auto overflow-hidden rounded-2xl border border-white/15 bg-black/30 shadow-xl sm:mx-0">
                   <img src={PROFILE_IMAGE_URL} alt="Ramón Curbalán, entrenador y profesional del deporte" className="h-44 w-32 object-cover object-top sm:h-48 sm:w-full" />
@@ -341,24 +368,6 @@ export default function Main() {
               </a>
             </article>
           </div>
-
-          <form onSubmit={submitReservation} className="rounded-3xl bg-white p-7 text-[#202724] shadow-2xl">
-            <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field name="nombre" label="Nombre" required />
-              <Field name="email" label="Email" type="email" required />
-              <Field name="telefono" label="Teléfono" type="tel" />
-              <label className="space-y-2 text-sm font-semibold">Modalidad<select name="modalidad" defaultValue="orientacion" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]"><option value="entrenamiento_personal">Entrenamiento personal</option><option value="grupo_reducido">Grupo reducido</option><option value="orientacion">Quiero orientación</option></select></label>
-              <Field name="fecha_preferida" label="Fecha preferida" type="date" required />
-              <Field name="franja_horaria" label="Hora aproximada" type="time" required />
-            </div>
-            <p className="mt-2 text-xs text-[#67706b]">La hora solicitada queda pendiente de confirmación según disponibilidad.</p>
-            <label className="mt-4 block space-y-2 text-sm font-semibold">Objetivo principal<input name="objetivo" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" placeholder="Mejorar condición física, ganar fuerza, perder grasa..." /></label>
-            <label className="mt-4 block space-y-2 text-sm font-semibold">Cuéntame un poco más<textarea name="mensaje" rows={4} className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" /></label>
-            <label className="mt-4 flex items-start gap-3 text-xs leading-5 text-[#67706b]"><input type="checkbox" name="consentimiento" required className="mt-1" />Acepto que mis datos sean utilizados para responder a esta solicitud de información.</label>
-            {formMessage ? <p className={`mt-4 rounded-xl px-4 py-3 text-sm ${formMessage.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{formMessage.text}</p> : null}
-            <Button type="submit" disabled={sending} className="mt-6 w-full rounded-xl bg-[#2f9e24] py-6 text-base hover:bg-[#27891e]">{sending ? "Enviando solicitud..." : "Solicitar valoración"}</Button>
-          </form>
         </div>
       </section>
 
