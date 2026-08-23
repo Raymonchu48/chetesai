@@ -8,29 +8,18 @@ import {
   Award,
   CalendarDays,
   CheckCircle2,
-  ClipboardCheck,
   Clock,
   ExternalLink,
   Mail,
   MapPin,
   ShieldCheck,
   Target,
-  TrendingUp,
-  UserRound,
-  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { files, heroSlideshow } from "@/assets/files";
 
 const PROFILE_IMAGE_URL = "https://raymonchu48.github.io/Deportivo/Mi_imagen.png";
 const PROFILE_PDF_URL = "https://raymonchu48.github.io/Deportivo/Carta_presentacion_deportiva_profesional.pdf";
-
-const benefits = [
-  { icon: UserRound, title: "Entrenamiento 1:1", description: "Atención individual y objetivo claro." },
-  { icon: Users, title: "Grupos reducidos 2–4", description: "Más atención, mejor ambiente." },
-  { icon: ClipboardCheck, title: "Seguimiento personalizado", description: "Valoramos y ajustamos tu progreso." },
-  { icon: TrendingUp, title: "Rutinas y progreso", description: "Entrena con método. Mejora real." },
-];
 
 const services = [
   { image: "/brand/chetesai-entrenamiento-personal.webp", imageAlt: "Entrenador Chetesaí Fitness+ acompañando una sesión de entrenamiento personal", title: "Entrenamiento personal", description: "Sesiones 1:1 adaptadas a tus objetivos, nivel y estilo de vida." },
@@ -145,7 +134,7 @@ export default function Main() {
 
   return (
     <main className="min-h-screen bg-[#f7f4ee] text-[#202724]">
-      <section id="inicio" className="relative min-h-[760px] overflow-hidden bg-[#050706]">
+      <section id="inicio" className="relative min-h-[640px] overflow-hidden bg-[#050706]">
         {heroSlideshow.map((slide, index) => (
           <div key={index} className="hero-media absolute inset-0 bg-cover bg-center transition-opacity duration-1000" style={{ backgroundImage: `url(${slide.url})`, opacity: currentSlide === index ? 1 : 0 }} />
         ))}
@@ -175,7 +164,7 @@ export default function Main() {
           </div>
         </nav>
 
-        <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-5 pb-44 pt-16 lg:grid-cols-[230px_1fr] lg:px-8 lg:pt-20">
+        <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-5 pb-20 pt-16 lg:grid-cols-[230px_1fr] lg:px-8 lg:pb-24 lg:pt-20">
           <div className="hidden border-r border-white/25 pr-10 lg:flex lg:items-center"><div className="w-full overflow-hidden rounded-[30px] bg-white p-3 shadow-2xl"><img src={files.logo.url} alt="Logo completo de Chetesaí Fitness+" className="aspect-square h-auto w-full object-contain" /></div></div>
           <div className="max-w-3xl self-center">
             <p className="mb-5 text-sm font-bold uppercase tracking-[0.18em] text-[#8cdb78]">Entrenamiento personal y grupos reducidos en Mallorca</p>
@@ -185,11 +174,6 @@ export default function Main() {
           </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 z-20 mx-auto max-w-7xl px-5 lg:px-8">
-          <div className="grid overflow-hidden rounded-t-3xl border border-white/15 bg-[#151917]/90 shadow-2xl backdrop-blur-xl md:grid-cols-4">
-            {benefits.map((benefit) => { const Icon = benefit.icon; return <div key={benefit.title} className="flex gap-4 border-b border-white/10 p-5 last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0"><div className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-[#8cdb78]/35 bg-[#8cdb78]/10"><Icon className="h-6 w-6 text-[#8cdb78]" /></div><div><h2 className="font-bold text-white">{benefit.title}</h2><p className="mt-1 text-sm leading-5 text-white/60">{benefit.description}</p></div></div>; })}
-          </div>
-        </div>
       </section>
 
       <section id="servicios" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
