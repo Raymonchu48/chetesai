@@ -256,6 +256,65 @@ footer img[alt="Chetesaí Fitness+"] {
   }
 }
 
+
+.valuation-cta {
+  position: relative;
+  isolation: isolate;
+  transition: transform 220ms ease, box-shadow 220ms ease, filter 220ms ease;
+}
+
+.valuation-cta::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  z-index: -1;
+  border: 2px solid rgba(140, 219, 120, 0.6);
+  border-radius: 1.25rem;
+  pointer-events: none;
+  animation: valuation-heartbeat 2.8s ease-out infinite;
+}
+
+.valuation-cta:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 20px 42px rgba(47, 158, 36, 0.32);
+  filter: saturate(1.08);
+}
+
+.valuation-cta:active {
+  transform: translateY(-1px) scale(0.995);
+}
+
+.valuation-cta svg {
+  transition: transform 220ms ease;
+}
+
+.valuation-cta:hover svg {
+  transform: translateX(5px);
+}
+
+@keyframes valuation-heartbeat {
+  0%, 52%, 100% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  8% {
+    opacity: 0.65;
+    transform: scale(1.015);
+  }
+  17% {
+    opacity: 0;
+    transform: scale(1.07);
+  }
+  24% {
+    opacity: 0.4;
+    transform: scale(1.025);
+  }
+  36% {
+    opacity: 0;
+    transform: scale(1.09);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -263,5 +322,20 @@ footer img[alt="Chetesaí Fitness+"] {
 
   #tarifas:target {
     animation: none;
+  }
+
+  .valuation-cta,
+  .valuation-cta svg {
+    transition: none;
+  }
+
+  .valuation-cta::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .valuation-cta:hover,
+  .valuation-cta:active {
+    transform: none;
   }
 }
