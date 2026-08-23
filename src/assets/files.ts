@@ -15,7 +15,7 @@ export const files: {[fileName: string]: {description: string, url: string}} = {
   },
   hero_gym: {
     description: "Hero image for gym landing",
-    url: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=80"
+    url: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=2400&q=90"
   },
   hero_leg_stretch: {
     description: "Entrenador personal asistiendo a una mujer con estiramiento de piernas en el gimnasio",
@@ -39,7 +39,7 @@ export const files: {[fileName: string]: {description: string, url: string}} = {
   },
   training_session: {
     description: "Personal training session image",
-    url: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80"
+    url: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=2400&q=90"
   },
   gym_equipment: {
     description: "Gym equipment image",
@@ -47,17 +47,16 @@ export const files: {[fileName: string]: {description: string, url: string}} = {
   },
   fitness_motivation: {
     description: "Fitness motivation image",
-    url: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80"
+    url: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=2400&q=90"
   },
 };
 
 // Hero slideshow images array for the landing page carousel
 export const heroSlideshow = [
   { url: files.hero_personal_trainer?.url, alt: "Entrenamiento personal con abdominales" },
-  { url: files.hero_leg_stretch?.url, alt: "Estiramiento y flexibilidad asistida" },
-  { url: files.hero_plank_woman?.url, alt: "Entrenamiento de plancha con supervision" },
-  { url: files.hero_plank_man?.url, alt: "Sesion de plancha con coach" },
-  { url: files.hero_ems_training?.url, alt: "Entrenamiento EMS avanzado" },
+  { url: files.hero_gym?.url, alt: "Sala de entrenamiento profesional" },
+  { url: files.training_session?.url, alt: "Entrenamiento personal supervisado" },
+  { url: files.fitness_motivation?.url, alt: "Entrenamiento de fuerza y mejora física" },
 ];
 
 // Business plan data
