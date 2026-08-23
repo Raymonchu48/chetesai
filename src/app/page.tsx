@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import {
@@ -32,7 +33,7 @@ const benefits = [
 ];
 
 const services = [
-  { icon: UserRound, title: "Entrenamiento personal", description: "Sesiones 1:1 adaptadas a tus objetivos, nivel y estilo de vida." },
+  { image: "/brand/chetesai-entrenamiento-personal.webp", imageAlt: "Entrenador Chetesaí Fitness+ acompañando una sesión de entrenamiento personal", title: "Entrenamiento personal", description: "Sesiones 1:1 adaptadas a tus objetivos, nivel y estilo de vida." },
   { icon: Users, title: "Grupos reducidos", description: "Dos a cuatro personas sin perder atención, técnica ni calidad." },
   { icon: ClipboardCheck, title: "Seguimiento continuo", description: "Valoraciones periódicas y ajustes para que sigas avanzando." },
   { icon: Target, title: "Rutina adaptada", description: "Un plan realista, progresivo y preparado específicamente para ti." },
@@ -193,7 +194,37 @@ export default function Main() {
 
       <section id="servicios" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Servicios</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Todo lo que necesitas para entrenar mejor</h2><p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Atención cercana, planificación profesional y seguimiento para que el entrenamiento encaje en tu vida.</p></div>
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">{services.map((service) => { const Icon = service.icon; return <article key={service.title} className="rounded-3xl border border-[#ded8cd] bg-[#fffdf9] p-6 text-center shadow-sm"><div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#eaf5e8]"><Icon className="h-7 w-7 text-[#2f9e24]" /></div><h3 className="mt-5 text-lg font-bold">{service.title}</h3><p className="mt-3 text-sm leading-6 text-[#67706b]">{service.description}</p></article>; })}</div>
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {services.map((service) => {
+            const Icon = service.icon;
+            return (
+              <article
+                key={service.title}
+                className={`overflow-hidden rounded-3xl border border-[#ded8cd] bg-[#fffdf9] text-center shadow-sm ${service.image ? "" : "p-6"}`}
+              >
+                {service.image ? (
+                  <div className="relative aspect-[16/9] w-full bg-[#e9e4db]">
+                    <Image
+                      src={service.image}
+                      alt={service.imageAlt ?? service.title}
+                      fill
+                      sizes="(max-width: 639px) calc(100vw - 2.5rem), (max-width: 1023px) calc(50vw - 2rem), 240px"
+                      className="object-cover"
+                    />
+                  </div>
+                ) : Icon ? (
+                  <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#eaf5e8]">
+                    <Icon className="h-7 w-7 text-[#2f9e24]" />
+                  </div>
+                ) : null}
+                <div className={service.image ? "px-6 pb-6 pt-5" : ""}>
+                  <h3 className={`${service.image ? "" : "mt-5"} text-lg font-bold`}>{service.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-[#67706b]">{service.description}</p>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </section>
 
       <section id="proceso" className="border-y border-[#ded8cd] bg-[#fffdf9]"><div className="mx-auto max-w-7xl px-5 py-20 lg:px-8"><div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Cómo funciona</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Un proceso sencillo y personal</h2></div><div className="mt-12 grid gap-5 md:grid-cols-3">{steps.map((step) => <article key={step.number} className="rounded-3xl border border-[#ded8cd] bg-white p-7"><span className="grid h-11 w-11 place-items-center rounded-full bg-[#2f9e24] text-lg font-black text-white">{step.number}</span><h3 className="mt-5 text-xl font-bold">{step.title}</h3><p className="mt-3 leading-7 text-[#67706b]">{step.description}</p></article>)}</div></div></section>
