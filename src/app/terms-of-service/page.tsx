@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LegalList, LegalNotice, LegalPage, LegalSection, LEGAL_EMAIL } from "@/components/legal/LegalPage";
+import { LegalList, LegalNotice, LegalPage, LegalSection, LEGAL_EMAIL, LEGAL_FISCAL_ADDRESS, LEGAL_NIF } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
   title: "Términos y condiciones | Chetesaí Fitness+",
@@ -13,7 +13,7 @@ export default function TermsPage() {
       <LegalNotice><strong>Información de salud:</strong> los contenidos y planes de Chetesaí son educativos y de acondicionamiento físico. No sustituyen diagnóstico, tratamiento, fisioterapia ni atención médica. Ante dolor, mareo o síntomas inusuales, interrumpe la actividad y consulta a un profesional sanitario.</LegalNotice>
 
       <LegalSection title="1. Titular y aceptación">
-        <p>El servicio es prestado por Ramón Alberto Curbalán Vega bajo la marca Chetesaí Fitness+. Al utilizar la web, solicitar una valoración, contratar un plan o acceder al portal, aceptas estas condiciones y las políticas vinculadas.</p>
+        <p>El servicio es prestado por Ramón Alberto Curbalán Vega, con NIF {LEGAL_NIF} y domicilio fiscal en {LEGAL_FISCAL_ADDRESS}, bajo la marca Chetesaí Fitness+. Al utilizar la web, solicitar una valoración, contratar un plan o acceder al portal, aceptas estas condiciones y las políticas vinculadas.</p>
         <p>Si no estás de acuerdo, no debes utilizar la cuenta o los servicios contratados y puedes contactar mediante <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a>.</p>
       </LegalSection>
 

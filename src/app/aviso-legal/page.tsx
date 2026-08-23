@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LegalList, LegalNotice, LegalPage, LegalSection, LEGAL_EMAIL } from "@/components/legal/LegalPage";
+import { LegalList, LegalPage, LegalSection, LEGAL_EMAIL, LEGAL_FISCAL_ADDRESS, LEGAL_NIF } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
   title: "Aviso legal | Chetesaí Fitness+",
@@ -10,17 +10,15 @@ export const metadata: Metadata = {
 export default function LegalNoticePage() {
   return (
     <LegalPage title="Aviso legal" summary="Información general sobre el titular, la finalidad y las normas de acceso a la web y al portal Chetesaí Fitness+.">
-      <LegalNotice><strong>Dato pendiente:</strong> para completar plenamente la identificación exigida al prestador deben incorporarse el NIF y el domicilio profesional completo del titular. No se han inventado ni publicado esos datos sin tu confirmación.</LegalNotice>
-
       <LegalSection title="1. Identificación del titular">
         <LegalList>
           <li><strong>Titular:</strong> Ramón Alberto Curbalán Vega.</li>
           <li><strong>Nombre comercial:</strong> Chetesaí Fitness+.</li>
           <li><strong>Sitio web:</strong> <a href="https://www.chetesaifitness.com">www.chetesaifitness.com</a>.</li>
           <li><strong>Actividad:</strong> entrenamiento personal, grupos reducidos, orientación nutricional, hábitos y plataforma digital de seguimiento.</li>
-          <li><strong>Ubicación:</strong> Mallorca, Islas Baleares, España.</li>
+          <li><strong>NIF:</strong> {LEGAL_NIF}.</li>
+          <li><strong>Domicilio fiscal:</strong> {LEGAL_FISCAL_ADDRESS}.</li>
           <li><strong>Contacto:</strong> <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a>.</li>
-          <li><strong>NIF y domicilio profesional:</strong> pendientes de incorporación tras confirmación del titular.</li>
         </LegalList>
       </LegalSection>
 
