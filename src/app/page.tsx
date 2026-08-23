@@ -12,6 +12,7 @@ import {
   ExternalLink,
   Mail,
   MapPin,
+  Plus,
   ShieldCheck,
   Target,
 } from "lucide-react";
@@ -30,9 +31,9 @@ const services = [
 ];
 
 const steps = [
-  { number: "1", title: "Solicita tu valoración", description: "Cuéntanos tu objetivo, disponibilidad y modalidad preferida." },
-  { number: "2", title: "Valoramos y planificamos", description: "Analizamos tu punto de partida y creamos una propuesta realista." },
-  { number: "3", title: "Entrenas y progresas", description: "Te acompañamos, medimos el avance y ajustamos el plan." },
+  { number: "1", icon: CalendarDays, title: "Solicita tu valoración", description: "Cuéntanos tu objetivo, disponibilidad y modalidad preferida." },
+  { number: "2", icon: Target, title: "Valoramos y planificamos", description: "Analizamos tu punto de partida y creamos una propuesta realista." },
+  { number: "3", icon: CheckCircle2, title: "Entrenas y progresas", description: "Te acompañamos, medimos el avance y ajustamos el plan." },
 ];
 
 const personalPlans = [
@@ -78,6 +79,7 @@ export default function Main() {
   const [showRates, setShowRates] = useState(false);
   const [sending, setSending] = useState(false);
   const [formMessage, setFormMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((previous) => (previous + 1) % heroSlideshow.length);
@@ -207,7 +209,43 @@ export default function Main() {
         </div>
       </section>
 
-      <section id="proceso" className="border-y border-[#ded8cd] bg-[#fffdf9]"><div className="mx-auto max-w-5xl px-5 py-14 sm:py-16 lg:px-8"><div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Cómo funciona</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Un proceso sencillo y personal</h2></div><div className="mt-8 grid gap-4 md:grid-cols-3">{steps.map((step) => <article key={step.number} className="rounded-[22px] border border-[#ded8cd] bg-white p-5 sm:p-6"><span className="grid h-10 w-10 place-items-center rounded-full bg-[#2f9e24] text-base font-black text-white">{step.number}</span><h3 className="mt-4 text-lg font-bold">{step.title}</h3><p className="mt-2 text-sm leading-6 text-[#67706b]">{step.description}</p></article>)}</div></div></section>
+      <section id="proceso" className="border-y border-[#d7dfd3] bg-[#eef3eb]">
+        <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8">
+          <div className="text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Cómo funciona</p>
+            <h2 className="mt-3 text-3xl font-black md:text-5xl">Un proceso sencillo y personal</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Tres pasos conectados, con acompañamiento desde la primera conversación hasta cada ajuste del plan.</p>
+          </div>
+
+          <div className="relative mt-11">
+            <div aria-hidden="true" className="absolute bottom-7 left-7 top-7 w-px bg-[#2f9e24]/30 md:hidden" />
+            <div aria-hidden="true" className="absolute left-[16.666%] right-[16.666%] top-7 hidden h-px bg-gradient-to-r from-[#2f9e24]/25 via-[#2f9e24] to-[#2f9e24]/25 md:block" />
+            <div className="grid gap-9 md:grid-cols-3 md:gap-8">
+              {steps.map((step) => {
+                const StepIcon = step.icon;
+                return (
+                  <article key={step.number} className="relative z-10 grid grid-cols-[56px_1fr] items-start gap-5 text-left md:block md:text-center">
+                    <div className="relative grid h-14 w-14 place-items-center rounded-full border-4 border-[#eef3eb] bg-[#2f9e24] text-white shadow-lg shadow-[#2f9e24]/15 md:mx-auto">
+                      <StepIcon className="h-5 w-5" />
+                      <span className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-[#18211d] text-[10px] font-black text-white">{step.number}</span>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-black md:mt-5">{step.title}</h3>
+                      <p className="mt-2 max-w-xs text-sm leading-6 text-[#67706b] md:mx-auto">{step.description}</p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-11 text-center">
+            <Button onClick={() => goTo("contacto")} className="rounded-xl bg-[#2f9e24] px-6 py-5 hover:bg-[#27891e]">
+              Solicitar valoración <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
 
       {showRates ? <section id="tarifas" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Bonos mensuales</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Elige el ritmo que encaja contigo</h2><p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Planes flexibles, sin matrícula ni permanencia.</p></div>
@@ -215,7 +253,45 @@ export default function Main() {
         <div className="mt-10 rounded-3xl border border-[#ded8cd] bg-[#fffdf9] p-7"><div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-sm font-bold uppercase tracking-[0.16em] text-[#2f9e24]">Grupos reducidos 2–4</p><h3 className="mt-2 text-2xl font-black">Comparte el entrenamiento, no la atención</h3><p className="mt-2 text-[#67706b]">Puedes venir con tu grupo o solicitar plaza en uno compatible.</p></div><div className="grid gap-3 sm:grid-cols-3">{groupPlans.map((plan) => <div key={plan.name} className="rounded-2xl bg-[#f1eee7] px-5 py-4 text-center"><p className="font-bold">{plan.name}</p><p className="mt-1 text-xs text-[#67706b]">{plan.sessions}</p><p className="mt-2 text-xl font-black text-[#2f9e24]">{plan.price}</p></div>)}</div></div></div>
       </section> : null}
 
-      <section id="faq" className="border-y border-[#ded8cd] bg-[#fffdf9]"><div className="mx-auto max-w-5xl px-5 py-20 lg:px-8"><div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Preguntas frecuentes</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Antes de empezar</h2></div><div className="mt-12 grid gap-4 md:grid-cols-2">{faqs.map((faq) => <article key={faq.question} className="rounded-3xl border border-[#ded8cd] bg-white p-6"><h3 className="font-bold">{faq.question}</h3><p className="mt-3 text-sm leading-6 text-[#67706b]">{faq.answer}</p></article>)}</div></div></section>
+      <section id="faq" className="border-b border-[#ded8cd] bg-[#fffdf9]">
+        <div className="mx-auto max-w-4xl px-5 py-16 lg:px-8">
+          <div className="text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Preguntas frecuentes</p>
+            <h2 className="mt-3 text-3xl font-black md:text-5xl">Antes de empezar</h2>
+            <p className="mx-auto mt-4 max-w-xl text-[#67706b]">Lo esencial, explicado de forma clara antes de reservar tu primera valoración.</p>
+          </div>
+
+          <div className="mt-10 overflow-hidden rounded-[28px] border border-[#ded8cd] bg-white shadow-sm">
+            {faqs.map((faq, index) => {
+              const isOpen = openFaqIndex === index;
+              const buttonId = `faq-button-${index}`;
+              const answerId = `faq-answer-${index}`;
+              return (
+                <div key={faq.question} className={index < faqs.length - 1 ? "border-b border-[#e8e2d8]" : ""}>
+                  <button
+                    id={buttonId}
+                    type="button"
+                    onClick={() => setOpenFaqIndex((current) => current === index ? null : index)}
+                    aria-expanded={isOpen}
+                    aria-controls={answerId}
+                    className="flex w-full items-center justify-between gap-6 px-6 py-5 text-left transition hover:bg-[#f7f4ee] sm:px-7"
+                  >
+                    <span className="font-bold text-[#202724]">{faq.question}</span>
+                    <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full transition-colors ${isOpen ? "bg-[#2f9e24] text-white" : "bg-[#eef3eb] text-[#2f9e24]"}`}>
+                      <Plus className={`h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-45" : ""}`} />
+                    </span>
+                  </button>
+                  {isOpen ? (
+                    <div id={answerId} role="region" aria-labelledby={buttonId} className="px-6 pb-5 pr-16 text-sm leading-6 text-[#67706b] sm:px-7 sm:pr-20">
+                      {faq.answer}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
       <section id="contacto" className="bg-[#18211d] text-white">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.92fr_1.08fr] lg:px-8">
