@@ -77,6 +77,7 @@ const highlightedCredentials = [
 export default function Main() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showRates, setShowRates] = useState(false);
+  const [showValuation, setShowValuation] = useState(false);
   const [sending, setSending] = useState(false);
   const [formMessage, setFormMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -93,6 +94,14 @@ export default function Main() {
   function revealRates() {
     setShowRates(true);
     window.setTimeout(() => document.getElementById("tarifas")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+  }
+
+  function openValuation() {
+    setShowRates(false);
+    setShowValuation(true);
+    window.setTimeout(() => {
+      document.getElementById("formulario-valoracion")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   }
 
   function goTo(section: string) {
@@ -157,7 +166,7 @@ export default function Main() {
             <Link href="/login" className="transition hover:text-white">Acceso clientes</Link>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <Button className="rounded-xl bg-[#2f9e24] px-4 hover:bg-[#27891e] lg:px-5" onClick={() => goTo("formulario-valoracion")}>
+            <Button className="rounded-xl bg-[#2f9e24] px-4 hover:bg-[#27891e] lg:px-5" onClick={openValuation}>
               <CalendarDays className="mr-2 h-4 w-4" />
               <span className="hidden sm:inline">Reserva tu valoración</span>
               <span className="sm:hidden">Reserva</span>
@@ -242,7 +251,7 @@ export default function Main() {
           </div>
 
           <div className="mt-11 text-center">
-            <Button onClick={() => goTo("formulario-valoracion")} className="rounded-xl bg-[#2f9e24] px-6 py-5 hover:bg-[#27891e]">
+            <Button onClick={openValuation} className="rounded-xl bg-[#2f9e24] px-6 py-5 hover:bg-[#27891e]">
               Solicitar valoración <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -251,7 +260,7 @@ export default function Main() {
 
       {showRates ? <section id="tarifas" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Bonos mensuales</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Elige el ritmo que encaja contigo</h2><p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Planes flexibles, sin matrícula ni permanencia.</p></div>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">{personalPlans.map((plan) => <article key={plan.name} className={`relative rounded-3xl border bg-[#fffdf9] p-7 shadow-sm ${plan.popular ? "border-[#2f9e24] ring-2 ring-[#2f9e24]/10" : "border-[#ded8cd]"}`}>{plan.popular ? <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#2f9e24] px-4 py-1 text-xs font-bold uppercase text-white">Más popular</span> : null}<p className="text-center text-2xl font-black">{plan.name}</p><p className="mt-2 text-center text-sm font-semibold text-[#2f9e24]">{plan.sessions}</p><p className="mt-6 text-center text-4xl font-black">{plan.price}<span className="text-base font-medium text-[#67706b]"> / mes</span></p><p className="mt-1 text-center text-sm text-[#67706b]">{plan.perSession}</p><div className="mt-7 space-y-3">{plan.features.map((feature) => <p key={feature} className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-[#2f9e24]" />{feature}</p>)}</div><Button className={`mt-7 w-full rounded-xl ${plan.popular ? "bg-[#2f9e24] hover:bg-[#27891e]" : "bg-[#202724] hover:bg-[#303a35]"}`} onClick={() => goTo("formulario-valoracion")}>Elegir {plan.name}</Button></article>)}</div>
+        <div className="mt-12 grid gap-6 md:grid-cols-3">{personalPlans.map((plan) => <article key={plan.name} className={`relative rounded-3xl border bg-[#fffdf9] p-7 shadow-sm ${plan.popular ? "border-[#2f9e24] ring-2 ring-[#2f9e24]/10" : "border-[#ded8cd]"}`}>{plan.popular ? <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#2f9e24] px-4 py-1 text-xs font-bold uppercase text-white">Más popular</span> : null}<p className="text-center text-2xl font-black">{plan.name}</p><p className="mt-2 text-center text-sm font-semibold text-[#2f9e24]">{plan.sessions}</p><p className="mt-6 text-center text-4xl font-black">{plan.price}<span className="text-base font-medium text-[#67706b]"> / mes</span></p><p className="mt-1 text-center text-sm text-[#67706b]">{plan.perSession}</p><div className="mt-7 space-y-3">{plan.features.map((feature) => <p key={feature} className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-[#2f9e24]" />{feature}</p>)}</div><Button className={`mt-7 w-full rounded-xl ${plan.popular ? "bg-[#2f9e24] hover:bg-[#27891e]" : "bg-[#202724] hover:bg-[#303a35]"}`} onClick={openValuation}>Elegir {plan.name}</Button></article>)}</div>
         <div className="mt-10 rounded-3xl border border-[#ded8cd] bg-[#fffdf9] p-7"><div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-sm font-bold uppercase tracking-[0.16em] text-[#2f9e24]">Grupos reducidos 2–4</p><h3 className="mt-2 text-2xl font-black">Comparte el entrenamiento, no la atención</h3><p className="mt-2 text-[#67706b]">Puedes venir con tu grupo o solicitar plaza en uno compatible.</p></div><div className="grid gap-3 sm:grid-cols-3">{groupPlans.map((plan) => <div key={plan.name} className="rounded-2xl bg-[#f1eee7] px-5 py-4 text-center"><p className="font-bold">{plan.name}</p><p className="mt-1 text-xs text-[#67706b]">{plan.sessions}</p><p className="mt-2 text-xl font-black text-[#2f9e24]">{plan.price}</p></div>)}</div></div></div>
       </section> : null}
 
@@ -297,7 +306,8 @@ export default function Main() {
 
       <section id="contacto" className="bg-[#18211d] text-white">
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-          <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#111612] shadow-2xl shadow-black/30 lg:grid lg:grid-cols-[0.92fr_1.08fr]">
+          {showValuation ? (
+            <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#111612] shadow-2xl shadow-black/30 lg:grid lg:grid-cols-[0.92fr_1.08fr]">
             <div className="p-7 sm:p-9 lg:p-10">
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8cdb78]">Primera valoración</p>
             <h2 className="mt-3 text-4xl font-black md:text-5xl">Cuéntame tu objetivo</h2>
@@ -332,8 +342,10 @@ export default function Main() {
             {formMessage ? <p className={`mt-4 rounded-xl px-4 py-3 text-sm ${formMessage.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{formMessage.text}</p> : null}
             <Button type="submit" disabled={sending} className="mt-6 w-full rounded-xl bg-[#2f9e24] py-6 text-base hover:bg-[#27891e]">{sending ? "Enviando solicitud..." : "Solicitar valoración"}</Button>
             </form>
+            </div>
+          ) : null}
 
-            <article id="sobre-mi" className="mx-7 mb-7 mt-7 scroll-mt-24 sm:mx-9 sm:mb-9 lg:col-start-1 lg:row-start-2 lg:mx-10 lg:mb-10 lg:mt-0 rounded-[28px] border border-[#b38d45]/35 bg-[#0f1713]/75 p-5 shadow-2xl shadow-black/25 backdrop-blur-xl sm:p-6">
+            <article id="sobre-mi" className="mx-auto mt-10 max-w-5xl scroll-mt-24 rounded-[28px] border border-[#b38d45]/35 bg-[#0f1713]/75 p-5 shadow-2xl shadow-black/25 backdrop-blur-xl sm:p-6">
               <div className="grid gap-5 sm:grid-cols-[132px_1fr] sm:items-center">
                 <div className="mx-auto overflow-hidden rounded-2xl border border-white/15 bg-black/30 shadow-xl sm:mx-0">
                   <img src={PROFILE_IMAGE_URL} alt="Ramón Curbalán, entrenador y profesional del deporte" className="h-44 w-32 object-cover object-top sm:h-48 sm:w-full" />
@@ -367,7 +379,6 @@ export default function Main() {
                 Ver perfil profesional <ExternalLink className="h-4 w-4" />
               </a>
             </article>
-          </div>
         </div>
       </section>
 
