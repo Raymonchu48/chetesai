@@ -176,17 +176,17 @@ export default function Main() {
 
       </section>
 
-      <section id="servicios" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+      <section id="servicios" className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
         <div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Servicios</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Todo lo que necesitas para entrenar mejor</h2><p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Atención cercana, planificación profesional y seguimiento para que el entrenamiento encaje en tu vida.</p></div>
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {services.map((service) => {
             return (
               <article
                 key={service.title}
-                className={`overflow-hidden rounded-3xl border border-[#ded8cd] bg-[#fffdf9] text-center shadow-sm ${service.image ? "" : "p-6"}`}
+                className={`overflow-hidden rounded-[22px] border border-[#ded8cd] bg-[#fffdf9] text-center shadow-sm ${service.image ? "" : "p-5"}`}
               >
                 {service.image ? (
-                  <div className="relative aspect-[16/9] w-full bg-[#e9e4db]">
+                  <div className="relative aspect-[3/2] w-full bg-[#e9e4db]">
                     <Image
                       src={service.image}
                       alt={service.imageAlt ?? service.title}
@@ -197,9 +197,9 @@ export default function Main() {
                     />
                   </div>
                 ) : null}
-                <div className={service.image ? "px-6 pb-6 pt-5" : ""}>
-                  <h3 className={`${service.image ? "" : "mt-5"} text-lg font-bold`}>{service.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-[#67706b]">{service.description}</p>
+                <div className={service.image ? "px-5 pb-5 pt-4" : ""}>
+                  <h3 className={`${service.image ? "" : "mt-4"} text-base font-bold leading-6`}>{service.title}</h3>
+                  <p className="mt-2 text-sm leading-5 text-[#67706b]">{service.description}</p>
                 </div>
               </article>
             );
@@ -207,7 +207,7 @@ export default function Main() {
         </div>
       </section>
 
-      <section id="proceso" className="border-y border-[#ded8cd] bg-[#fffdf9]"><div className="mx-auto max-w-7xl px-5 py-20 lg:px-8"><div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Cómo funciona</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Un proceso sencillo y personal</h2></div><div className="mt-12 grid gap-5 md:grid-cols-3">{steps.map((step) => <article key={step.number} className="rounded-3xl border border-[#ded8cd] bg-white p-7"><span className="grid h-11 w-11 place-items-center rounded-full bg-[#2f9e24] text-lg font-black text-white">{step.number}</span><h3 className="mt-5 text-xl font-bold">{step.title}</h3><p className="mt-3 leading-7 text-[#67706b]">{step.description}</p></article>)}</div></div></section>
+      <section id="proceso" className="border-y border-[#ded8cd] bg-[#fffdf9]"><div className="mx-auto max-w-5xl px-5 py-14 sm:py-16 lg:px-8"><div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Cómo funciona</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Un proceso sencillo y personal</h2></div><div className="mt-8 grid gap-4 md:grid-cols-3">{steps.map((step) => <article key={step.number} className="rounded-[22px] border border-[#ded8cd] bg-white p-5 sm:p-6"><span className="grid h-10 w-10 place-items-center rounded-full bg-[#2f9e24] text-base font-black text-white">{step.number}</span><h3 className="mt-4 text-lg font-bold">{step.title}</h3><p className="mt-2 text-sm leading-6 text-[#67706b]">{step.description}</p></article>)}</div></div></section>
 
       {showRates ? <section id="tarifas" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Bonos mensuales</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Elige el ritmo que encaja contigo</h2><p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Planes flexibles, sin matrícula ni permanencia.</p></div>
