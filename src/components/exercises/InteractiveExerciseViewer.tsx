@@ -66,14 +66,16 @@ export default function InteractiveExerciseViewer({ item, visualModel = "hombre"
           </div>
         )}
 
-        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/70 to-transparent p-4 text-white">
-          <span className="inline-flex items-center gap-2 rounded-full bg-black/45 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] backdrop-blur">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-[#8cdb78]" /> Guía interactiva
-          </span>
-          <span className="rounded-full bg-[#c9653b] px-3 py-1.5 text-[10px] font-black uppercase tracking-wide">
-            {levelLabels[active.nivel] || active.nivel}
-          </span>
-        </div>
+        {!compact ? (
+          <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/70 to-transparent p-4 text-white">
+            <span className="inline-flex items-center gap-2 rounded-full bg-black/45 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] backdrop-blur">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-[#8cdb78]" /> Guía interactiva
+            </span>
+            <span className="rounded-full bg-[#c9653b] px-3 py-1.5 text-[10px] font-black uppercase tracking-wide">
+              {levelLabels[active.nivel] || active.nivel}
+            </span>
+          </div>
+        ) : null}
 
         {!directVideo && active.video_url ? (
           <a
