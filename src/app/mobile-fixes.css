@@ -10,6 +10,28 @@
     padding-bottom: 1.25rem !important;
   }
 
+  #inicio .hero-media,
+  #inicio .hero-shade {
+    inset: 0 0 auto !important;
+    height: clamp(760px, 100svh, 900px);
+  }
+
+  #inicio .hero-media {
+    background-position: center top !important;
+    background-size: cover !important;
+    image-rendering: auto;
+  }
+
+  #inicio .hero-shade {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.32) 0%,
+      rgba(0, 0, 0, 0.48) 48%,
+      rgba(5, 7, 6, 0.82) 76%,
+      #050706 100%
+    ) !important;
+  }
+
   #inicio header,
   #inicio nav {
     overflow: visible !important;
