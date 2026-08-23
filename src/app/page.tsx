@@ -196,7 +196,6 @@ export default function Main() {
         <div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Servicios</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Todo lo que necesitas para entrenar mejor</h2><p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Atención cercana, planificación profesional y seguimiento para que el entrenamiento encaje en tu vida.</p></div>
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {services.map((service) => {
-            const Icon = service.icon;
             return (
               <article
                 key={service.title}
@@ -212,10 +211,6 @@ export default function Main() {
                       className="object-cover"
                       style={{ objectPosition: service.imagePosition ?? "center" }}
                     />
-                  </div>
-                ) : Icon ? (
-                  <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#eaf5e8]">
-                    <Icon className="h-7 w-7 text-[#2f9e24]" />
                   </div>
                 ) : null}
                 <div className={service.image ? "px-6 pb-6 pt-5" : ""}>
