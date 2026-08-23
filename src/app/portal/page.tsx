@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import LogoutButton from "@/components/LogoutButton";
 import ExerciseMediaVisual from "@/components/exercises/ExerciseMediaVisual";
 import InteractiveExerciseViewer from "@/components/exercises/InteractiveExerciseViewer";
@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Activity, Apple, ArrowRight, CalendarDays, CheckCircle2, ChevronDown, CircleCheck, CircleX, Clock3, Dumbbell, Flame, History, Lightbulb, PlayCircle, RotateCcw, SkipForward, Sparkles, Square, Target, TrendingUp, TriangleAlert } from "lucide-react";
+import { Activity, Apple, ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, ChevronDown, CircleCheck, CircleX, Clock3, Dumbbell, Flame, History, Lightbulb, List, PlayCircle, RotateCcw, SkipForward, Sparkles, Square, Target, TrendingUp, TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
 
 type Exercise = {
@@ -116,6 +116,7 @@ const labels: Record<string, string> = {
 };
 
 export default function PortalPage() {
+  const autoSelectedDay = useRef(false);
   const [data, setData] = useState<PortalData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -129,6 +130,8 @@ export default function PortalPage() {
   const [restSeconds, setRestSeconds] = useState(0);
   const [selectedExercise, setSelectedExercise] = useState<NonNullable<Exercise["ejercicios"]> | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [activeExerciseIndex, setActiveExerciseIndex] = useState(0);
+  const [guidedMode, setGuidedMode] = useState(true);
 
   const loadHistory = useCallback(async () => {
     try {
@@ -155,6 +158,7 @@ export default function PortalPage() {
   useEffect(() => {
     setSession(null);
     setRestSeconds(0);
+    setActiveExerciseIndex(0);
     fetch(`/api/portal/entrenamiento?dia=${selectedDay}`)
       .then((response) => response.json())
       .then((result: { ok: boolean; data?: WorkoutSession | null }) => {
@@ -187,6 +191,9 @@ export default function PortalPage() {
   const totalSets = session?.series.length || 0;
   const progress = totalSets ? Math.round((completedSets / totalSets) * 100) : 0;
   const sessionState = String(session?.sesion?.estado || "");
+  const displayedExercises = sessionState === "en_curso" && guidedMode
+    ? dayExercises.slice(activeExerciseIndex, activeExerciseIndex + 1)
+    : dayExercises;
   const visualModel: ExerciseVisualModel = data?.cliente?.modelo_visual === "mujer" ? "mujer" : "hombre";
   const weeklySessions = useMemo(() => {
     const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -198,8 +205,25 @@ export default function PortalPage() {
   const firstName = data?.cliente?.nombre?.trim().split(/\s+/)[0] || "atleta";
 
   useEffect(() => {
-    if (trainingDays.length && !trainingDays.includes(selectedDay)) setSelectedDay(trainingDays[0]);
+    if (!trainingDays.length) return;
+    const currentWeekday = new Date().getDay();
+    const today = currentWeekday === 0 ? 7 : currentWeekday;
+    if (!autoSelectedDay.current) {
+      autoSelectedDay.current = true;
+      setSelectedDay(trainingDays.includes(today) ? today : trainingDays[0]);
+      return;
+    }
+    if (!trainingDays.includes(selectedDay)) setSelectedDay(trainingDays[0]);
   }, [selectedDay, trainingDays]);
+
+  useEffect(() => {
+    if (!session?.series.length || sessionState !== "en_curso") return;
+    const firstPending = dayExercises.findIndex((exercise) => {
+      const rows = session.series.filter((row) => row.rutina_ejercicio_id === exercise.id);
+      return rows.length > 0 && rows.some((row) => !row.completada);
+    });
+    setActiveExerciseIndex(firstPending >= 0 ? firstPending : Math.max(0, dayExercises.length - 1));
+  }, [dayExercises, session?.sesion?.id, sessionState]);
 
   async function startWorkout() {
     setStarting(true);
@@ -243,7 +267,15 @@ export default function PortalPage() {
       });
       const result = (await response.json()) as { ok: boolean; error?: string };
       if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo guardar la serie");
-      if (completed) setRestSeconds(rest);
+      if (completed) {
+        setRestSeconds(rest);
+        const exerciseRows = session?.series.filter((item) => item.rutina_ejercicio_id === row.rutina_ejercicio_id) || [];
+        const exerciseFinished = exerciseRows.every((item) => item.id === row.id || item.completada);
+        if (exerciseFinished) {
+          setActiveExerciseIndex((current) => Math.min(dayExercises.length - 1, current + 1));
+          if (activeExerciseIndex < dayExercises.length - 1) toast.success("Ejercicio completado. Vamos al siguiente.");
+        }
+      }
     } catch (err) {
       patchLocalSet(row.id, { completada: row.completada });
       toast.error(err instanceof Error ? err.message : "Error al guardar");
@@ -338,7 +370,10 @@ export default function PortalPage() {
 
             {restSeconds > 0 ? <section className="mb-6 flex flex-col items-center justify-between gap-4 rounded-3xl border border-[#f0d3c4] bg-[#fff4ee] p-5 text-center sm:flex-row sm:text-left"><div className="flex items-center gap-3"><Clock3 className="h-7 w-7 text-[#c9653b]" /><div><p className="text-xs font-bold uppercase tracking-[0.15em] text-[#c9653b]">Descanso</p><p className="text-3xl font-bold">{restSeconds}s</p></div></div><Button variant="outline" onClick={() => setRestSeconds(0)}><SkipForward className="mr-2 h-4 w-4" />Saltar descanso</Button></section> : null}
 
-            <div className="space-y-4">{dayExercises.map((item, index) => {
+            {sessionState === "en_curso" ? <section className="mb-4 flex flex-col gap-3 rounded-[24px] border border-[#ded8cd] bg-[#fffdf9] p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"><div><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#2f9e24]">Modo entrenamiento</p><h2 className="mt-1 text-lg font-black">{guidedMode ? `Ejercicio ${activeExerciseIndex + 1} de ${dayExercises.length}` : "Vista completa de la sesión"}</h2></div><div className="flex gap-2"><Button type="button" variant="outline" className="rounded-xl" onClick={() => setGuidedMode((value) => !value)}><List className="mr-2 h-4 w-4" />{guidedMode ? "Ver lista" : "Modo guiado"}</Button>{guidedMode ? <><Button type="button" size="icon" variant="outline" aria-label="Ejercicio anterior" disabled={activeExerciseIndex === 0} onClick={() => setActiveExerciseIndex((current) => Math.max(0, current - 1))}><ArrowLeft className="h-4 w-4" /></Button><Button type="button" size="icon" aria-label="Ejercicio siguiente" disabled={activeExerciseIndex >= dayExercises.length - 1} onClick={() => setActiveExerciseIndex((current) => Math.min(dayExercises.length - 1, current + 1))}><ArrowRight className="h-4 w-4" /></Button></> : null}</div></section> : null}
+
+            <div className="space-y-4">{displayedExercises.map((item) => {
+              const index = dayExercises.findIndex((exercise) => exercise.id === item.id);
               const exercise = item.ejercicios;
               const rows = session?.series.filter((row) => row.rutina_ejercicio_id === item.id) || [];
               const groupName = labels[exercise?.grupo_muscular || ""] || exercise?.grupo_muscular || "Otros";
