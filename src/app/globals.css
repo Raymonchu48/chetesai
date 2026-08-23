@@ -182,29 +182,11 @@ button:has(img[alt="Chetesaí Fitness+"]) img {
   align-self: stretch;
 }
 
-#contacto form::after {
-  content: "";
-  display: block;
-  min-height: 360px;
-  margin: 1.75rem -1.75rem -1.75rem;
-  border-radius: 0 0 1.5rem 1.5rem;
-  background-image:
-    linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.92) 8%, rgba(24, 33, 29, 0.42) 30%, rgba(24, 33, 29, 0.82) 78%, #18211d 100%),
-    linear-gradient(to right, rgba(24, 33, 29, 0.22), rgba(24, 33, 29, 0.45)),
-    url("/brand/chetesai-contacto-entrenador.webp");
-  background-position: center top, center, center 38%;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
 @media (max-width: 1023px) {
   #inicio > div.relative.z-10.mx-auto.grid.max-w-7xl {
     padding-top: 4.5rem !important;
   }
 
-  #contacto form::after {
-    min-height: 280px;
-  }
 }
 
 @media (max-width: 639px) {
@@ -220,9 +202,6 @@ button:has(img[alt="Chetesaí Fitness+"]) img {
     justify-content: flex-start;
   }
 
-  #contacto form::after {
-    min-height: 220px;
-  }
 }
 
 footer div:has(> img[alt="Chetesaí Fitness+"]) {
