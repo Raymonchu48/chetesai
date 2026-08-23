@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LegalList, LegalPage, LegalSection, LEGAL_EMAIL } from "@/components/legal/LegalPage";
+import { LegalList, LegalPage, LegalSection, LEGAL_EMAIL, LEGAL_FISCAL_ADDRESS, LEGAL_NIF } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
   title: "Política de privacidad | Chetesaí Fitness+",
@@ -12,7 +12,8 @@ export default function PrivacyPolicyPage() {
     <LegalPage title="Política de privacidad" summary="Explicamos qué datos tratamos, para qué los utilizamos y cómo puedes ejercer tus derechos cuando utilizas la web y el portal Chetesaí Fitness+.">
       <LegalSection title="1. Responsable del tratamiento">
         <p><strong>Responsable:</strong> Ramón Alberto Curbalán Vega, titular de Chetesaí Fitness+.</p>
-        <p><strong>Ámbito de actividad:</strong> Mallorca, Islas Baleares, España.</p>
+        <p><strong>NIF:</strong> {LEGAL_NIF}.</p>
+        <p><strong>Domicilio fiscal:</strong> {LEGAL_FISCAL_ADDRESS}.</p>
         <p><strong>Contacto:</strong> <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a> o mediante el formulario disponible en la página principal.</p>
       </LegalSection>
 
