@@ -307,13 +307,6 @@ export default function Main() {
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8cdb78]">Primera valoración</p>
               <h2 className="mt-3 text-4xl font-black md:text-5xl">Cuéntame tu objetivo</h2>
               <p className="mt-5 max-w-lg leading-7 text-white/65">Envíame tus datos y te responderé para valorar tu punto de partida y encontrar la modalidad más adecuada.</p>
-              <div className="mt-8 space-y-4 text-sm text-white/75">
-                <p className="flex items-center gap-3"><MapPin className="h-5 w-5 text-[#8cdb78]" />Mallorca, Islas Baleares</p>
-                <p className="flex items-center gap-3"><Mail className="h-5 w-5 text-[#8cdb78]" />chetesaifitnnes@gmail.com</p>
-                <p className="flex items-center gap-3"><Clock className="h-5 w-5 text-[#8cdb78]" />Respuesta habitual en menos de 24 horas</p>
-                <p className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-[#8cdb78]" />Tus datos se utilizarán únicamente para atender la solicitud</p>
-              </div>
-
               <div className="relative mt-9 min-h-[280px] flex-1 overflow-hidden rounded-[24px] border border-white/10 bg-black/25 shadow-2xl shadow-black/30">
                 <Image
                   src="/brand/chetesai-contacto-entrenador.webp"
@@ -349,8 +342,8 @@ export default function Main() {
             {formMessage ? <p className={`mt-4 rounded-xl px-4 py-3 text-sm ${formMessage.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{formMessage.text}</p> : null}
             <Button type="submit" disabled={sending} className="mt-6 w-full rounded-xl bg-[#2f9e24] py-6 text-base hover:bg-[#27891e]">{sending ? "Enviando solicitud..." : "Solicitar valoración"}</Button>
 
-            <div className="mt-8 flex min-h-[250px] items-center justify-center rounded-[24px] border border-[#b38d45]/35 bg-gradient-to-br from-[#0a0d0b] via-[#111612] to-[#18211d] px-5 py-10 text-white shadow-inner">
-              <div className="flex items-center gap-4 rounded-[24px] border border-[#b38d45]/40 bg-black/30 px-5 py-4 shadow-2xl shadow-black/35 backdrop-blur-sm sm:gap-5 sm:px-6 sm:py-5">
+            <div className="mt-8 rounded-[24px] border border-[#b38d45]/35 bg-gradient-to-br from-[#0a0d0b] via-[#111612] to-[#18211d] px-5 py-8 text-white shadow-inner sm:px-7 sm:py-9">
+              <div className="mx-auto flex max-w-md items-center justify-center gap-4 rounded-[24px] border border-[#b38d45]/40 bg-black/30 px-5 py-4 shadow-2xl shadow-black/35 backdrop-blur-sm sm:gap-5 sm:px-6 sm:py-5">
                 <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-[#d7b86b]/45 bg-[#080a09] p-2 sm:h-[72px] sm:w-[72px]">
                   <Image src="/brand/chetesai-logo-mark.svg" alt="" width={72} height={72} className="h-full w-full object-contain" />
                 </div>
@@ -358,6 +351,25 @@ export default function Main() {
                   <p className="text-base font-black text-white sm:text-lg">Chetesaí Fitness+</p>
                   <p className="mt-1 text-xs text-white/60 sm:text-sm">Entrenamiento personalizado</p>
                 </div>
+              </div>
+
+              <div className="mx-auto mt-7 max-w-md space-y-4 border-t border-white/10 pt-6 text-sm leading-6 text-white/75">
+                <p className="grid grid-cols-[24px_1fr] items-start gap-3">
+                  <MapPin className="mt-0.5 h-5 w-5 text-[#8cdb78]" />
+                  <span>Mallorca, Islas Baleares</span>
+                </p>
+                <p className="grid grid-cols-[24px_1fr] items-start gap-3">
+                  <Mail className="mt-0.5 h-5 w-5 text-[#8cdb78]" />
+                  <span className="break-all">chetesaifitnnes@gmail.com</span>
+                </p>
+                <p className="grid grid-cols-[24px_1fr] items-start gap-3">
+                  <Clock className="mt-0.5 h-5 w-5 text-[#8cdb78]" />
+                  <span>Respuesta habitual en menos de 24 horas</span>
+                </p>
+                <p className="grid grid-cols-[24px_1fr] items-start gap-3">
+                  <ShieldCheck className="mt-0.5 h-5 w-5 text-[#8cdb78]" />
+                  <span>Tus datos se utilizarán únicamente para atender la solicitud</span>
+                </p>
               </div>
             </div>
             </form>
