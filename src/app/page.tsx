@@ -225,7 +225,7 @@ export default function Main() {
             <p className="mt-5 max-w-lg leading-7 text-white/65">Envíame tus datos y te responderé para valorar tu punto de partida y encontrar la modalidad más adecuada.</p>
             <div className="mt-8 space-y-4 text-sm text-white/75">
               <p className="flex items-center gap-3"><MapPin className="h-5 w-5 text-[#8cdb78]" />Mallorca, Islas Baleares</p>
-              <p className="flex items-center gap-3"><Mail className="h-5 w-5 text-[#8cdb78]" />contacto@chetesaifitnnes.com</p>
+              <p className="flex items-center gap-3"><Mail className="h-5 w-5 text-[#8cdb78]" />chetesaifitnnes@gmail.com</p>
               <p className="flex items-center gap-3"><Clock className="h-5 w-5 text-[#8cdb78]" />Respuesta habitual en menos de 24 horas</p>
               <p className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-[#8cdb78]" />Tus datos se utilizarán únicamente para atender la solicitud</p>
             </div>
