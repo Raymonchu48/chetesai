@@ -191,7 +191,7 @@ button:has(img[alt="Chetesaí Fitness+"]) img {
   background-image:
     linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.92) 8%, rgba(24, 33, 29, 0.42) 30%, rgba(24, 33, 29, 0.82) 78%, #18211d 100%),
     linear-gradient(to right, rgba(24, 33, 29, 0.22), rgba(24, 33, 29, 0.45)),
-    url("https://storage.googleapis.com/totalum-live-bucket/chetesai/files/personal-trainer-marratxi-2048x1152.jpg?GoogleAccessId=totalum-live%40totalum-live.iam.gserviceaccount.com&Expires=2086261055&Signature=tielNgAgSBBx1%2BJn2rtzUlN4MkPNc20qSwf1cK%2FOmeATxMAmSrAwjAPaFIaoNf63QGe6iD33Nj7gKv0jX3%2FwLLsE5oEJO%2Bi%2F4m4dpcxY9qZZMyckUyp6TwbJlJywe%2FimQmHl2xwUAuPyUYG%2FCk63%2Bo%2FKuJEmghTTrS6F4BtE%2BJy9EpvFnnA58avmJG3z8%2BukixSZytcDxLBbHaD2dKMIsmFRayl4JIiotGRmV7%2FaOKdcIcK4ZmmdgpQgoW7iBm4dXDIFYlV5VGPp8YOjhso4L1FndNFsArEceyBqrjyYUki32SVQv1pgBzNLBQF90nT%2BVt3AogW5tAwWQgNfst777w%3D%3D");
+    url("/brand/chetesai-contacto-entrenador.webp");
   background-position: center top, center, center 38%;
   background-repeat: no-repeat;
   background-size: cover;
