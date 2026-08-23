@@ -286,7 +286,26 @@ export default function Main() {
         </div>
       </section>
 
-      <footer className="bg-[#111612] text-white/55"><div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-5 px-5 py-8 text-sm sm:flex-row lg:px-8"><div className="flex items-center gap-3"><div className="grid h-11 w-11 place-items-center overflow-hidden rounded-xl bg-white p-1"><img src={files.logo.url} alt="Chetesaí Fitness+" className="h-full w-full object-contain" /></div><div><p className="font-bold text-white">Chetesaí Fitness+</p><p>Entrena con cabeza. Mejora con método.</p></div></div><div className="flex items-center gap-5"><Link href="/login" className="hover:text-white">Acceso privado</Link><span>© {new Date().getFullYear()} Chetesaí Fitness+</span></div></div></footer>
+      <footer className="bg-[#111612] text-white/55">
+        <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
+          <div className="flex flex-col items-center justify-between gap-5 text-sm sm:flex-row">
+            <div className="flex items-center gap-3">
+              <div className="grid h-11 w-11 place-items-center overflow-hidden rounded-xl bg-white p-1"><img src={files.logo.url} alt="Chetesaí Fitness+" className="h-full w-full object-contain" /></div>
+              <div><p className="font-bold text-white">Chetesaí Fitness+</p><p>Entrena con cabeza. Mejora con método.</p></div>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-5">
+              <Link href="/login" className="transition hover:text-white">Acceso privado</Link>
+              <span>© {new Date().getFullYear()} Chetesaí Fitness+</span>
+            </div>
+          </div>
+          <nav aria-label="Información legal" className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 border-t border-white/10 pt-6 text-sm">
+            <Link href="/privacy-policy" className="transition hover:text-[#8cdb78]">Política de privacidad</Link>
+            <Link href="/terms-of-service" className="transition hover:text-[#8cdb78]">Términos y condiciones</Link>
+            <Link href="/politica-cookies" className="transition hover:text-[#8cdb78]">Política de cookies</Link>
+            <Link href="/aviso-legal" className="transition hover:text-[#8cdb78]">Aviso legal</Link>
+          </nav>
+        </div>
+      </footer>
     </main>
   );
 }

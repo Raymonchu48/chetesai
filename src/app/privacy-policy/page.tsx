@@ -1,265 +1,66 @@
-import { Card, CardContent } from "@/components/ui/card";
+import type { Metadata } from "next";
 import Link from "next/link";
+import { LegalList, LegalPage, LegalSection, LEGAL_EMAIL } from "@/components/legal/LegalPage";
 
-export default function PrivacyPolicy() {
+export const metadata: Metadata = {
+  title: "Política de privacidad | Chetesaí Fitness+",
+  description: "Información sobre el tratamiento de datos personales en Chetesaí Fitness+.",
+};
+
+export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
-      <div className="container mx-auto px-4 py-16 max-w-4xl">
-        <div className="mb-8">
-          <Link
-            href="/"
-            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-          >
-            ← Back to home
-          </Link>
-        </div>
+    <LegalPage title="Política de privacidad" summary="Explicamos qué datos tratamos, para qué los utilizamos y cómo puedes ejercer tus derechos cuando utilizas la web y el portal Chetesaí Fitness+.">
+      <LegalSection title="1. Responsable del tratamiento">
+        <p><strong>Responsable:</strong> Ramón Alberto Curbalán Vega, titular de Chetesaí Fitness+.</p>
+        <p><strong>Ámbito de actividad:</strong> Mallorca, Islas Baleares, España.</p>
+        <p><strong>Contacto:</strong> <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a> o mediante el formulario disponible en la página principal.</p>
+      </LegalSection>
 
-        <Card className="shadow-xl border-0">
-          <CardContent className="p-8 md:p-12">
-            <h1 className="text-3xl md:text-4xl font-bold mb-8">
-              Privacy Policy
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-8">
-              Last updated: {new Date().toLocaleDateString()}
-            </p>
+      <LegalSection title="2. Datos que podemos tratar">
+        <LegalList>
+          <li><strong>Identificación y contacto:</strong> nombre, correo electrónico, teléfono y datos incluidos en solicitudes o comunicaciones.</li>
+          <li><strong>Cuenta y autenticación:</strong> credenciales cifradas, identificadores de usuario, rol, sesiones y, si eliges ese método, información básica facilitada por Google.</li>
+          <li><strong>Valoración y salud:</strong> objetivos, antecedentes relevantes, lesiones, limitaciones, peso, medidas, composición corporal y otra información necesaria para adaptar el servicio.</li>
+          <li><strong>Entrenamiento, nutrición y hábitos:</strong> rutinas, series, cargas, RPE, asistencia, planificación alimentaria, hábitos, progreso, observaciones y fotografías que decidas aportar.</li>
+          <li><strong>Reservas y pagos:</strong> citas, bonos, facturación, estado de cobros e identificadores de transacción. Chetesaí no almacena los datos completos de tu tarjeta.</li>
+          <li><strong>Datos técnicos y de seguridad:</strong> dirección IP, dispositivo, navegador, registros de acceso, incidencias y cookies técnicas de sesión.</li>
+        </LegalList>
+      </LegalSection>
 
-            <div className="space-y-8 text-gray-700 dark:text-gray-300">
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  1. Introduction
-                </h2>
-                <p className="leading-relaxed">
-                  We are committed to protecting your personal
-                  information and your right to privacy. This Privacy Policy
-                  explains how we collect, use, disclose, and safeguard your
-                  information when you use our service.
-                </p>
-              </section>
+      <LegalSection title="3. Finalidades y bases jurídicas">
+        <LegalList>
+          <li><strong>Atender solicitudes y gestionar reservas:</strong> medidas precontractuales y ejecución del servicio solicitado.</li>
+          <li><strong>Crear y mantener tu cuenta:</strong> ejecución de la relación contractual.</li>
+          <li><strong>Diseñar y seguir planes personalizados:</strong> ejecución del servicio y, cuando se traten datos de salud, tu consentimiento explícito.</li>
+          <li><strong>Gestionar cobros, facturación y obligaciones contables:</strong> ejecución contractual y cumplimiento de obligaciones legales.</li>
+          <li><strong>Proteger la plataforma y prevenir accesos indebidos:</strong> interés legítimo en garantizar la seguridad del servicio.</li>
+          <li><strong>Enviar comunicaciones comerciales:</strong> únicamente cuando exista consentimiento o una base legal aplicable; podrás darte de baja en cualquier momento.</li>
+        </LegalList>
+      </LegalSection>
 
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  2. Information We Collect
-                </h2>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-medium mb-2">
-                      Personal Information
-                    </h3>
-                    <p className="leading-relaxed">
-                      When you register for an account, we collect:
-                    </p>
-                    <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                      <li>Name</li>
-                      <li>Email address</li>
-                      <li>
-                        Google account information (when using Google Sign-In)
-                      </li>
-                      <li>Organization details</li>
-                    </ul>
-                  </div>
+      <LegalSection title="4. Destinatarios y proveedores">
+        <p>No vendemos tus datos. Podrán acceder a ellos proveedores necesarios para prestar el servicio, sujetos a contratos y deberes de confidencialidad: infraestructura y alojamiento en Vercel, plataforma de datos Totalum, autenticación, correo, Stripe para pagos y Google cuando se utilice su acceso.</p>
+        <p>También podrán comunicarse datos a Administraciones, juzgados o autoridades cuando exista una obligación legal. Si un proveedor tratara datos fuera del Espacio Económico Europeo, se aplicarán las garantías previstas por el RGPD.</p>
+      </LegalSection>
 
-                  <div>
-                    <h3 className="text-lg font-medium mb-2">
-                      Automatically Collected Information
-                    </h3>
-                    <p className="leading-relaxed">
-                      We automatically collect certain information when you use
-                      our service:
-                    </p>
-                    <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                      <li>IP address</li>
-                      <li>Browser type and version</li>
-                      <li>Device information</li>
-                      <li>Usage data and analytics</li>
-                    </ul>
-                  </div>
-                </div>
-              </section>
+      <LegalSection title="5. Conservación">
+        <p>Los datos se conservarán mientras exista una cuenta o relación activa y durante los plazos necesarios para atender responsabilidades legales, fiscales, mercantiles o contractuales. Los datos basados exclusivamente en el consentimiento se suprimirán o anonimizarán cuando lo retires, salvo que deban conservarse bloqueados por una obligación legal.</p>
+      </LegalSection>
 
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  3. How We Use Your Information
-                </h2>
-                <p className="leading-relaxed mb-3">
-                  We use your information to:
-                </p>
-                <ul className="list-disc list-inside space-y-1 ml-4">
-                  <li>Provide and maintain our service</li>
-                  <li>Create and manage your account</li>
-                  <li>Send you important updates and notifications</li>
-                  <li>Respond to your inquiries and support requests</li>
-                  <li>Monitor and analyze usage patterns</li>
-                  <li>Improve our service and develop new features</li>
-                  <li>Comply with legal obligations</li>
-                </ul>
-              </section>
+      <LegalSection title="6. Tus derechos">
+        <p>Puedes solicitar el acceso, rectificación, supresión, oposición, limitación y portabilidad de tus datos, así como retirar el consentimiento sin que ello afecte a la licitud del tratamiento anterior.</p>
+        <p>Para ejercerlos, escribe a <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a> indicando el derecho solicitado y la información necesaria para verificar tu identidad. También puedes presentar una reclamación ante la <a href="https://www.aepd.es/" target="_blank" rel="noreferrer">Agencia Española de Protección de Datos</a>.</p>
+      </LegalSection>
 
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  4. Data Sharing and Disclosure
-                </h2>
-                <p className="leading-relaxed mb-3">
-                  We may share your information in the following situations:
-                </p>
-                <ul className="list-disc list-inside space-y-1 ml-4">
-                  <li>
-                    <strong>With your consent:</strong> We may share your
-                    information for any purpose with your explicit consent
-                  </li>
-                  <li>
-                    <strong>Service providers:</strong> We share data with
-                    third-party vendors who assist in providing our services
-                  </li>
-                  <li>
-                    <strong>Legal requirements:</strong> We may disclose
-                    information if required by law or valid legal process
-                  </li>
-                  <li>
-                    <strong>Business transfers:</strong> In connection with any
-                    merger, sale, or acquisition
-                  </li>
-                  <li>
-                    <strong>Protection of rights:</strong> To protect our
-                    rights, privacy, safety, or property
-                  </li>
-                </ul>
-              </section>
+      <LegalSection title="7. Menores de edad">
+        <p>Las cuentas o servicios para menores deberán gestionarse con la intervención de su madre, padre o representante legal. Cuando sea necesario tratar datos de un menor de 14 años, se solicitará el consentimiento de quien ejerza la patria potestad o tutela.</p>
+      </LegalSection>
 
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  5. Third-Party Services
-                </h2>
-                <p className="leading-relaxed">
-                  We use the following third-party services that may collect
-                  information:
-                </p>
-                <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                  <li>
-                    <strong>Google Sign-In:</strong> For authentication services
-                  </li>
-                  <li>
-                    <strong>Payment processors:</strong> For handling
-                    subscription payments
-                  </li>
-                  <li>
-                    <strong>Analytics services:</strong> To understand service
-                    usage
-                  </li>
-                </ul>
-                <p className="mt-3 leading-relaxed">
-                  These services have their own privacy policies governing the
-                  use of your information.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  6. Data Security
-                </h2>
-                <p className="leading-relaxed">
-                  We implement appropriate technical and organizational security
-                  measures to protect your personal information. However, no
-                  method of transmission over the Internet or electronic storage
-                  is 100% secure, and we cannot guarantee absolute security.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  7. Data Retention
-                </h2>
-                <p className="leading-relaxed">
-                  We retain your personal information for as long as necessary
-                  to provide our services and fulfill the purposes outlined in
-                  this Privacy Policy. We will also retain and use your
-                  information to comply with legal obligations, resolve
-                  disputes, and enforce our agreements.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  8. Your Rights
-                </h2>
-                <p className="leading-relaxed mb-3">
-                  Depending on your location, you may have the following rights:
-                </p>
-                <ul className="list-disc list-inside space-y-1 ml-4">
-                  <li>
-                    <strong>Access:</strong> Request access to your personal
-                    information
-                  </li>
-                  <li>
-                    <strong>Correction:</strong> Request correction of
-                    inaccurate information
-                  </li>
-                  <li>
-                    <strong>Deletion:</strong> Request deletion of your personal
-                    information
-                  </li>
-                  <li>
-                    <strong>Portability:</strong> Request a copy of your data in
-                    a portable format
-                  </li>
-                  <li>
-                    <strong>Objection:</strong> Object to certain processing of
-                    your information
-                  </li>
-                </ul>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  9. Children&aposs Privacy
-                </h2>
-                <p className="leading-relaxed">
-                  Our service is not intended for children under 13 years of
-                  age. We do not knowingly collect personal information from
-                  children under 13. If you are a parent or guardian and believe
-                  your child has provided us with personal information, please
-                  contact us.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  10. International Data Transfers
-                </h2>
-                <p className="leading-relaxed">
-                  Your information may be transferred to and processed in
-                  countries other than your country of residence. These
-                  countries may have data protection laws that are different
-                  from the laws of your country.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  11. Updates to This Policy
-                </h2>
-                <p className="leading-relaxed">
-                  We may update this Privacy Policy from time to time. We will
-                  notify you of any changes by posting the new Privacy Policy on
-                  this page and updating the &aposLast updated&apos date.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  12. Contact Us
-                </h2>
-                <p className="leading-relaxed">
-                  If you have any questions about this Privacy Policy or our
-                  data practices, please contact us at:
-                </p>
-                <p className="mt-3">
-                  Please use the contact information provided on our website.
-                </p>
-              </section>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+      <LegalSection title="8. Seguridad y actualización">
+        <p>Aplicamos medidas técnicas y organizativas orientadas a proteger la confidencialidad, integridad y disponibilidad de la información. Ningún sistema conectado a Internet es infalible, por lo que revisamos las medidas de seguridad y limitamos el acceso según las funciones de cada usuario.</p>
+        <p>Esta política podrá actualizarse cuando cambie la normativa, los proveedores o las funciones de la plataforma. La versión vigente estará siempre disponible en esta dirección.</p>
+        <p>Consulta también la <Link href="/politica-cookies">Política de cookies</Link> y los <Link href="/terms-of-service">Términos y condiciones</Link>.</p>
+      </LegalSection>
+    </LegalPage>
   );
 }
