@@ -1,320 +1,76 @@
-import { Card, CardContent } from "@/components/ui/card";
+import type { Metadata } from "next";
 import Link from "next/link";
+import { LegalList, LegalNotice, LegalPage, LegalSection, LEGAL_EMAIL } from "@/components/legal/LegalPage";
 
-export default function TermsOfService() {
+export const metadata: Metadata = {
+  title: "Términos y condiciones | Chetesaí Fitness+",
+  description: "Condiciones de acceso y uso de los servicios de Chetesaí Fitness+.",
+};
+
+export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
-      <div className="container mx-auto px-4 py-16 max-w-4xl">
-        <div className="mb-8">
-          <Link
-            href="/"
-            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-          >
-            ← Back to home
-          </Link>
-        </div>
+    <LegalPage title="Términos y condiciones" summary="Estas condiciones regulan el acceso a la web, el portal privado y los servicios de entrenamiento, nutrición, hábitos, reservas y seguimiento de Chetesaí Fitness+.">
+      <LegalNotice><strong>Información de salud:</strong> los contenidos y planes de Chetesaí son educativos y de acondicionamiento físico. No sustituyen diagnóstico, tratamiento, fisioterapia ni atención médica. Ante dolor, mareo o síntomas inusuales, interrumpe la actividad y consulta a un profesional sanitario.</LegalNotice>
 
-        <Card className="shadow-xl border-0">
-          <CardContent className="p-8 md:p-12">
-            <h1 className="text-3xl md:text-4xl font-bold mb-8">
-              Terms of Service
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-8">
-              Last updated: {new Date().toLocaleDateString()}
-            </p>
+      <LegalSection title="1. Titular y aceptación">
+        <p>El servicio es prestado por Ramón Alberto Curbalán Vega bajo la marca Chetesaí Fitness+. Al utilizar la web, solicitar una valoración, contratar un plan o acceder al portal, aceptas estas condiciones y las políticas vinculadas.</p>
+        <p>Si no estás de acuerdo, no debes utilizar la cuenta o los servicios contratados y puedes contactar mediante <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a>.</p>
+      </LegalSection>
 
-            <div className="space-y-8 text-gray-700 dark:text-gray-300">
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  1. Acceptance of Terms
-                </h2>
-                <p className="leading-relaxed">
-                  By accessing and using this website and its services
-                  (&apos;Service&apos;), you accept and agree to be bound by
-                  the terms and provisions of this agreement. If you do not
-                  agree to abide by the above, please do not use this Service.
-                </p>
-              </section>
+      <LegalSection title="2. Servicios">
+        <LegalList>
+          <li>Valoración inicial y planificación personalizada.</li>
+          <li>Entrenamiento personal y grupos reducidos.</li>
+          <li>Programación de rutinas, seguimiento técnico y registro de progreso.</li>
+          <li>Orientación nutricional y hábitos dentro del ámbito profesional ofrecido.</li>
+          <li>Portal privado para citas, sesiones, pagos, planes y comunicaciones.</li>
+        </LegalList>
+        <p>La propuesta concreta, frecuencia, lugar, precio y duración aplicables serán los mostrados o aceptados al contratar.</p>
+      </LegalSection>
 
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  2. Description of Service
-                </h2>
-                <p className="leading-relaxed">
-                  This Service provides a web-based platform with various
-                  features and functionalities as described on our website. The
-                  specific features available may vary based on your
-                  subscription plan.
-                </p>
-              </section>
+      <LegalSection title="3. Aptitud y responsabilidad del cliente">
+        <p>Debes facilitar información veraz sobre tu estado de salud, lesiones, limitaciones, embarazo, medicación o cualquier circunstancia relevante para entrenar de forma segura, y actualizarla si cambia.</p>
+        <p>Te comprometes a seguir las indicaciones técnicas, utilizar el material correctamente y comunicar cualquier molestia. Chetesaí podrá adaptar, pausar o rechazar una actividad cuando existan riesgos que requieran valoración sanitaria previa.</p>
+      </LegalSection>
 
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  3. User Accounts
-                </h2>
-                <div className="space-y-3">
-                  <p className="leading-relaxed">
-                    To use certain features of the Service, you must register
-                    for an account. When you register for an account, you agree
-                    to:
-                  </p>
-                  <ul className="list-disc list-inside space-y-1 ml-4">
-                    <li>Provide accurate, current, and complete information</li>
-                    <li>
-                      Maintain and update your information to keep it accurate
-                      and complete
-                    </li>
-                    <li>Maintain the security of your account credentials</li>
-                    <li>
-                      Accept responsibility for all activities that occur under
-                      your account
-                    </li>
-                    <li>
-                      Notify us immediately of any unauthorized use of your
-                      account
-                    </li>
-                  </ul>
-                </div>
-              </section>
+      <LegalSection title="4. Cuenta y acceso">
+        <LegalList>
+          <li>La cuenta es personal e intransferible.</li>
+          <li>Debes custodiar tus credenciales y avisar si detectas un acceso no autorizado.</li>
+          <li>No puedes intentar acceder a información ajena, alterar la plataforma, introducir código malicioso o utilizarla con fines ilícitos.</li>
+          <li>Podremos suspender accesos por seguridad, incumplimiento grave o finalización de la relación, informando cuando corresponda.</li>
+        </LegalList>
+      </LegalSection>
 
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  4. Subscription and Payment
-                </h2>
-                <div className="space-y-3">
-                  <p className="leading-relaxed">
-                    Some aspects of our Service are provided on a subscription
-                    basis. By subscribing, you agree to:
-                  </p>
-                  <ul className="list-disc list-inside space-y-1 ml-4">
-                    <li>
-                      Pay all applicable fees as described in our pricing plans
-                    </li>
-                    <li>
-                      Provide current, complete, and accurate billing
-                      information
-                    </li>
-                    <li>
-                      Authorize us to charge your payment method on a recurring
-                      basis
-                    </li>
-                    <li>
-                      Be responsible for all charges incurred under your account
-                    </li>
-                  </ul>
-                  <p className="leading-relaxed mt-3">
-                    Subscription fees are non-refundable except as required by
-                    law. We reserve the right to change our subscription plans
-                    or adjust pricing with 30 days&apos; notice.
-                  </p>
-                </div>
-              </section>
+      <LegalSection title="5. Reservas, cambios y cancelaciones">
+        <p>Las citas quedan sujetas a disponibilidad y confirmación. Salvo que la modalidad contratada indique otra cosa, las sesiones podrán reubicarse dentro del mismo mes cuando se avise con al menos 24 horas y exista disponibilidad.</p>
+        <p>Las ausencias o cancelaciones tardías podrán computarse como sesión realizada. Si Chetesaí cancela una sesión, se ofrecerá una alternativa o recuperación equivalente.</p>
+      </LegalSection>
 
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  5. User Responsibilities and Conduct
-                </h2>
-                <div className="space-y-3">
-                  <p className="leading-relaxed">
-                    You agree to use the Service only for lawful purposes and in
-                    accordance with these Terms. You agree not to:
-                  </p>
-                  <ul className="list-disc list-inside space-y-1 ml-4">
-                    <li>
-                      Use the Service in any way that violates any applicable
-                      laws or regulations
-                    </li>
-                    <li>
-                      Create passes that contain false, misleading, or
-                      fraudulent information
-                    </li>
-                    <li>
-                      Impersonate any person or entity or misrepresent your
-                      affiliation
-                    </li>
-                    <li>
-                      Upload or transmit viruses or any other type of malicious
-                      code
-                    </li>
-                    <li>
-                      Attempt to gain unauthorized access to any portion of the
-                      Service
-                    </li>
-                    <li>Interfere with or disrupt the Service or servers</li>
-                    <li>
-                      Use the Service to send spam or unsolicited communications
-                    </li>
-                    <li>Violate the privacy rights of others</li>
-                  </ul>
-                </div>
-              </section>
+      <LegalSection title="6. Precios, bonos y pagos">
+        <p>El precio, impuestos aplicables, periodicidad y prestaciones se mostrarán antes de confirmar una contratación. Los planes publicados no tienen matrícula ni permanencia salvo que se informe expresamente de una condición distinta.</p>
+        <p>Los pagos electrónicos pueden gestionarse mediante Stripe. Chetesaí recibe el estado y el identificador de la operación, pero no almacena los datos completos de la tarjeta. Los impagos podrán suspender temporalmente el acceso a servicios pendientes.</p>
+      </LegalSection>
 
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  6. Intellectual Property Rights
-                </h2>
-                <div className="space-y-3">
-                  <h3 className="text-lg font-medium mb-2">
-                    Our Intellectual Property
-                  </h3>
-                  <p className="leading-relaxed">
-                    The Service and its original content, features, and
-                    functionality are owned by us and are protected by
-                    international copyright, trademark, patent, trade secret,
-                    and other intellectual property laws.
-                  </p>
+      <LegalSection title="7. Desistimiento y reembolsos">
+        <p>Cuando resulte aplicable el derecho de desistimiento de consumidores, se informará de su plazo y forma de ejercicio antes de contratar. Si solicitas que un servicio comience durante ese plazo, podrán aplicarse las consecuencias legalmente previstas al servicio ya ejecutado.</p>
+        <p>Los reembolsos, cambios de bono o devoluciones se resolverán según la modalidad contratada y la normativa de consumidores aplicable.</p>
+      </LegalSection>
 
-                  <h3 className="text-lg font-medium mb-2 mt-4">
-                    Your Content
-                  </h3>
-                  <p className="leading-relaxed">
-                    You retain ownership of any content you create using our
-                    Service. By using our Service, you grant us a worldwide,
-                    non-exclusive, royalty-free license to use, reproduce, and
-                    display your content solely for the purpose of providing the
-                    Service to you.
-                  </p>
-                </div>
-              </section>
+      <LegalSection title="8. Propiedad intelectual y contenidos">
+        <p>La marca, diseño, textos, fotografías, vídeos, fichas de ejercicios, planes y demás contenidos propios están protegidos. Se concede al cliente un uso personal de los materiales asignados; no pueden venderse, difundirse o reutilizarse comercialmente sin autorización.</p>
+        <p>El contenido aportado por el cliente seguirá siendo suyo. Autoriza su tratamiento únicamente para prestar el servicio, conforme a la <Link href="/privacy-policy">Política de privacidad</Link>.</p>
+      </LegalSection>
 
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  7. Privacy
-                </h2>
-                <p className="leading-relaxed">
-                  Your use of our Service is also governed by our Privacy
-                  Policy. Please review our Privacy Policy, which also governs
-                  the Site and informs users of our data collection practices.
-                </p>
-              </section>
+      <LegalSection title="9. Disponibilidad y responsabilidad">
+        <p>Trabajamos para mantener la plataforma disponible y segura, aunque pueden producirse mantenimientos, actualizaciones o incidencias ajenas. Cuando sea posible, se restaurará el servicio y la información desde las medidas de continuidad existentes.</p>
+        <p>Nada de estas condiciones limita los derechos irrenunciables de consumidores ni excluye responsabilidades que legalmente no puedan excluirse.</p>
+      </LegalSection>
 
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  8. Disclaimers
-                </h2>
-                <div className="space-y-3">
-                  <p className="leading-relaxed uppercase font-medium">
-                    The Service is provided on an &aposAS IS&apos and &aposAS
-                    AVAILABLE&apos basis without warranties of any kind, either
-                    express or implied, including but not limited to:
-                  </p>
-                  <ul className="list-disc list-inside space-y-1 ml-4">
-                    <li>Warranties of merchantability</li>
-                    <li>Fitness for a particular purpose</li>
-                    <li>Non-infringement</li>
-                    <li>
-                      That the Service will be uninterrupted or error-free
-                    </li>
-                    <li>That defects will be corrected</li>
-                    <li>
-                      That the Service is free of viruses or harmful components
-                    </li>
-                  </ul>
-                </div>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  9. Limitation of Liability
-                </h2>
-                <p className="leading-relaxed uppercase font-medium">
-                  To the maximum extent permitted by law, we shall not be
-                  liable for any indirect, incidental, special,
-                  consequential, or punitive damages, or any loss of profits or
-                  revenues, whether incurred directly or indirectly, or any loss
-                  of data, use, goodwill, or other intangible losses resulting
-                  from:
-                </p>
-                <ul className="list-disc list-inside space-y-1 ml-4 mt-3">
-                  <li>Your use or inability to use the Service</li>
-                  <li>Any unauthorized access to or use of our servers</li>
-                  <li>
-                    Any interruption or cessation of transmission to or from the
-                    Service
-                  </li>
-                  <li>
-                    Any bugs, viruses, or similar harmful code transmitted
-                    through the Service
-                  </li>
-                  <li>Any errors or omissions in any content</li>
-                </ul>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  10. Indemnification
-                </h2>
-                <p className="leading-relaxed">
-                  You agree to defend, indemnify, and hold harmless us and our
-                  affiliates, officers, directors, employees, and agents
-                  from and against any claims, liabilities, damages, judgments,
-                  awards, losses, costs, expenses, or fees arising out of or
-                  relating to your violation of these Terms or your use of the
-                  Service.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  11. Termination
-                </h2>
-                <p className="leading-relaxed">
-                  We may terminate or suspend your account and bar access to the
-                  Service immediately, without prior notice or liability, under
-                  our sole discretion, for any reason whatsoever, including
-                  without limitation if you breach the Terms. Upon termination,
-                  your right to use the Service will cease immediately.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  12. Governing Law
-                </h2>
-                <p className="leading-relaxed">
-                  These Terms shall be governed and construed in accordance with
-                  the laws of [Your Jurisdiction], without regard to its
-                  conflict of law provisions. Our failure to enforce any right
-                  or provision of these Terms will not be considered a waiver of
-                  those rights.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  13. Changes to Terms
-                </h2>
-                <p className="leading-relaxed">
-                  We reserve the right, at our sole discretion, to modify or
-                  replace these Terms at any time. If a revision is material, we
-                  will provide at least 30 days notice prior to any new terms
-                  taking effect.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-                  14. Contact Information
-                </h2>
-                <p className="leading-relaxed">
-                  If you have any questions about these Terms, please contact us
-                  at:
-                </p>
-                <p className="mt-3">
-                  Please use the contact information provided on our website.
-                </p>
-              </section>
-
-              <section className="pt-8 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  By using this Service, you acknowledge that you have read,
-                  understood, and agree to be bound by these Terms of Service.
-                </p>
-              </section>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+      <LegalSection title="10. Legislación y contacto">
+        <p>Estas condiciones se rigen por la legislación española. En caso de conflicto con una persona consumidora, serán competentes los órganos y tribunales que determine la normativa aplicable; no se impone una renuncia a su fuero legal.</p>
+        <p>Para consultas o reclamaciones, escribe a <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a>. Podremos actualizar estas condiciones cuando cambien los servicios o la normativa, publicando siempre la fecha de la versión vigente.</p>
+      </LegalSection>
+    </LegalPage>
   );
 }
