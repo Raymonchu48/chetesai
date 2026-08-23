@@ -308,8 +308,32 @@ export default function Main() {
               <p className="flex items-center gap-3"><Clock className="h-5 w-5 text-[#8cdb78]" />Respuesta habitual en menos de 24 horas</p>
               <p className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-[#8cdb78]" />Tus datos se utilizarán únicamente para atender la solicitud</p>
             </div>
+          </div>
 
-            <article id="sobre-mi" className="mt-10 scroll-mt-24 rounded-[28px] border border-[#b38d45]/35 bg-[#0f1713]/75 p-5 shadow-2xl shadow-black/25 backdrop-blur-xl sm:p-6">
+            <form id="formulario-valoracion" onSubmit={submitReservation} className="scroll-mt-5 border-t border-[#ded8cd] bg-white p-7 text-[#202724] sm:p-9 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:border-l lg:border-t-0 lg:p-10">
+              <div className="mb-7">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#2f9e24]">Formulario de valoración</p>
+                <h3 className="mt-2 text-2xl font-black sm:text-3xl">Tu valoración empieza aquí</h3>
+                <p className="mt-2 text-sm leading-6 text-[#67706b]">Completa tus datos y te responderé para confirmar el mejor punto de partida.</p>
+              </div>
+              <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field name="nombre" label="Nombre" required />
+              <Field name="email" label="Email" type="email" required />
+              <Field name="telefono" label="Teléfono" type="tel" />
+              <label className="space-y-2 text-sm font-semibold">Modalidad<select name="modalidad" defaultValue="orientacion" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]"><option value="entrenamiento_personal">Entrenamiento personal</option><option value="grupo_reducido">Grupo reducido</option><option value="orientacion">Quiero orientación</option></select></label>
+              <Field name="fecha_preferida" label="Fecha preferida" type="date" required />
+              <Field name="franja_horaria" label="Hora aproximada" type="time" required />
+            </div>
+            <p className="mt-2 text-xs text-[#67706b]">La hora solicitada queda pendiente de confirmación según disponibilidad.</p>
+            <label className="mt-4 block space-y-2 text-sm font-semibold">Objetivo principal<input name="objetivo" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" placeholder="Mejorar condición física, ganar fuerza, perder grasa..." /></label>
+            <label className="mt-4 block space-y-2 text-sm font-semibold">Cuéntame un poco más<textarea name="mensaje" rows={4} className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" /></label>
+            <label className="mt-4 flex items-start gap-3 text-xs leading-5 text-[#67706b]"><input type="checkbox" name="consentimiento" required className="mt-1" />Acepto que mis datos sean utilizados para responder a esta solicitud de información.</label>
+            {formMessage ? <p className={`mt-4 rounded-xl px-4 py-3 text-sm ${formMessage.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{formMessage.text}</p> : null}
+            <Button type="submit" disabled={sending} className="mt-6 w-full rounded-xl bg-[#2f9e24] py-6 text-base hover:bg-[#27891e]">{sending ? "Enviando solicitud..." : "Solicitar valoración"}</Button>
+            </form>
+
+            <article id="sobre-mi" className="mx-7 mb-7 mt-7 scroll-mt-24 sm:mx-9 sm:mb-9 lg:col-start-1 lg:row-start-2 lg:mx-10 lg:mb-10 lg:mt-0 rounded-[28px] border border-[#b38d45]/35 bg-[#0f1713]/75 p-5 shadow-2xl shadow-black/25 backdrop-blur-xl sm:p-6">
               <div className="grid gap-5 sm:grid-cols-[132px_1fr] sm:items-center">
                 <div className="mx-auto overflow-hidden rounded-2xl border border-white/15 bg-black/30 shadow-xl sm:mx-0">
                   <img src={PROFILE_IMAGE_URL} alt="Ramón Curbalán, entrenador y profesional del deporte" className="h-44 w-32 object-cover object-top sm:h-48 sm:w-full" />
@@ -343,30 +367,6 @@ export default function Main() {
                 Ver perfil profesional <ExternalLink className="h-4 w-4" />
               </a>
             </article>
-          </div>
-
-            <form id="formulario-valoracion" onSubmit={submitReservation} className="scroll-mt-5 border-t border-[#ded8cd] bg-white p-7 text-[#202724] sm:p-9 lg:border-l lg:border-t-0 lg:p-10">
-              <div className="mb-7">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#2f9e24]">Formulario de valoración</p>
-                <h3 className="mt-2 text-2xl font-black sm:text-3xl">Tu valoración empieza aquí</h3>
-                <p className="mt-2 text-sm leading-6 text-[#67706b]">Completa tus datos y te responderé para confirmar el mejor punto de partida.</p>
-              </div>
-              <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field name="nombre" label="Nombre" required />
-              <Field name="email" label="Email" type="email" required />
-              <Field name="telefono" label="Teléfono" type="tel" />
-              <label className="space-y-2 text-sm font-semibold">Modalidad<select name="modalidad" defaultValue="orientacion" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]"><option value="entrenamiento_personal">Entrenamiento personal</option><option value="grupo_reducido">Grupo reducido</option><option value="orientacion">Quiero orientación</option></select></label>
-              <Field name="fecha_preferida" label="Fecha preferida" type="date" required />
-              <Field name="franja_horaria" label="Hora aproximada" type="time" required />
-            </div>
-            <p className="mt-2 text-xs text-[#67706b]">La hora solicitada queda pendiente de confirmación según disponibilidad.</p>
-            <label className="mt-4 block space-y-2 text-sm font-semibold">Objetivo principal<input name="objetivo" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" placeholder="Mejorar condición física, ganar fuerza, perder grasa..." /></label>
-            <label className="mt-4 block space-y-2 text-sm font-semibold">Cuéntame un poco más<textarea name="mensaje" rows={4} className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" /></label>
-            <label className="mt-4 flex items-start gap-3 text-xs leading-5 text-[#67706b]"><input type="checkbox" name="consentimiento" required className="mt-1" />Acepto que mis datos sean utilizados para responder a esta solicitud de información.</label>
-            {formMessage ? <p className={`mt-4 rounded-xl px-4 py-3 text-sm ${formMessage.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{formMessage.text}</p> : null}
-            <Button type="submit" disabled={sending} className="mt-6 w-full rounded-xl bg-[#2f9e24] py-6 text-base hover:bg-[#27891e]">{sending ? "Enviando solicitud..." : "Solicitar valoración"}</Button>
-            </form>
           </div>
         </div>
       </section>
