@@ -144,11 +144,11 @@ export default function Main() {
 
   return (
     <main className="min-h-screen bg-[#f7f4ee] text-[#202724]">
-      <section id="inicio" className="relative min-h-[760px] overflow-hidden">
+      <section id="inicio" className="relative min-h-[760px] overflow-hidden bg-[#050706]">
         {heroSlideshow.map((slide, index) => (
-          <div key={index} className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000" style={{ backgroundImage: `url(${slide.url})`, opacity: currentSlide === index ? 1 : 0 }} />
+          <div key={index} className="hero-media absolute inset-0 bg-cover bg-center transition-opacity duration-1000" style={{ backgroundImage: `url(${slide.url})`, opacity: currentSlide === index ? 1 : 0 }} />
         ))}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-black/35" />
+        <div className="hero-shade absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-black/35" />
 
         <nav className="relative z-20 mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:px-8">
           <button type="button" onClick={() => goTo("inicio")} className="flex shrink-0 items-center gap-3 text-left">
