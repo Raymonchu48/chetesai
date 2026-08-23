@@ -250,11 +250,6 @@ export default function Main() {
             </div>
           </div>
 
-          <div className="mt-11 text-center">
-            <Button onClick={openValuation} className="rounded-xl bg-[#2f9e24] px-6 py-5 hover:bg-[#27891e]">
-              Solicitar valoración <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
         </div>
       </section>
 
@@ -379,6 +374,20 @@ export default function Main() {
                 Ver perfil profesional <ExternalLink className="h-4 w-4" />
               </a>
             </article>
+
+            <div className="mx-auto mt-10 max-w-5xl px-1 pb-1">
+              <Button
+                type="button"
+                onClick={openValuation}
+                aria-label="Abrir el formulario para solicitar una valoración"
+                className="valuation-cta min-h-16 w-full rounded-2xl border border-[#8cdb78]/40 bg-gradient-to-r from-[#278d20] via-[#36ad2b] to-[#278d20] px-7 py-5 text-base font-black text-white shadow-xl shadow-[#2f9e24]/20 hover:from-[#2f9e24] hover:via-[#42bd35] hover:to-[#2f9e24] sm:min-h-[72px] sm:text-lg"
+              >
+                <span>Solicitar valoración</span>
+                <span aria-hidden="true" className="grid h-9 w-9 place-items-center rounded-full bg-white/15">
+                  <ArrowRight className="h-5 w-5" />
+                </span>
+              </Button>
+            </div>
         </div>
       </section>
 
