@@ -35,7 +35,7 @@ const benefits = [
 const services = [
   { image: "/brand/chetesai-entrenamiento-personal.webp", imageAlt: "Entrenador Chetesaí Fitness+ acompañando una sesión de entrenamiento personal", title: "Entrenamiento personal", description: "Sesiones 1:1 adaptadas a tus objetivos, nivel y estilo de vida." },
   { icon: Users, title: "Grupos reducidos", description: "Dos a cuatro personas sin perder atención, técnica ni calidad." },
-  { icon: ClipboardCheck, title: "Seguimiento continuo", description: "Valoraciones periódicas y ajustes para que sigas avanzando." },
+  { image: "/brand/chetesai-seguimiento-continuo.webp", imageAlt: "Entrenador y clienta con camisetas Chetesaí Fitness+ durante una sesión de seguimiento", imagePosition: "center 33%", title: "Seguimiento continuo", description: "Valoraciones periódicas y ajustes para que sigas avanzando." },
   { icon: Target, title: "Rutina adaptada", description: "Un plan realista, progresivo y preparado específicamente para ti." },
   { image: "/brand/chetesai-tecnica-progreso.webp", imageAlt: "Entrenador Chetesaí Fitness+ supervisando la técnica de una plancha", imagePosition: "center 25%", title: "Técnica y progreso", description: "Mejora cómo te mueves y consigue resultados medibles." },
 ];
