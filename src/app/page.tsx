@@ -37,7 +37,7 @@ const services = [
   { icon: Users, title: "Grupos reducidos", description: "Dos a cuatro personas sin perder atención, técnica ni calidad." },
   { icon: ClipboardCheck, title: "Seguimiento continuo", description: "Valoraciones periódicas y ajustes para que sigas avanzando." },
   { icon: Target, title: "Rutina adaptada", description: "Un plan realista, progresivo y preparado específicamente para ti." },
-  { icon: TrendingUp, title: "Técnica y progreso", description: "Mejora cómo te mueves y consigue resultados medibles." },
+  { image: "/brand/chetesai-tecnica-progreso.webp", imageAlt: "Entrenador Chetesaí Fitness+ supervisando la técnica de una plancha", imagePosition: "center 25%", title: "Técnica y progreso", description: "Mejora cómo te mueves y consigue resultados medibles." },
 ];
 
 const steps = [
@@ -210,6 +210,7 @@ export default function Main() {
                       fill
                       sizes="(max-width: 639px) calc(100vw - 2.5rem), (max-width: 1023px) calc(50vw - 2rem), 240px"
                       className="object-cover"
+                      style={{ objectPosition: service.imagePosition ?? "center" }}
                     />
                   </div>
                 ) : Icon ? (
