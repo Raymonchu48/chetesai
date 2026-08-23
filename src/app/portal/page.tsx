@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import LogoutButton from "@/components/LogoutButton";
 import ExerciseMediaVisual from "@/components/exercises/ExerciseMediaVisual";
@@ -482,5 +481,5 @@ function HeroMetric({ icon, value, label }: { icon: React.ReactNode; value: stri
 
 function QuickLink({ href, icon, label, description, tone }: { href: string; icon: React.ReactNode; label: string; description: string; tone: "green" | "gold" }) {
   const colors = tone === "green" ? "bg-[#e9f5e7] text-[#2f9e24]" : "bg-[#f6eedc] text-[#a77b27]";
-  return <Link href={href} className="group flex min-h-28 flex-col justify-between rounded-[24px] border border-[#ded8cd] bg-[#fffdf9] p-4 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-[#8cdb78] hover:shadow-lg"><div className="flex items-start justify-between gap-2"><span className={`grid h-10 w-10 place-items-center rounded-2xl ${colors}`}>{icon}</span><ArrowRight className="h-4 w-4 text-[#9ca39f] transition-transform group-hover:translate-x-1 group-hover:text-[#2f9e24]" /></div><div><p className="text-sm font-black">{label}</p><p className="mt-0.5 text-[11px] text-[#7b837e]">{description}</p></div></Link>;
+  return <a href={href} aria-label={`${label}: ${description}`} className="group relative z-10 flex min-h-28 touch-manipulation select-none flex-col justify-between rounded-[24px] border border-[#ded8cd] bg-[#fffdf9] p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-[#8cdb78] hover:shadow-lg active:scale-[0.98] active:border-[#8cdb78] active:bg-[#f4faF2]"><div className="pointer-events-none flex items-start justify-between gap-2"><span className={`grid h-10 w-10 place-items-center rounded-2xl ${colors}`}>{icon}</span><ArrowRight className="h-4 w-4 text-[#9ca39f] transition-transform group-hover:translate-x-1 group-hover:text-[#2f9e24]" /></div><div className="pointer-events-none"><p className="text-sm font-black">{label}</p><p className="mt-0.5 text-[11px] text-[#7b837e]">{description}</p></div></a>;
 }
