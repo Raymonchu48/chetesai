@@ -209,7 +209,7 @@ export default function Main() {
           style={{ backgroundImage: "url('/brand/chetesai-hero-poster.webp')" }}
         />
         <video
-          className="hero-media absolute inset-0 h-full w-full object-cover object-center motion-reduce:hidden xl:left-auto xl:w-auto xl:max-w-none xl:object-contain xl:object-right"
+          className="hero-media absolute inset-0 h-full w-full object-cover object-center motion-reduce:hidden xl:left-[36%] xl:right-0 xl:w-[64%] xl:object-[center_42%]"
           autoPlay
           muted
           loop
@@ -221,10 +221,18 @@ export default function Main() {
           <source src="/brand/chetesai-hero-loop.mp4" type="video/mp4" />
         </video>
         <div
-          className="hero-shade absolute inset-0"
+          className="hero-shade absolute inset-0 xl:hidden"
           style={{
             background:
               "linear-gradient(90deg, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.58) 38%, rgba(0,0,0,0.18) 67%, rgba(0,0,0,0.05) 100%)",
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-y-0 left-0 hidden w-[40%] xl:block"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(4,7,5,0.97) 0%, rgba(4,7,5,0.94) 78%, rgba(4,7,5,0.72) 90%, rgba(4,7,5,0) 100%)",
           }}
         />
         <div
@@ -236,11 +244,11 @@ export default function Main() {
           }}
         />
 
-        <div className="relative z-10 mx-auto flex max-w-7xl px-5 pb-20 pt-16 sm:pt-10 lg:px-8 lg:pb-24 lg:pt-8">
-          <div className="w-full max-w-[560px]">
+        <div className="relative z-10 mx-auto flex max-w-7xl px-5 pb-20 pt-16 sm:pt-10 lg:px-8 lg:pb-24 lg:pt-8 xl:mx-0 xl:max-w-none xl:px-0 xl:pb-20 xl:pt-10">
+          <div className="w-full max-w-[560px] xl:w-[36%] xl:max-w-none xl:px-[clamp(2.5rem,4vw,4.75rem)]">
             <p className="mb-4 text-xs font-bold uppercase tracking-[0.17em] text-[#8cdb78] sm:text-sm">Entrenamiento personal y grupos reducidos en Mallorca</p>
-            <h1 className="max-w-[560px] text-5xl font-black leading-[0.98] tracking-tight text-white md:text-[3.5rem] xl:text-[3.75rem]">Entrena con cabeza.<br /><span className="text-[#d8c7a5]">Mejora con método.</span></h1>
-            <p className="mt-6 max-w-[520px] text-lg leading-8 text-white/75">Un enfoque realista, progresivo y medible para mejorar tu condición física sin rutinas genéricas ni promesas de humo.</p>
+            <h1 className="max-w-[560px] text-5xl font-black leading-[0.98] tracking-tight text-white md:text-[3.5rem] xl:max-w-full xl:text-[clamp(2.75rem,3vw,3.5rem)]">Entrena con cabeza.<br /><span className="text-[#d8c7a5]">Mejora con método.</span></h1>
+            <p className="mt-6 max-w-[520px] text-lg leading-8 text-white/75 xl:max-w-full xl:text-base xl:leading-7">Un enfoque realista, progresivo y medible para mejorar tu condición física sin rutinas genéricas ni promesas de humo.</p>
             <div className="mt-5">
               <p className="flex items-center gap-2 text-sm font-semibold text-[#9fe68f]"><Target className="h-4 w-4" />Valoración inicial y planificación personalizada</p>
               <button
