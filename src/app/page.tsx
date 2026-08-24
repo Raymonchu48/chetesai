@@ -185,15 +185,13 @@ export default function Main() {
           className="hero-media absolute inset-0 hidden h-full w-full object-cover object-center md:block motion-reduce:hidden"
           autoPlay
           muted
+          loop
           playsInline
           preload="metadata"
           poster={heroSlideshow[0]?.url}
           aria-hidden="true"
-          onTimeUpdate={(event) => {
-            if (event.currentTarget.currentTime >= 7.45) event.currentTarget.currentTime = 0;
-          }}
         >
-          <source src="/brand/chetesai-presentacion.mp4" type="video/mp4" />
+          <source src="/brand/chetesai-hero-loop.mp4" type="video/mp4" />
         </video>
         <div className="hero-shade absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-black/35" />
 
