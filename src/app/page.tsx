@@ -91,18 +91,29 @@ export default function Main() {
     return () => window.clearInterval(interval);
   }, [nextSlide]);
 
-  function revealRates() {
+  const revealRates = useCallback(() => {
     setShowRates(true);
     window.setTimeout(() => document.getElementById("tarifas")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
-  }
+  }, []);
 
-  function openValuation() {
+  const openValuation = useCallback(() => {
     setShowRates(false);
     setShowValuation(true);
     window.setTimeout(() => {
       document.getElementById("formulario-valoracion")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
-  }
+  }, []);
+
+  useEffect(() => {
+    const handleOpenValuation = () => openValuation();
+    const handleOpenRates = () => revealRates();
+    window.addEventListener("chetesai:open-valuation", handleOpenValuation);
+    window.addEventListener("chetesai:open-rates", handleOpenRates);
+    return () => {
+      window.removeEventListener("chetesai:open-valuation", handleOpenValuation);
+      window.removeEventListener("chetesai:open-rates", handleOpenRates);
+    };
+  }, [openValuation, revealRates]);
 
   function goTo(section: string) {
     if (section !== "tarifas") setShowRates(false);
