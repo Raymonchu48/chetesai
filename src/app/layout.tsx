@@ -8,6 +8,7 @@ import { ScriptExecutor } from "@/components/ScriptExecutor";
 import { DevToolsHandler } from "@/components/DevToolsHandler";
 import { GlobalErrorCatcher } from "@/components/GlobalErrorCatcher";
 import { MobileLandingNav } from "@/components/MobileLandingNav";
+import { ChetesaiAiAssistant } from "@/components/ChetesaiAiAssistant";
 import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ScriptExecutor />
         <DevToolsHandler />
         <MobileLandingNav />
+        <ChetesaiAiAssistant />
         <div className="min-h-screen flex flex-col">
           <main className="flex-1">{children}</main>
         </div>
