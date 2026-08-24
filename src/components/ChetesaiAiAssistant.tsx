@@ -1,10 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Apple,
-  Bot,
   CalendarDays,
   ChevronRight,
   Dumbbell,
@@ -168,9 +168,19 @@ export function ChetesaiAiAssistant() {
         onClick={() => setOpen((current) => !current)}
         aria-label={open ? "Cerrar Chetesaí Coach IA" : "Abrir Chetesaí Coach IA"}
         aria-expanded={open}
-        className={`fixed right-4 z-[75] grid h-16 w-16 place-items-center rounded-full border border-[#d7b86b]/50 bg-gradient-to-br from-[#17201c] to-[#080b09] text-white shadow-[0_16px_45px_rgba(0,0,0,0.38)] transition duration-300 hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#8cdb78] focus:ring-offset-2 sm:right-6 ${launcherPosition}`}
+        className={`group fixed right-4 z-[75] grid h-16 w-16 place-items-center rounded-full border border-[#d7b86b]/60 bg-gradient-to-br from-[#17201c] to-[#080b09] text-white shadow-[0_16px_45px_rgba(0,0,0,0.38)] transition duration-300 hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#8cdb78] focus:ring-offset-2 sm:right-6 ${launcherPosition}`}
       >
-        {open ? <X className="h-6 w-6" /> : <Bot className="h-7 w-7 text-[#9fe68f]" />}
+        {open ? <X className="h-6 w-6" /> : (
+          <span className="absolute inset-[3px] overflow-hidden rounded-full border border-white/20 bg-[#111713] ring-1 ring-[#d7b86b]/35">
+            <Image
+              src="/brand/chetesai-coach-avatar.webp"
+              alt=""
+              fill
+              sizes="64px"
+              className="object-cover transition duration-300 group-hover:scale-110"
+            />
+          </span>
+        )}
         {!open ? (
           <span className="absolute -right-1 -top-1 grid h-6 min-w-6 place-items-center rounded-full border-2 border-[#101713] bg-[#2f9e24] px-1 text-[10px] font-black">
             IA
