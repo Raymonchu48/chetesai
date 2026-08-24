@@ -17,9 +17,13 @@
   }
 
   #inicio .hero-media {
-    background-position: center top !important;
+    background-position: 64% center !important;
     background-size: cover !important;
     image-rendering: auto;
+  }
+
+  #inicio video.hero-media {
+    object-position: 64% center !important;
   }
 
   #inicio .hero-shade {

@@ -19,7 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { files, heroSlideshow } from "@/assets/files";
+import { files } from "@/assets/files";
 
 const PROFILE_IMAGE_URL = "https://raymonchu48.github.io/Deportivo/Mi_imagen.png";
 const PROFILE_PDF_URL = "https://raymonchu48.github.io/Deportivo/Carta_presentacion_deportiva_profesional.pdf";
@@ -77,22 +77,12 @@ const highlightedCredentials = [
 ];
 
 export default function Main() {
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [showRates, setShowRates] = useState(false);
   const [showValuation, setShowValuation] = useState(false);
   const [showPresentationVideo, setShowPresentationVideo] = useState(false);
   const [sending, setSending] = useState(false);
   const [formMessage, setFormMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
-
-  const nextSlide = useCallback(() => {
-    setCurrentSlide((previous) => (previous + 1) % heroSlideshow.length);
-  }, []);
-
-  useEffect(() => {
-    const interval = window.setInterval(nextSlide, 5500);
-    return () => window.clearInterval(interval);
-  }, [nextSlide]);
 
   useEffect(() => {
     if (!showPresentationVideo) return;
@@ -178,17 +168,19 @@ export default function Main() {
   return (
     <main className="min-h-screen bg-[#f7f4ee] text-[#202724]">
       <section id="inicio" className="relative min-h-[640px] overflow-hidden bg-[#050706]">
-        {heroSlideshow.map((slide, index) => (
-          <div key={index} className="hero-media absolute inset-0 bg-cover bg-center transition-opacity duration-1000 md:hidden motion-reduce:block" style={{ backgroundImage: `url(${slide.url})`, opacity: currentSlide === index ? 1 : 0 }} />
-        ))}
+        <div
+          aria-hidden="true"
+          className="hero-media absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/brand/chetesai-hero-poster.webp')" }}
+        />
         <video
-          className="hero-media absolute inset-0 hidden h-full w-full object-cover object-center md:block motion-reduce:hidden"
+          className="hero-media absolute inset-0 h-full w-full object-cover object-center motion-reduce:hidden"
           autoPlay
           muted
           loop
           playsInline
-          preload="metadata"
-          poster={heroSlideshow[0]?.url}
+          preload="auto"
+          poster="/brand/chetesai-hero-poster.webp"
           aria-hidden="true"
         >
           <source src="/brand/chetesai-hero-loop.mp4" type="video/mp4" />
@@ -272,7 +264,7 @@ export default function Main() {
             >
               <X className="h-5 w-5" />
             </button>
-            <video className="aspect-video w-full bg-black object-contain" controls autoPlay playsInline preload="metadata" poster={heroSlideshow[0]?.url}>
+            <video className="aspect-video w-full bg-black object-contain" controls autoPlay playsInline preload="metadata" poster="/brand/chetesai-hero-poster.webp">
               <source src="/brand/chetesai-presentacion.mp4" type="video/mp4" />
               Tu navegador no puede reproducir este vídeo.
             </video>
