@@ -241,15 +241,15 @@ export default function Main() {
             <p className="mb-4 text-xs font-bold uppercase tracking-[0.17em] text-[#8cdb78] sm:text-sm">Entrenamiento personal y grupos reducidos en Mallorca</p>
             <h1 className="max-w-[560px] text-5xl font-black leading-[0.98] tracking-tight text-white md:text-[3.5rem] xl:text-[3.75rem]">Entrena con cabeza.<br /><span className="text-[#d8c7a5]">Mejora con método.</span></h1>
             <p className="mt-6 max-w-[520px] text-lg leading-8 text-white/75">Un enfoque realista, progresivo y medible para mejorar tu condición física sin rutinas genéricas ni promesas de humo.</p>
-            <div className="mt-5 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+            <div className="mt-5">
               <p className="flex items-center gap-2 text-sm font-semibold text-[#9fe68f]"><Target className="h-4 w-4" />Valoración inicial y planificación personalizada</p>
               <button
                 type="button"
                 onClick={() => setShowPresentationVideo(true)}
-                className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-black/35 px-4 py-2.5 text-sm font-bold text-white shadow-lg backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-[#8cdb78]/70 hover:bg-black/55 focus:outline-none focus:ring-2 focus:ring-[#8cdb78] focus:ring-offset-2 focus:ring-offset-black"
+                className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-black/35 px-5 py-3 text-sm font-bold text-white shadow-lg backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-[#8cdb78]/70 hover:bg-black/55 focus:outline-none focus:ring-2 focus:ring-[#8cdb78] focus:ring-offset-2 focus:ring-offset-black"
               >
                 <PlayCircle className="h-5 w-5 text-[#9fe68f]" />
-                Ver presentación <span className="hidden sm:inline">con sonido</span>
+                Ver presentación
               </button>
             </div>
           </div>
