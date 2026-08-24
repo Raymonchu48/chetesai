@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import {
+  ArrowLeft,
   ArrowRight,
   Award,
   CalendarDays,
@@ -85,11 +86,13 @@ export default function Main() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   useEffect(() => {
-    if (!showPresentationVideo) return;
+    if (!showPresentationVideo && !showValuation) return;
 
     const previousOverflow = document.body.style.overflow;
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setShowPresentationVideo(false);
+      if (event.key !== "Escape") return;
+      if (showPresentationVideo) setShowPresentationVideo(false);
+      else setShowValuation(false);
     };
 
     document.body.style.overflow = "hidden";
@@ -98,7 +101,7 @@ export default function Main() {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", closeOnEscape);
     };
-  }, [showPresentationVideo]);
+  }, [showPresentationVideo, showValuation]);
 
   const revealRates = useCallback(() => {
     setShowRates(true);
@@ -107,10 +110,15 @@ export default function Main() {
 
   const openValuation = useCallback(() => {
     setShowRates(false);
+    setShowPresentationVideo(false);
     setShowValuation(true);
+  }, []);
+
+  const returnToStart = useCallback(() => {
+    setShowValuation(false);
     window.setTimeout(() => {
-      document.getElementById("formulario-valoracion")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 100);
+      document.getElementById("inicio")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
   }, []);
 
   useEffect(() => {
@@ -385,77 +393,102 @@ export default function Main() {
       <section id="contacto" className="bg-[#18211d] text-white">
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
           {showValuation ? (
-            <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#111612] shadow-2xl shadow-black/30 lg:grid lg:grid-cols-[0.92fr_1.08fr]">
-            <div className="flex h-full flex-col p-7 sm:p-9 lg:p-10">
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8cdb78]">Primera valoración</p>
-              <h2 className="mt-3 text-4xl font-black md:text-5xl">Cuéntame tu objetivo</h2>
-              <p className="mt-5 max-w-lg leading-7 text-white/65">Envíame tus datos y te responderé para valorar tu punto de partida y encontrar la modalidad más adecuada.</p>
-              <div className="relative mt-9 min-h-[280px] flex-1 overflow-hidden rounded-[24px] border border-white/10 bg-black/25 shadow-2xl shadow-black/30">
-                <Image
-                  src="/brand/chetesai-contacto-entrenador.webp"
-                  alt="Entrenador Chetesaí Fitness+ supervisando una sesión personalizada"
-                  fill
-                  sizes="(max-width: 1023px) calc(100vw - 5rem), 520px"
-                  className="object-cover object-[center_38%]"
-                />
-                <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#111612]/80 via-transparent to-black/5" />
-                <p className="absolute bottom-5 left-5 right-5 text-sm font-bold tracking-wide text-white/90">Entrenamiento cercano, técnico y personalizado</p>
-              </div>
-            </div>
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="valuation-dialog-title"
+              className="fixed inset-0 z-[120] flex items-stretch justify-center sm:items-center sm:p-5"
+            >
+              <button
+                type="button"
+                aria-label="Cerrar la primera valoración"
+                onClick={() => setShowValuation(false)}
+                className="absolute inset-0 cursor-default bg-black/80 backdrop-blur-md"
+              />
 
-            <form id="formulario-valoracion" onSubmit={submitReservation} className="scroll-mt-5 border-t border-[#ded8cd] bg-white p-7 text-[#202724] sm:p-9 lg:col-start-2 lg:row-start-1 lg:border-l lg:border-t-0 lg:p-10">
-              <div className="mb-7">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#2f9e24]">Formulario de valoración</p>
-                <h3 className="mt-2 text-2xl font-black sm:text-3xl">Tu valoración empieza aquí</h3>
-                <p className="mt-2 text-sm leading-6 text-[#67706b]">Completa tus datos y te responderé para confirmar el mejor punto de partida.</p>
-              </div>
-              <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field name="nombre" label="Nombre" required />
-              <Field name="email" label="Email" type="email" required />
-              <Field name="telefono" label="Teléfono" type="tel" />
-              <label className="space-y-2 text-sm font-semibold">Modalidad<select name="modalidad" defaultValue="orientacion" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]"><option value="entrenamiento_personal">Entrenamiento personal</option><option value="grupo_reducido">Grupo reducido</option><option value="orientacion">Quiero orientación</option></select></label>
-              <Field name="fecha_preferida" label="Fecha preferida" type="date" required />
-              <Field name="franja_horaria" label="Hora aproximada" type="time" required />
-            </div>
-            <p className="mt-2 text-xs text-[#67706b]">La hora solicitada queda pendiente de confirmación según disponibilidad.</p>
-            <label className="mt-4 block space-y-2 text-sm font-semibold">Objetivo principal<input name="objetivo" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" placeholder="Mejorar condición física, ganar fuerza, perder grasa..." /></label>
-            <label className="mt-4 block space-y-2 text-sm font-semibold">Cuéntame un poco más<textarea name="mensaje" rows={4} className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" /></label>
-            <label className="mt-4 flex items-start gap-3 text-xs leading-5 text-[#67706b]"><input type="checkbox" name="consentimiento" required className="mt-1" />Acepto que mis datos sean utilizados para responder a esta solicitud de información.</label>
-            {formMessage ? <p className={`mt-4 rounded-xl px-4 py-3 text-sm ${formMessage.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{formMessage.text}</p> : null}
-            <Button type="submit" disabled={sending} className="mt-6 w-full rounded-xl bg-[#2f9e24] py-6 text-base hover:bg-[#27891e]">{sending ? "Enviando solicitud..." : "Solicitar valoración"}</Button>
+              <div className="relative z-10 flex h-[100dvh] w-full flex-col overflow-hidden bg-[#111612] shadow-2xl shadow-black/60 sm:h-[min(92dvh,900px)] sm:max-w-6xl sm:rounded-[32px] sm:border sm:border-white/15">
+                <header className="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 bg-[#0d120f] px-4 py-3 text-white sm:px-6 sm:py-4">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[#d7b86b]/45 bg-black/35 p-1.5">
+                      <Image src="/brand/chetesai-logo-mark.svg" alt="" width={44} height={44} className="h-full w-full object-contain" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8cdb78]">Chetesaí Fitness+</p>
+                      <h2 id="valuation-dialog-title" className="truncate text-base font-black sm:text-lg">Primera valoración</h2>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    autoFocus
+                    aria-label="Cerrar y volver a la página"
+                    onClick={() => setShowValuation(false)}
+                    className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 text-sm font-bold text-white transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-[#8cdb78] sm:px-4"
+                  >
+                    <span className="hidden sm:inline">Volver a la página</span>
+                    <X className="h-5 w-5" />
+                  </button>
+                </header>
 
-            <div className="mt-8 rounded-[24px] border border-[#b38d45]/35 bg-gradient-to-br from-[#0a0d0b] via-[#111612] to-[#18211d] px-5 py-8 text-white shadow-inner sm:px-7 sm:py-9">
-              <div className="mx-auto flex max-w-md items-center justify-center gap-4 rounded-[24px] border border-[#b38d45]/40 bg-black/30 px-5 py-4 shadow-2xl shadow-black/35 backdrop-blur-sm sm:gap-5 sm:px-6 sm:py-5">
-                <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-[#d7b86b]/45 bg-[#080a09] p-2 sm:h-[72px] sm:w-[72px]">
-                  <Image src="/brand/chetesai-logo-mark.svg" alt="" width={72} height={72} className="h-full w-full object-contain" />
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                  <div className="lg:grid lg:min-h-full lg:grid-cols-[0.88fr_1.12fr]">
+                    <div className="flex flex-col p-5 text-white sm:p-8 lg:p-10">
+                      <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#8cdb78]">Tu punto de partida</p>
+                      <h3 className="mt-3 text-3xl font-black sm:text-4xl">Cuéntame tu objetivo</h3>
+                      <p className="mt-4 max-w-lg text-sm leading-6 text-white/65 sm:text-base sm:leading-7">Envíame tus datos y te responderé para valorar tu situación y encontrar la modalidad más adecuada.</p>
+
+                      <div className="relative mt-7 hidden min-h-[230px] flex-1 overflow-hidden rounded-[24px] border border-white/10 bg-black/25 shadow-2xl shadow-black/30 lg:block">
+                        <Image
+                          src="/brand/chetesai-contacto-entrenador.webp"
+                          alt="Entrenador Chetesaí Fitness+ supervisando una sesión personalizada"
+                          fill
+                          sizes="420px"
+                          className="object-cover object-[center_38%]"
+                        />
+                        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#111612]/85 via-transparent to-black/5" />
+                        <p className="absolute bottom-5 left-5 right-5 text-sm font-bold tracking-wide text-white/90">Entrenamiento cercano, técnico y personalizado</p>
+                      </div>
+
+                      <div className="mt-6 grid gap-3 text-xs leading-5 text-white/70 sm:grid-cols-2 lg:grid-cols-1">
+                        <p className="flex items-start gap-3"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#8cdb78]" /><span>Mallorca, Islas Baleares</span></p>
+                        <p className="flex items-start gap-3"><Mail className="mt-0.5 h-4 w-4 shrink-0 text-[#8cdb78]" /><span className="break-all">chetesaifitnnes@gmail.com</span></p>
+                        <p className="flex items-start gap-3"><Clock className="mt-0.5 h-4 w-4 shrink-0 text-[#8cdb78]" /><span>Respuesta habitual en menos de 24 horas</span></p>
+                        <p className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#8cdb78]" /><span>Uso exclusivo de los datos para atender tu solicitud</span></p>
+                      </div>
+                    </div>
+
+                    <form id="formulario-valoracion" onSubmit={submitReservation} className="border-t border-[#ded8cd] bg-white p-5 text-[#202724] sm:p-8 lg:border-l lg:border-t-0 lg:p-10">
+                      <div className="mb-7">
+                        <p className="text-xs font-black uppercase tracking-[0.18em] text-[#2f9e24]">Formulario de valoración</p>
+                        <h3 className="mt-2 text-2xl font-black sm:text-3xl">Tu valoración empieza aquí</h3>
+                        <p className="mt-2 text-sm leading-6 text-[#67706b]">Completa tus datos y te responderé para confirmar el mejor punto de partida.</p>
+                      </div>
+                      <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <Field name="nombre" label="Nombre" required />
+                        <Field name="email" label="Email" type="email" required />
+                        <Field name="telefono" label="Teléfono" type="tel" />
+                        <label className="space-y-2 text-sm font-semibold">Modalidad<select name="modalidad" defaultValue="orientacion" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]"><option value="entrenamiento_personal">Entrenamiento personal</option><option value="grupo_reducido">Grupo reducido</option><option value="orientacion">Quiero orientación</option></select></label>
+                        <Field name="fecha_preferida" label="Fecha preferida" type="date" required />
+                        <Field name="franja_horaria" label="Hora aproximada" type="time" required />
+                      </div>
+                      <p className="mt-2 text-xs text-[#67706b]">La hora solicitada queda pendiente de confirmación según disponibilidad.</p>
+                      <label className="mt-4 block space-y-2 text-sm font-semibold">Objetivo principal<input name="objetivo" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" placeholder="Mejorar condición física, ganar fuerza, perder grasa..." /></label>
+                      <label className="mt-4 block space-y-2 text-sm font-semibold">Cuéntame un poco más<textarea name="mensaje" rows={4} className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" /></label>
+                      <label className="mt-4 flex items-start gap-3 text-xs leading-5 text-[#67706b]"><input type="checkbox" name="consentimiento" required className="mt-1" />Acepto que mis datos sean utilizados para responder a esta solicitud de información.</label>
+                      {formMessage ? <p className={`mt-4 rounded-xl px-4 py-3 text-sm ${formMessage.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{formMessage.text}</p> : null}
+                      <Button type="submit" disabled={sending} className="mt-6 w-full rounded-xl bg-[#2f9e24] py-6 text-base hover:bg-[#27891e]">{sending ? "Enviando solicitud..." : "Solicitar valoración"}</Button>
+                      <button
+                        type="button"
+                        onClick={returnToStart}
+                        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d8d2c8] px-5 py-3.5 text-sm font-bold text-[#47504b] transition hover:border-[#2f9e24] hover:bg-[#f4f8f2] hover:text-[#27891e] focus:outline-none focus:ring-2 focus:ring-[#2f9e24]/40"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                        Volver al inicio
+                      </button>
+                    </form>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-base font-black text-white sm:text-lg">Chetesaí Fitness+</p>
-                  <p className="mt-1 text-xs text-white/60 sm:text-sm">Entrenamiento personalizado</p>
-                </div>
               </div>
-
-              <div className="mx-auto mt-7 max-w-md space-y-4 border-t border-white/10 pt-6 text-sm leading-6 text-white/75">
-                <p className="grid grid-cols-[24px_1fr] items-start gap-3">
-                  <MapPin className="mt-0.5 h-5 w-5 text-[#8cdb78]" />
-                  <span>Mallorca, Islas Baleares</span>
-                </p>
-                <p className="grid grid-cols-[24px_1fr] items-start gap-3">
-                  <Mail className="mt-0.5 h-5 w-5 text-[#8cdb78]" />
-                  <span className="break-all">chetesaifitnnes@gmail.com</span>
-                </p>
-                <p className="grid grid-cols-[24px_1fr] items-start gap-3">
-                  <Clock className="mt-0.5 h-5 w-5 text-[#8cdb78]" />
-                  <span>Respuesta habitual en menos de 24 horas</span>
-                </p>
-                <p className="grid grid-cols-[24px_1fr] items-start gap-3">
-                  <ShieldCheck className="mt-0.5 h-5 w-5 text-[#8cdb78]" />
-                  <span>Tus datos se utilizarán únicamente para atender la solicitud</span>
-                </p>
-              </div>
-            </div>
-            </form>
             </div>
           ) : null}
 
