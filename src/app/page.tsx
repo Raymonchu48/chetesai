@@ -462,11 +462,11 @@ export default function Main() {
             <article id="sobre-mi" className="mx-auto mt-10 max-w-5xl scroll-mt-24 rounded-[28px] border border-[#b38d45]/35 bg-[#0f1713]/75 p-5 shadow-2xl shadow-black/25 backdrop-blur-xl sm:p-6">
               <div className="grid gap-5 sm:grid-cols-[132px_1fr] sm:items-center">
                 <div className="mx-auto overflow-hidden rounded-2xl border border-white/15 bg-black/30 shadow-xl sm:mx-0">
-                  <img src={PROFILE_IMAGE_URL} alt="Ramón Curbalán, entrenador y profesional del deporte" className="h-44 w-32 object-cover object-top sm:h-48 sm:w-full" />
+                  <img src={PROFILE_IMAGE_URL} alt="Raymond Vega, entrenador y profesional del deporte" className="h-44 w-32 object-cover object-top sm:h-48 sm:w-full" />
                 </div>
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#d7b86b]">Sobre mí</p>
-                  <h3 className="mt-2 text-2xl font-black text-white">Ramón Curbalán</h3>
+                  <h3 className="mt-2 text-2xl font-black text-white">Raymond Vega</h3>
                   <p className="mt-3 text-sm leading-6 text-white/70">Profesional del entrenamiento, la nutrición y el rendimiento con una visión integral de la salud y la mejora física.</p>
                   <p className="mt-3 text-sm font-semibold leading-6 text-[#9fe68f]">Método, seguimiento y adaptación individual para construir un progreso realista, medible y sostenible.</p>
                 </div>
