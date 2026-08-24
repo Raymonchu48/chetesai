@@ -193,7 +193,21 @@ export default function Main() {
         >
           <source src="/brand/chetesai-hero-loop.mp4" type="video/mp4" />
         </video>
-        <div className="hero-shade absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-black/35" />
+        <div
+          className="hero-shade absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.58) 38%, rgba(0,0,0,0.18) 67%, rgba(0,0,0,0.05) 100%)",
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 hidden sm:block"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 72%, rgba(0,0,0,0.34) 100%)",
+          }}
+        />
 
         <nav className="relative z-20 mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:px-8">
           <button type="button" onClick={() => goTo("inicio")} className="flex shrink-0 items-center gap-3 text-left">
@@ -219,12 +233,11 @@ export default function Main() {
           </div>
         </nav>
 
-        <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-5 pb-20 pt-16 lg:grid-cols-[230px_1fr] lg:px-8 lg:pb-24 lg:pt-20">
-          <div className="hidden border-r border-white/25 pr-10 lg:flex lg:items-center"><div className="w-full overflow-hidden rounded-[30px] bg-white p-3 shadow-2xl"><img src={files.logo.url} alt="Logo completo de Chetesaí Fitness+" className="aspect-square h-auto w-full object-contain" /></div></div>
-          <div className="max-w-3xl self-center">
-            <p className="mb-5 text-sm font-bold uppercase tracking-[0.18em] text-[#8cdb78]">Entrenamiento personal y grupos reducidos en Mallorca</p>
-            <h1 className="max-w-3xl text-5xl font-black leading-[0.98] tracking-tight text-white md:text-7xl">Entrena con cabeza.<br /><span className="text-[#d8c7a5]">Mejora con método.</span></h1>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-white/75 md:text-xl">Un enfoque realista, progresivo y medible para mejorar tu condición física sin rutinas genéricas ni promesas de humo.</p>
+        <div className="relative z-10 mx-auto flex max-w-7xl px-5 pb-20 pt-16 sm:pt-10 lg:px-8 lg:pb-24 lg:pt-8">
+          <div className="w-full max-w-[560px]">
+            <p className="mb-4 text-xs font-bold uppercase tracking-[0.17em] text-[#8cdb78] sm:text-sm">Entrenamiento personal y grupos reducidos en Mallorca</p>
+            <h1 className="max-w-[560px] text-5xl font-black leading-[0.98] tracking-tight text-white md:text-[3.5rem] xl:text-[3.75rem]">Entrena con cabeza.<br /><span className="text-[#d8c7a5]">Mejora con método.</span></h1>
+            <p className="mt-6 max-w-[520px] text-lg leading-8 text-white/75">Un enfoque realista, progresivo y medible para mejorar tu condición física sin rutinas genéricas ni promesas de humo.</p>
             <div className="mt-5 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
               <p className="flex items-center gap-2 text-sm font-semibold text-[#9fe68f]"><Target className="h-4 w-4" />Valoración inicial y planificación personalizada</p>
               <button
