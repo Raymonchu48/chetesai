@@ -209,7 +209,7 @@ export default function Main() {
           style={{ backgroundImage: "url('/brand/chetesai-hero-poster.webp')" }}
         />
         <video
-          className="hero-media absolute inset-0 h-full w-full object-cover object-center motion-reduce:hidden"
+          className="hero-media absolute inset-0 h-full w-full object-cover object-center motion-reduce:hidden xl:left-auto xl:w-auto xl:max-w-none xl:object-contain xl:object-right"
           autoPlay
           muted
           loop
