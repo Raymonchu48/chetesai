@@ -88,6 +88,12 @@ export function ChetesaiAiAssistant() {
   if (!isVisibleRoute) return null;
 
   const quickActions = isPortal ? portalActions : publicActions;
+  const launcherPosition = isPortal
+    ? "bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+5.5rem)] md:bottom-[max(1.25rem,env(safe-area-inset-bottom))]"
+    : "bottom-[max(1.25rem,env(safe-area-inset-bottom))]";
+  const panelPosition = isPortal
+    ? "bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+10.5rem)] max-h-[min(62dvh,580px)] md:bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+5rem)] md:max-h-[min(74dvh,680px)]"
+    : "bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+5rem)] max-h-[min(74dvh,680px)]";
 
   function runQuickAction(action: string) {
     if (action.startsWith("/")) {
@@ -162,7 +168,7 @@ export function ChetesaiAiAssistant() {
         onClick={() => setOpen((current) => !current)}
         aria-label={open ? "Cerrar Chetesaí Coach IA" : "Abrir Chetesaí Coach IA"}
         aria-expanded={open}
-        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-[75] grid h-16 w-16 place-items-center rounded-full border border-[#d7b86b]/50 bg-gradient-to-br from-[#17201c] to-[#080b09] text-white shadow-[0_16px_45px_rgba(0,0,0,0.38)] transition duration-300 hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#8cdb78] focus:ring-offset-2 sm:right-6"
+        className={`fixed right-4 z-[75] grid h-16 w-16 place-items-center rounded-full border border-[#d7b86b]/50 bg-gradient-to-br from-[#17201c] to-[#080b09] text-white shadow-[0_16px_45px_rgba(0,0,0,0.38)] transition duration-300 hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#8cdb78] focus:ring-offset-2 sm:right-6 ${launcherPosition}`}
       >
         {open ? <X className="h-6 w-6" /> : <Bot className="h-7 w-7 text-[#9fe68f]" />}
         {!open ? (
@@ -172,14 +178,11 @@ export function ChetesaiAiAssistant() {
         ) : null}
       </button>
 
-      <section
+      {open ? <section
         role="dialog"
         aria-modal="false"
         aria-label="Chetesaí Coach IA"
-        aria-hidden={!open}
-        className={`fixed inset-x-3 bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+5rem)] z-[74] flex max-h-[min(74dvh,680px)] flex-col overflow-hidden rounded-[28px] border border-[#b38d45]/35 bg-[#f9f7f2] shadow-[0_28px_80px_rgba(0,0,0,0.45)] transition duration-300 sm:inset-x-auto sm:right-6 sm:w-[390px] ${
-          open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none translate-y-5 opacity-0"
-        }`}
+        className={`fixed inset-x-3 z-[74] flex flex-col overflow-hidden rounded-[28px] border border-[#b38d45]/35 bg-[#f9f7f2] shadow-[0_28px_80px_rgba(0,0,0,0.45)] animate-in fade-in slide-in-from-bottom-4 duration-300 sm:inset-x-auto sm:right-6 sm:w-[390px] ${panelPosition}`}
       >
         <header className="flex items-center gap-3 bg-gradient-to-r from-[#111713] to-[#1b2721] px-5 py-4 text-white">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-[#8cdb78]/25 bg-[#8cdb78]/10 text-[#9fe68f]">
@@ -271,10 +274,10 @@ export function ChetesaiAiAssistant() {
             </button>
           </div>
         </div>
-      </section>
+      </section> : null}
 
       {!open ? (
-        <span className="pointer-events-none fixed bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+1.1rem)] right-[5.25rem] z-[73] hidden rounded-full border border-[#b38d45]/25 bg-[#111713]/95 px-3 py-2 text-xs font-bold text-white shadow-xl sm:block">
+        <span className={`pointer-events-none fixed right-[5.25rem] z-[73] hidden rounded-full border border-[#b38d45]/25 bg-[#111713]/95 px-3 py-2 text-xs font-bold text-white shadow-xl sm:block ${isPortal ? "bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+6.6rem)] md:bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+1.1rem)]" : "bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+1.1rem)]"}`}>
           <MessageCircle className="mr-1.5 inline h-3.5 w-3.5 text-[#9fe68f]" /> ¿Te ayudo?
         </span>
       ) : null}
