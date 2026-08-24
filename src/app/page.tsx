@@ -117,7 +117,7 @@ export default function Main() {
   const returnToStart = useCallback(() => {
     setShowValuation(false);
     window.setTimeout(() => {
-      document.getElementById("inicio")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }, 80);
   }, []);
 
@@ -135,7 +135,8 @@ export default function Main() {
   function goTo(section: string) {
     if (section !== "tarifas") setShowRates(false);
     window.setTimeout(() => {
-      document.getElementById(section)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (section === "inicio") window.scrollTo({ top: 0, behavior: "smooth" });
+      else document.getElementById(section)?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 80);
   }
 
@@ -174,7 +175,33 @@ export default function Main() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f4ee] text-[#202724]">
+    <main className="min-h-screen bg-[#f7f4ee] pt-20 text-[#202724]">
+      <header className="fixed inset-x-0 top-0 z-[75] border-b border-[#b38d45]/25 bg-[#0b100d]/95 text-white shadow-xl shadow-black/25 backdrop-blur-xl">
+        <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-3 pl-[5rem] pr-4 sm:pl-[5.25rem] sm:pr-5 lg:pr-8 xl:px-8" aria-label="Navegación principal">
+          <button type="button" onClick={() => goTo("inicio")} className="flex min-w-0 shrink-0 items-center gap-3 text-left">
+            <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl border border-[#b38d45]/35 bg-[#101713] p-1.5 shadow-lg"><img src={files.logo.url} alt="Chetesaí Fitness+" className="h-full w-full object-contain" /></div>
+            <div className="hidden sm:block"><p className="font-bold leading-tight text-white">Chetesaí Fitness+</p><p className="text-xs text-white/55">Entrenamiento personalizado</p></div>
+          </button>
+          <div className="hidden items-center gap-7 text-sm font-medium text-white/75 xl:flex">
+            <button type="button" onClick={() => goTo("servicios")} className="transition hover:text-white">Servicios</button>
+            <button type="button" onClick={() => goTo("proceso")} className="transition hover:text-white">Cómo funciona</button>
+            <button type="button" onClick={() => goTo("sobre-mi")} className="transition hover:text-white">Sobre mí</button>
+            <button type="button" onClick={() => goTo("faq")} className="transition hover:text-white">FAQ</button>
+            <Link href="/login" className="transition hover:text-white">Acceso clientes</Link>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <Button className="rounded-xl bg-[#2f9e24] px-3 hover:bg-[#27891e] sm:px-4 lg:px-5" onClick={openValuation}>
+              <CalendarDays className="mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Reserva tu valoración</span>
+              <span className="sm:hidden">Reserva</span>
+            </Button>
+            <Button variant="outline" className="hidden rounded-xl border-white/30 bg-white/5 px-4 text-white hover:bg-white/10 hover:text-white sm:inline-flex lg:px-5" onClick={revealRates}>
+              Ver tarifas <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </nav>
+      </header>
+
       <section id="inicio" className="relative min-h-[640px] overflow-hidden bg-[#050706]">
         <div
           aria-hidden="true"
@@ -208,30 +235,6 @@ export default function Main() {
               "linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 72%, rgba(0,0,0,0.34) 100%)",
           }}
         />
-
-        <nav className="relative z-20 mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:px-8">
-          <button type="button" onClick={() => goTo("inicio")} className="flex shrink-0 items-center gap-3 text-left">
-            <div className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg"><img src={files.logo.url} alt="Chetesaí Fitness+" className="h-full w-full object-contain" /></div>
-            <div className="hidden sm:block"><p className="font-bold leading-tight text-white">Chetesaí Fitness+</p><p className="text-xs text-white/55">Entrenamiento personalizado</p></div>
-          </button>
-          <div className="hidden items-center gap-7 text-sm font-medium text-white/80 xl:flex">
-            <button type="button" onClick={() => goTo("servicios")} className="transition hover:text-white">Servicios</button>
-            <button type="button" onClick={() => goTo("proceso")} className="transition hover:text-white">Cómo funciona</button>
-            <button type="button" onClick={() => goTo("sobre-mi")} className="transition hover:text-white">Sobre mí</button>
-            <button type="button" onClick={() => goTo("faq")} className="transition hover:text-white">FAQ</button>
-            <Link href="/login" className="transition hover:text-white">Acceso clientes</Link>
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <Button className="rounded-xl bg-[#2f9e24] px-4 hover:bg-[#27891e] lg:px-5" onClick={openValuation}>
-              <CalendarDays className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Reserva tu valoración</span>
-              <span className="sm:hidden">Reserva</span>
-            </Button>
-            <Button variant="outline" className="hidden rounded-xl border-white/35 bg-black/20 px-4 text-white hover:bg-white/10 hover:text-white sm:inline-flex lg:px-5" onClick={revealRates}>
-              Ver tarifas <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        </nav>
 
         <div className="relative z-10 mx-auto flex max-w-7xl px-5 pb-20 pt-16 sm:pt-10 lg:px-8 lg:pb-24 lg:pt-8">
           <div className="w-full max-w-[560px]">
@@ -280,7 +283,7 @@ export default function Main() {
         </div>
       ) : null}
 
-      <section id="servicios" className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+      <section id="servicios" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-16 lg:px-8">
         <div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Servicios</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Todo lo que necesitas para entrenar mejor</h2><p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Atención cercana, planificación profesional y seguimiento para que el entrenamiento encaje en tu vida.</p></div>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {services.map((service) => {
@@ -311,7 +314,7 @@ export default function Main() {
         </div>
       </section>
 
-      <section id="proceso" className="border-y border-[#d7dfd3] bg-[#eef3eb]">
+      <section id="proceso" className="scroll-mt-20 border-y border-[#d7dfd3] bg-[#eef3eb]">
         <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8">
           <div className="text-center">
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Cómo funciona</p>
@@ -344,13 +347,13 @@ export default function Main() {
         </div>
       </section>
 
-      {showRates ? <section id="tarifas" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+      {showRates ? <section id="tarifas" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-20 lg:px-8">
         <div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Bonos mensuales</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Elige el ritmo que encaja contigo</h2><p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Planes flexibles, sin matrícula ni permanencia.</p></div>
         <div className="mt-12 grid gap-6 md:grid-cols-3">{personalPlans.map((plan) => <article key={plan.name} className={`relative rounded-3xl border bg-[#fffdf9] p-7 shadow-sm ${plan.popular ? "border-[#2f9e24] ring-2 ring-[#2f9e24]/10" : "border-[#ded8cd]"}`}>{plan.popular ? <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#2f9e24] px-4 py-1 text-xs font-bold uppercase text-white">Más popular</span> : null}<p className="text-center text-2xl font-black">{plan.name}</p><p className="mt-2 text-center text-sm font-semibold text-[#2f9e24]">{plan.sessions}</p><p className="mt-6 text-center text-4xl font-black">{plan.price}<span className="text-base font-medium text-[#67706b]"> / mes</span></p><p className="mt-1 text-center text-sm text-[#67706b]">{plan.perSession}</p><div className="mt-7 space-y-3">{plan.features.map((feature) => <p key={feature} className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-[#2f9e24]" />{feature}</p>)}</div><Button className={`mt-7 w-full rounded-xl ${plan.popular ? "bg-[#2f9e24] hover:bg-[#27891e]" : "bg-[#202724] hover:bg-[#303a35]"}`} onClick={openValuation}>Elegir {plan.name}</Button></article>)}</div>
         <div className="mt-10 rounded-3xl border border-[#ded8cd] bg-[#fffdf9] p-7"><div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-sm font-bold uppercase tracking-[0.16em] text-[#2f9e24]">Grupos reducidos 2–4</p><h3 className="mt-2 text-2xl font-black">Comparte el entrenamiento, no la atención</h3><p className="mt-2 text-[#67706b]">Puedes venir con tu grupo o solicitar plaza en uno compatible.</p></div><div className="grid gap-3 sm:grid-cols-3">{groupPlans.map((plan) => <div key={plan.name} className="rounded-2xl bg-[#f1eee7] px-5 py-4 text-center"><p className="font-bold">{plan.name}</p><p className="mt-1 text-xs text-[#67706b]">{plan.sessions}</p><p className="mt-2 text-xl font-black text-[#2f9e24]">{plan.price}</p></div>)}</div></div></div>
       </section> : null}
 
-      <section id="faq" className="border-b border-[#ded8cd] bg-[#fffdf9]">
+      <section id="faq" className="scroll-mt-20 border-b border-[#ded8cd] bg-[#fffdf9]">
         <div className="mx-auto max-w-4xl px-5 py-16 lg:px-8">
           <div className="text-center">
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Preguntas frecuentes</p>
@@ -390,7 +393,7 @@ export default function Main() {
         </div>
       </section>
 
-      <section id="contacto" className="bg-[#18211d] text-white">
+      <section id="contacto" className="scroll-mt-20 bg-[#18211d] text-white">
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
           {showValuation ? (
             <div

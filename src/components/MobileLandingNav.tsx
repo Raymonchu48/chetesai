@@ -83,10 +83,17 @@ export function MobileLandingNav() {
     setRatesOpen(true);
   }
 
+  function openValuation() {
+    setOpen(false);
+    window.setTimeout(() => {
+      window.dispatchEvent(new Event("chetesai:open-valuation"));
+    }, 120);
+  }
+
   function reserveFromRates() {
     setRatesOpen(false);
     window.setTimeout(() => {
-      document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.dispatchEvent(new Event("chetesai:open-valuation"));
     }, 120);
   }
 
@@ -98,7 +105,7 @@ export function MobileLandingNav() {
         aria-expanded={open}
         aria-controls="mobile-landing-menu"
         onClick={() => setOpen(true)}
-        className="fixed left-4 top-[6.75rem] z-[70] grid h-12 w-12 place-items-center rounded-2xl border border-[#b38d45]/40 bg-[#101713]/90 text-white shadow-2xl backdrop-blur-xl xl:hidden"
+        className="fixed left-4 top-4 z-[76] grid h-12 w-12 place-items-center rounded-2xl border border-[#b38d45]/40 bg-[#101713] text-white shadow-lg xl:hidden"
       >
         <Menu className="h-6 w-6" />
       </button>
@@ -167,7 +174,7 @@ export function MobileLandingNav() {
           <div className="mt-6 space-y-3 border-t border-white/10 pt-6">
             <button
               type="button"
-              onClick={() => goToSection("contacto")}
+              onClick={openValuation}
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#2f9e24] px-4 py-4 font-bold text-white shadow-lg shadow-[#2f9e24]/15"
             >
               <CalendarDays className="h-5 w-5" />
