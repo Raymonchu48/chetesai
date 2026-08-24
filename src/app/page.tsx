@@ -12,9 +12,11 @@ import {
   ExternalLink,
   Mail,
   MapPin,
+  PlayCircle,
   Plus,
   ShieldCheck,
   Target,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { files, heroSlideshow } from "@/assets/files";
@@ -78,6 +80,7 @@ export default function Main() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showRates, setShowRates] = useState(false);
   const [showValuation, setShowValuation] = useState(false);
+  const [showPresentationVideo, setShowPresentationVideo] = useState(false);
   const [sending, setSending] = useState(false);
   const [formMessage, setFormMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -90,6 +93,22 @@ export default function Main() {
     const interval = window.setInterval(nextSlide, 5500);
     return () => window.clearInterval(interval);
   }, [nextSlide]);
+
+  useEffect(() => {
+    if (!showPresentationVideo) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setShowPresentationVideo(false);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [showPresentationVideo]);
 
   const revealRates = useCallback(() => {
     setShowRates(true);
@@ -160,8 +179,22 @@ export default function Main() {
     <main className="min-h-screen bg-[#f7f4ee] text-[#202724]">
       <section id="inicio" className="relative min-h-[640px] overflow-hidden bg-[#050706]">
         {heroSlideshow.map((slide, index) => (
-          <div key={index} className="hero-media absolute inset-0 bg-cover bg-center transition-opacity duration-1000" style={{ backgroundImage: `url(${slide.url})`, opacity: currentSlide === index ? 1 : 0 }} />
+          <div key={index} className="hero-media absolute inset-0 bg-cover bg-center transition-opacity duration-1000 md:hidden motion-reduce:block" style={{ backgroundImage: `url(${slide.url})`, opacity: currentSlide === index ? 1 : 0 }} />
         ))}
+        <video
+          className="hero-media absolute inset-0 hidden h-full w-full object-cover object-center md:block motion-reduce:hidden"
+          autoPlay
+          muted
+          playsInline
+          preload="metadata"
+          poster={heroSlideshow[0]?.url}
+          aria-hidden="true"
+          onTimeUpdate={(event) => {
+            if (event.currentTarget.currentTime >= 7.45) event.currentTarget.currentTime = 0;
+          }}
+        >
+          <source src="/brand/chetesai-presentacion.mp4" type="video/mp4" />
+        </video>
         <div className="hero-shade absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-black/35" />
 
         <nav className="relative z-20 mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:px-8">
@@ -194,11 +227,47 @@ export default function Main() {
             <p className="mb-5 text-sm font-bold uppercase tracking-[0.18em] text-[#8cdb78]">Entrenamiento personal y grupos reducidos en Mallorca</p>
             <h1 className="max-w-3xl text-5xl font-black leading-[0.98] tracking-tight text-white md:text-7xl">Entrena con cabeza.<br /><span className="text-[#d8c7a5]">Mejora con método.</span></h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-white/75 md:text-xl">Un enfoque realista, progresivo y medible para mejorar tu condición física sin rutinas genéricas ni promesas de humo.</p>
-            <p className="mt-5 flex items-center gap-2 text-sm font-semibold text-[#9fe68f]"><Target className="h-4 w-4" />Valoración inicial y planificación personalizada</p>
+            <div className="mt-5 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+              <p className="flex items-center gap-2 text-sm font-semibold text-[#9fe68f]"><Target className="h-4 w-4" />Valoración inicial y planificación personalizada</p>
+              <button
+                type="button"
+                onClick={() => setShowPresentationVideo(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-black/35 px-4 py-2.5 text-sm font-bold text-white shadow-lg backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-[#8cdb78]/70 hover:bg-black/55 focus:outline-none focus:ring-2 focus:ring-[#8cdb78] focus:ring-offset-2 focus:ring-offset-black"
+              >
+                <PlayCircle className="h-5 w-5 text-[#9fe68f]" />
+                Ver presentación <span className="hidden sm:inline">con sonido</span>
+              </button>
+            </div>
           </div>
         </div>
 
       </section>
+
+      {showPresentationVideo ? (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 sm:p-8" role="dialog" aria-modal="true" aria-labelledby="presentation-video-title">
+          <button
+            type="button"
+            aria-label="Cerrar la presentación"
+            className="absolute inset-0 cursor-default bg-black/85 backdrop-blur-md"
+            onClick={() => setShowPresentationVideo(false)}
+          />
+          <div className="relative z-10 w-full max-w-5xl overflow-hidden rounded-[24px] border border-[#d7b86b]/40 bg-black shadow-2xl shadow-black/60 sm:rounded-[30px]">
+            <h2 id="presentation-video-title" className="sr-only">Presentación de Chetesaí Fitness+</h2>
+            <button
+              type="button"
+              aria-label="Cerrar vídeo"
+              onClick={() => setShowPresentationVideo(false)}
+              className="absolute right-3 top-3 z-20 grid h-11 w-11 place-items-center rounded-full border border-white/25 bg-black/70 text-white shadow-lg backdrop-blur-md transition hover:scale-105 hover:bg-black focus:outline-none focus:ring-2 focus:ring-[#8cdb78] sm:right-4 sm:top-4"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <video className="aspect-video w-full bg-black object-contain" controls autoPlay playsInline preload="metadata" poster={heroSlideshow[0]?.url}>
+              <source src="/brand/chetesai-presentacion.mp4" type="video/mp4" />
+              Tu navegador no puede reproducir este vídeo.
+            </video>
+          </div>
+        </div>
+      ) : null}
 
       <section id="servicios" className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
         <div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Servicios</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Todo lo que necesitas para entrenar mejor</h2><p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Atención cercana, planificación profesional y seguimiento para que el entrenamiento encaje en tu vida.</p></div>
