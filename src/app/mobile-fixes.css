@@ -36,39 +36,6 @@
     ) !important;
   }
 
-  #inicio header,
-  #inicio nav {
-    overflow: visible !important;
-  }
-
-  #inicio header > div,
-  #inicio nav > div {
-    flex-wrap: wrap !important;
-    row-gap: 0.75rem !important;
-  }
-
-  #inicio nav {
-    gap: 0.5rem !important;
-  }
-
-  #inicio nav > a:not([href="#contacto"]):not([href="#tarifas"]),
-  #inicio nav > button:not(:has(img[alt="Chetesaí Fitness+"])) {
-    display: none !important;
-  }
-
-  #inicio a[href="#contacto"],
-  #inicio a[href="#tarifas"] {
-    display: inline-flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    min-height: 44px;
-    flex: 1 1 calc(50% - 0.4rem);
-    justify-content: center;
-    white-space: nowrap;
-    padding-inline: 0.8rem !important;
-    font-size: 0.82rem !important;
-  }
-
   #inicio > div.relative.z-10.mx-auto.grid.max-w-7xl {
     display: block !important;
     width: 100% !important;
