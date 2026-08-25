@@ -283,7 +283,7 @@ export default function Main() {
             >
               <X className="h-5 w-5" />
             </button>
-            <video className="aspect-video w-full bg-black object-contain" controls autoPlay playsInline preload="metadata" poster="/brand/chetesai-hero-poster.webp">
+            <video className="aspect-video w-full bg-black object-contain" controls autoPlay playsInline preload="metadata" poster="/brand/chetesai-presentacion-poster.webp">
               <source src="/brand/chetesai-presentacion.mp4" type="video/mp4" />
               Tu navegador no puede reproducir este vídeo.
             </video>
