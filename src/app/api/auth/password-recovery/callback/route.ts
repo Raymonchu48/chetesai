@@ -12,6 +12,14 @@ type TokenResponse = {
 const INVALID_LINK_MESSAGE =
   "El enlace de recuperación ha caducado o ya se ha utilizado. Solicita uno nuevo.";
 
+function publicAppUrl(request: NextRequest) {
+  const configured = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
+  if (configured && !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configured)) {
+    return configured.replace(/\/$/, "");
+  }
+  return request.nextUrl.origin.replace(/\/$/, "");
+}
+
 function recoveryError(request: NextRequest, message: string) {
   const url = new URL("/forgot-password", request.url);
   url.searchParams.set("error", message);
@@ -70,7 +78,7 @@ export async function GET(request: NextRequest) {
     return recoveryError(request, INVALID_LINK_MESSAGE);
   }
 
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin).replace(/\/$/, "");
+  const appUrl = publicAppUrl(request);
   const response = NextResponse.redirect(`${appUrl}/reset-password`);
   const secure = process.env.NODE_ENV === "production";
 
