@@ -9,6 +9,9 @@ type TokenResponse = {
   msg?: string;
 };
 
+const INVALID_LINK_MESSAGE =
+  "El enlace de recuperación ha caducado o ya se ha utilizado. Solicita uno nuevo.";
+
 function recoveryError(request: NextRequest, message: string) {
   const url = new URL("/forgot-password", request.url);
   url.searchParams.set("error", message);
@@ -29,38 +32,42 @@ export async function GET(request: NextRequest) {
     request.nextUrl.searchParams.get("error_description") ||
     request.nextUrl.searchParams.get("error");
   if (callbackError) {
-    return recoveryError(request, callbackError);
+    return recoveryError(request, INVALID_LINK_MESSAGE);
   }
 
+  const tokenHash = request.nextUrl.searchParams.get("token_hash");
+  const verificationType = request.nextUrl.searchParams.get("type");
   const code = request.nextUrl.searchParams.get("code");
   const verifier = request.cookies.get("chetesai_recovery_pkce_verifier")?.value;
 
-  if (!code || !verifier) {
-    return recoveryError(
-      request,
-      "El enlace de recuperación ha caducado o ya se ha utilizado. Solicita uno nuevo."
-    );
+  let tokenResponse: Response;
+  if (tokenHash && verificationType === "recovery") {
+    tokenResponse = await fetch(`${supabaseUrl}/auth/v1/verify`, {
+      method: "POST",
+      headers: {
+        apikey: anonKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token_hash: tokenHash, type: "recovery" }),
+      cache: "no-store",
+    });
+  } else if (code && verifier) {
+    tokenResponse = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=pkce`, {
+      method: "POST",
+      headers: {
+        apikey: anonKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ auth_code: code, code_verifier: verifier }),
+      cache: "no-store",
+    });
+  } else {
+    return recoveryError(request, INVALID_LINK_MESSAGE);
   }
-
-  const tokenResponse = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=pkce`, {
-    method: "POST",
-    headers: {
-      apikey: anonKey,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ auth_code: code, code_verifier: verifier }),
-    cache: "no-store",
-  });
 
   const tokenData = (await tokenResponse.json()) as TokenResponse;
   if (!tokenResponse.ok || !tokenData.access_token) {
-    return recoveryError(
-      request,
-      tokenData.error_description ||
-        tokenData.msg ||
-        tokenData.error ||
-        "No se pudo validar el enlace de recuperación"
-    );
+    return recoveryError(request, INVALID_LINK_MESSAGE);
   }
 
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin).replace(/\/$/, "");
