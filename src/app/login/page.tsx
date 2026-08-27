@@ -200,7 +200,7 @@ export default function LoginPage() {
               className="flex h-14 w-full items-center justify-center gap-3 rounded-xl border border-[#d9dde2] bg-white text-base font-bold text-[#07182b] shadow-sm transition hover:border-[#bfc5cc] hover:bg-[#fafafa] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <GoogleIcon />
-              {googleLoading ? "Conectando con Google..." : "Continúa con Google"}
+              {googleLoading ? "Conectando con Google..." : "Continuar con Google"}
             </button>
 
             <div className="flex gap-3 rounded-2xl border border-[#cbd9b4] bg-[#f7fbef] px-4 py-4 text-sm leading-relaxed text-[#315f22]">
