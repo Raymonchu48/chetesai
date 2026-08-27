@@ -16,6 +16,14 @@ type TokenResponse = {
   msg?: string;
 };
 
+function publicAppUrl(request: NextRequest) {
+  const configured = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
+  if (configured && !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configured)) {
+    return configured.replace(/\/$/, "");
+  }
+  return request.nextUrl.origin.replace(/\/$/, "");
+}
+
 function loginError(request: NextRequest, message: string) {
   const url = new URL("/login", request.url);
   url.searchParams.set("oauthError", message);
@@ -140,7 +148,7 @@ export async function GET(request: NextRequest) {
     return loginError(request, "Esta cuenta corresponde al acceso de cliente. Selecciona Cliente.");
   }
 
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin).replace(/\/$/, "");
+  const appUrl = publicAppUrl(request);
   const response = NextResponse.redirect(`${appUrl}${isClientAccount ? "/portal" : "/dashboard"}`);
   const secure = process.env.NODE_ENV === "production";
 
