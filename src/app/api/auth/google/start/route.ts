@@ -11,6 +11,14 @@ function base64Url(input: Buffer) {
     .replace(/=+$/g, "");
 }
 
+function publicAppUrl(request: NextRequest) {
+  const configured = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
+  if (configured && !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configured)) {
+    return configured.replace(/\/$/, "");
+  }
+  return request.nextUrl.origin.replace(/\/$/, "");
+}
+
 function loginError(request: NextRequest, message: string) {
   const url = new URL("/login", request.url);
   url.searchParams.set("oauthError", message);
@@ -32,7 +40,7 @@ export async function GET(request: NextRequest) {
 
   const verifier = base64Url(randomBytes(64));
   const challenge = base64Url(createHash("sha256").update(verifier).digest());
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin).replace(/\/$/, "");
+  const appUrl = publicAppUrl(request);
   const callbackUrl = `${appUrl}/api/auth/google/callback`;
 
   const authorizeUrl = new URL(`${supabaseUrl.replace(/\/$/, "")}/auth/v1/authorize`);
@@ -60,7 +68,7 @@ export async function GET(request: NextRequest) {
       };
       const raw = data.error_description || data.msg || data.message || "";
       if (/provider.*not enabled|unsupported provider/i.test(raw)) {
-        message = "Google todavía no está habilitado en Supabase";
+        message = "El acceso con Google todavía no está disponible.";
       } else if (raw) {
         message = raw;
       }
