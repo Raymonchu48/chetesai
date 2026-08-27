@@ -1,19 +1,67 @@
-import { createHash, randomBytes } from "crypto";
+import { createHmac } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { buildPasswordRecoveryEmail } from "@/lib/password-recovery-email";
 
-function base64Url(input: Buffer) {
-  return input
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
+type GenerateLinkResponse = {
+  action_link?: string;
+  hashed_token?: string;
+  verification_type?: string;
+};
+
+function genericSuccess() {
+  return NextResponse.json({
+    ok: true,
+    message: "Si existe una cuenta con ese correo, recibirás un enlace para crear una nueva contraseña.",
+  });
+}
+
+function privateHash(value: string, secret: string) {
+  return createHmac("sha256", secret).update(value).digest("hex");
+}
+
+function clientIp(request: NextRequest) {
+  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip")?.trim() ||
+    "unknown";
+}
+
+function brandedSender(value: string) {
+  return value.includes("<") ? value : `Chetesaí Fitness+ <${value}>`;
+}
+
+async function checkRateLimit(
+  supabaseUrl: string,
+  serviceKey: string,
+  emailHash: string,
+  ipHash: string
+) {
+  const response = await fetch(`${supabaseUrl}/rest/v1/rpc/check_password_recovery_rate_limit`, {
+    method: "POST",
+    headers: {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ p_email_hash: emailHash, p_ip_hash: ipHash }),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    console.error("Password recovery rate limit failed", response.status, await response.text());
+    return false;
+  }
+
+  return (await response.json()) === true;
 }
 
 export async function POST(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.AUTH_FROM_EMAIL || process.env.BOOKING_FROM_EMAIL;
+  const replyTo = process.env.AUTH_REPLY_TO || process.env.BOOKING_REPLY_TO;
 
-  if (!supabaseUrl || !anonKey) {
+  if (!supabaseUrl || !serviceKey || !resendApiKey || !fromEmail) {
     return NextResponse.json(
       { ok: false, error: "El servicio de recuperación no está configurado" },
       { status: 500 }
@@ -35,60 +83,67 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const verifier = base64Url(randomBytes(64));
-  const challenge = base64Url(createHash("sha256").update(verifier).digest());
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin).replace(/\/$/, "");
   const callbackUrl = `${appUrl}/api/auth/password-recovery/callback`;
+  const emailHash = privateHash(email, serviceKey);
+  const ipHash = privateHash(clientIp(request), serviceKey);
 
-  const recoveryUrl = new URL(`${supabaseUrl}/auth/v1/recover`);
-  recoveryUrl.searchParams.set("redirect_to", callbackUrl);
+  if (!(await checkRateLimit(supabaseUrl, serviceKey, emailHash, ipHash))) {
+    return genericSuccess();
+  }
 
-  const recoveryResponse = await fetch(recoveryUrl, {
+  const linkResponse = await fetch(`${supabaseUrl}/auth/v1/admin/generate_link`, {
     method: "POST",
     headers: {
-      apikey: anonKey,
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      type: "recovery",
       email,
-      code_challenge: challenge,
-      code_challenge_method: "s256",
+      redirect_to: callbackUrl,
     }),
     cache: "no-store",
   });
 
-  if (!recoveryResponse.ok) {
-    let message = "No se pudo enviar el correo de recuperación";
-    try {
-      const errorData = (await recoveryResponse.json()) as {
-        msg?: string;
-        message?: string;
-        error_description?: string;
-      };
-      message = errorData.error_description || errorData.msg || errorData.message || message;
-    } catch {
-      // Keep the generic message.
-    }
-
-    if (recoveryResponse.status === 429) {
-      message = "Has solicitado varios correos recientemente. Espera un minuto y vuelve a intentarlo.";
-    }
-
-    return NextResponse.json({ ok: false, error: message }, { status: recoveryResponse.status });
+  if (!linkResponse.ok) {
+    console.warn("Password recovery link was not generated", linkResponse.status);
+    return genericSuccess();
   }
 
-  const response = NextResponse.json({
-    ok: true,
-    message: "Si existe una cuenta con ese correo, recibirás un enlace para crear una nueva contraseña.",
+  const linkData = (await linkResponse.json()) as GenerateLinkResponse;
+  if (!linkData.hashed_token || linkData.verification_type !== "recovery") {
+    console.error("Password recovery link response was incomplete");
+    return genericSuccess();
+  }
+
+  const brandedRecoveryUrl = new URL(callbackUrl);
+  brandedRecoveryUrl.searchParams.set("token_hash", linkData.hashed_token);
+  brandedRecoveryUrl.searchParams.set("type", "recovery");
+  const emailContent = buildPasswordRecoveryEmail(brandedRecoveryUrl.toString());
+
+  const emailResponse = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${resendApiKey}`,
+      "Content-Type": "application/json",
+      "User-Agent": "ChetesaiFitness/1.0",
+      "Idempotency-Key": `password-recovery-${emailHash}-${Math.floor(Date.now() / 60_000)}`,
+    },
+    body: JSON.stringify({
+      from: brandedSender(fromEmail),
+      to: [email],
+      ...(replyTo ? { reply_to: replyTo } : {}),
+      subject: emailContent.subject,
+      html: emailContent.html,
+      text: emailContent.text,
+    }),
   });
 
-  response.cookies.set("chetesai_recovery_pkce_verifier", verifier, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60,
-  });
+  if (!emailResponse.ok) {
+    console.error("Password recovery email failed", emailResponse.status, await emailResponse.text());
+  }
 
-  return response;
+  return genericSuccess();
 }
