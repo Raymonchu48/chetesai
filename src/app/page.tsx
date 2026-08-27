@@ -177,10 +177,10 @@ export default function Main() {
   return (
     <main className="min-h-screen bg-[#f7f4ee] pt-20 text-[#202724]">
       <header className="fixed inset-x-0 top-0 z-[75] border-b border-[#b38d45]/25 bg-[#0b100d]/95 text-white shadow-xl shadow-black/25 backdrop-blur-xl">
-        <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-3 pl-[5rem] pr-4 sm:pl-[5.25rem] sm:pr-5 lg:pr-8 xl:px-8" aria-label="Navegación principal">
-          <button type="button" onClick={() => goTo("inicio")} className="flex min-w-0 shrink-0 items-center gap-3 text-left">
-            <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl border border-[#b38d45]/35 bg-[#101713] p-1.5 shadow-lg"><img src={files.logo.url} alt="Chetesaí Fitness+" className="h-full w-full object-contain" /></div>
-            <div className="hidden sm:block"><p className="font-bold leading-tight text-white">Chetesaí Fitness+</p><p className="text-xs text-white/55">Entrenamiento personalizado</p></div>
+        <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-2 pl-[4.75rem] pr-3 sm:gap-3 sm:pl-[5.25rem] sm:pr-5 lg:pr-8 xl:px-8" aria-label="Navegación principal">
+          <button type="button" onClick={() => goTo("inicio")} className="flex min-w-0 flex-1 items-center gap-2 rounded-2xl border border-[#b38d45]/35 bg-[#101713] p-1 text-left shadow-lg sm:max-w-none sm:flex-initial sm:shrink-0 sm:gap-3 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
+            <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl p-1 sm:h-12 sm:w-12 sm:rounded-2xl sm:border sm:border-[#b38d45]/35 sm:bg-[#101713] sm:p-1.5 sm:shadow-lg"><img src={files.logo.url} alt="Chetesaí Fitness+" className="h-full w-full object-contain" /></div>
+            <div className="min-w-0 pr-1 sm:pr-0"><p className="truncate text-[11px] font-bold leading-tight text-white sm:text-base">Chetesaí Fitness+</p><p className="truncate text-[9px] leading-tight text-white/55 sm:text-xs">Entrenamiento personalizado</p></div>
           </button>
           <div className="hidden items-center gap-7 text-sm font-medium text-white/75 xl:flex">
             <button type="button" onClick={() => goTo("servicios")} className="transition hover:text-white">Servicios</button>
