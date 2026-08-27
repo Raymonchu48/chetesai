@@ -29,6 +29,14 @@ function brandedSender(value: string) {
   return value.includes("<") ? value : `Chetesaí Fitness+ <${value}>`;
 }
 
+function publicAppUrl(request: NextRequest) {
+  const configured = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
+  if (configured && !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configured)) {
+    return configured.replace(/\/$/, "");
+  }
+  return request.nextUrl.origin.replace(/\/$/, "");
+}
+
 async function checkRateLimit(
   supabaseUrl: string,
   serviceKey: string,
@@ -83,7 +91,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin).replace(/\/$/, "");
+  const appUrl = publicAppUrl(request);
   const callbackUrl = `${appUrl}/api/auth/password-recovery/callback`;
   const emailHash = privateHash(email, serviceKey);
   const ipHash = privateHash(clientIp(request), serviceKey);
