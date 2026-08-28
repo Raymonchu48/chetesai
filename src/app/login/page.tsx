@@ -19,6 +19,104 @@ type LoginResponse = {
 const BRAND_LOCKUP = "/brand/chetesai-login-lockup.svg";
 
 function ProfessionalIcon({ active }: { active: boolean }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="7" r="3" />
+      <path d="M5 21v-2a7 7 0 0 1 14 0v2M8 11l4 2 4-2" />
+      {active ? <path d="M3 8h3M18 8h3" /> : null}
+    </svg>
+  );
+}
+
+function ClientIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="7" r="3" />
+      <path d="M5 21v-2a7 7 0 0 1 14 0v2" />
+    </svg>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5">
+      <path fill="#4285F4" d="M21.6 12.227c0-.709-.064-1.391-.182-2.045H12v3.868h5.382a4.6 4.6 0 0 1-1.995 3.018v2.509h3.227c1.89-1.741 2.986-4.305 2.986-7.35Z" />
+      <path fill="#34A853" d="M12 22c2.7 0 4.964-.895 6.614-2.423l-3.227-2.509c-.895.6-2.041.955-3.387.955-2.605 0-4.809-1.759-5.6-4.123H3.064v2.591A9.997 9.997 0 0 0 12 22Z" />
+      <path fill="#FBBC05" d="M6.4 13.9A6.02 6.02 0 0 1 6.086 12c0-.659.114-1.3.314-1.9V7.509H3.064A9.997 9.997 0 0 0 2 12c0 1.614.386 3.141 1.064 4.491L6.4 13.9Z" />
+      <path fill="#EA4335" d="M12 5.977c1.468 0 2.786.505 3.823 1.495l2.864-2.863C16.959 2.995 14.695 2 12 2a9.997 9.997 0 0 0-8.936 5.509L6.4 10.1c.791-2.364 2.995-4.123 5.6-4.123Z" />
+    </svg>
+  );
+}
+
+export default function LoginPage() {
+  const router = useRouter();
+  const [accessRole, setAccessRole] = useState<AccessRole>("profesional");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    const savedEmail = window.localStorage.getItem("chetesai_login_email");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const oauthError = params.get("oauthError");
+    if (oauthError) setError(oauthError);
+    if (params.get("passwordReset") === "1") {
+      setNotice("Contraseña actualizada correctamente. Ya puedes iniciar sesión con tu nueva contraseña.");
+    }
+  }, []);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setNotice("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, accessRole }),
+      });
+      const data = (await response.json()) as LoginResponse;
+
+      if (!response.ok || !data.ok) {
+        setError(data.error || "No se pudo iniciar sesión");
+        return;
+      }
+
+      if (rememberMe) window.localStorage.setItem("chetesai_login_email", email);
+      else window.localStorage.removeItem("chetesai_login_email");
+
+      router.replace(data.redirectTo || (accessRole === "cliente" ? "/portal" : "/dashboard"));
+      router.refresh();
+    } catch {
+      setError("No se pudo conectar con el servidor");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleGoogleLogin() {
+    setError("");
+    setNotice("");
+    setGoogleLoading(true);
+    window.location.assign(`/api/auth/google/start?role=${accessRole}`);
+  }
+
+  const forgotPasswordHref = email.trim()
+    ? `/forgot-password?email=${encodeURIComponent(email.trim())}`
+    : "/forgot-password";
+
   const roleDescription =
     accessRole === "profesional"
       ? "Gestiona clientes, planes y evolución desde un único espacio."
@@ -83,27 +181,15 @@ function ProfessionalIcon({ active }: { active: boolean }) {
           </div>
 
           <div className="mb-6 grid grid-cols-2 rounded-2xl border border-[#e2e6e8] bg-[#eef1ef] p-1.5 shadow-inner" role="tablist" aria-label="Tipo de acceso">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={accessRole === "profesional"}
-              onClick={() => { setAccessRole("profesional"); setError(""); }}
-              className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "profesional" ? "bg-gradient-to-r from-[#9af51e] to-[#82e900] text-[#07182b] shadow-[0_9px_24px_rgba(142,229,0,0.28)]" : "text-[#6f7988] hover:text-[#07182b]")}
-            >
+            <button type="button" role="tab" aria-selected={accessRole === "profesional"} onClick={() => { setAccessRole("profesional"); setError(""); }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "profesional" ? "bg-gradient-to-r from-[#9af51e] to-[#82e900] text-[#07182b] shadow-[0_9px_24px_rgba(142,229,0,0.28)]" : "text-[#6f7988] hover:text-[#07182b]")}>
               <ProfessionalIcon active={accessRole === "profesional"} /> <span>Profesional</span>
             </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={accessRole === "cliente"}
-              onClick={() => { setAccessRole("cliente"); setError(""); }}
-              className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "cliente" ? "bg-gradient-to-r from-[#9af51e] to-[#82e900] text-[#07182b] shadow-[0_9px_24px_rgba(142,229,0,0.28)]" : "text-[#6f7988] hover:text-[#07182b]")}
-            >
+            <button type="button" role="tab" aria-selected={accessRole === "cliente"} onClick={() => { setAccessRole("cliente"); setError(""); }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "cliente" ? "bg-gradient-to-r from-[#9af51e] to-[#82e900] text-[#07182b] shadow-[0_9px_24px_rgba(142,229,0,0.28)]" : "text-[#6f7988] hover:text-[#07182b]")}>
               <ClientIcon /> <span>Cliente</span>
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4.5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email" className="font-bold text-[#07182b]">Correo electrónico</Label>
               <div className="relative">
@@ -136,7 +222,7 @@ function ProfessionalIcon({ active }: { active: boolean }) {
             {notice ? <div className="rounded-xl border border-[#cbd9b4] bg-[#f7fbef] px-4 py-3 text-sm font-medium text-[#315f22]">{notice}</div> : null}
             {error ? <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</div> : null}
 
-            <Button type="submit" disabled={loading || googleLoading} className="h-15 w-full rounded-xl bg-gradient-to-r from-[#9af51e] to-[#82e900] text-base font-black text-[#07182b] shadow-[0_12px_30px_rgba(142,229,0,0.28)] transition hover:-translate-y-0.5 hover:from-[#a5fa34] hover:to-[#8ef000] hover:shadow-[0_16px_36px_rgba(142,229,0,0.34)] sm:text-lg">
+            <Button type="submit" disabled={loading || googleLoading} className="h-16 w-full rounded-xl bg-gradient-to-r from-[#9af51e] to-[#82e900] text-base font-black text-[#07182b] shadow-[0_12px_30px_rgba(142,229,0,0.28)] transition hover:-translate-y-0.5 hover:from-[#a5fa34] hover:to-[#8ef000] hover:shadow-[0_16px_36px_rgba(142,229,0,0.34)] sm:text-lg">
               {loading ? "Comprobando acceso..." : "Entrar como " + (accessRole === "cliente" ? "cliente" : "profesional") + "  →"}
             </Button>
 
@@ -146,12 +232,7 @@ function ProfessionalIcon({ active }: { active: boolean }) {
               <span className="h-px flex-1 bg-[#dfe4e6]" />
             </div>
 
-            <button
-              type="button"
-              onClick={handleGoogleLogin}
-              disabled={loading || googleLoading}
-              className="flex h-13 w-full items-center justify-center gap-3 rounded-xl border border-[#d6dce0] bg-white text-sm font-bold text-[#07182b] shadow-[0_5px_16px_rgba(7,24,43,0.06)] transition hover:border-[#b9c3ca] hover:bg-[#f9faf9] disabled:cursor-not-allowed disabled:opacity-60 sm:text-base"
-            >
+            <button type="button" onClick={handleGoogleLogin} disabled={loading || googleLoading} className="flex h-14 w-full items-center justify-center gap-3 rounded-xl border border-[#d6dce0] bg-white text-sm font-bold text-[#07182b] shadow-[0_5px_16px_rgba(7,24,43,0.06)] transition hover:border-[#b9c3ca] hover:bg-[#f9faf9] disabled:cursor-not-allowed disabled:opacity-60 sm:text-base">
               <GoogleIcon />
               {googleLoading ? "Conectando con Google..." : "Continuar con Google"}
             </button>
