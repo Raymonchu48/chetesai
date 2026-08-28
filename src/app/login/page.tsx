@@ -173,14 +173,23 @@ export default function LoginPage() {
           <p className="relative mt-5 hidden text-xs text-white/40 lg:block">Chetesaí Fitness+ · Carga tus energías</p>
         </aside>
 
-        <div className="px-5 py-6 sm:px-10 sm:py-9 lg:px-12 lg:py-10">
+        <div className="relative isolate overflow-hidden bg-[linear-gradient(145deg,#fbfaf5_0%,#f3f7ec_52%,#eaf1ee_100%)] px-5 py-6 sm:px-10 sm:py-9 lg:px-12 lg:py-10">
+          <div aria-hidden="true" className="pointer-events-none absolute -right-20 top-8 h-56 w-56 rounded-full bg-[#8ef000]/10 blur-3xl sm:h-72 sm:w-72" />
+          <div aria-hidden="true" className="pointer-events-none absolute -left-24 bottom-10 h-52 w-52 rounded-full bg-[#c7a254]/10 blur-3xl" />
+          <img
+            aria-hidden="true"
+            src="/brand/chetesai-legacy-watermark.jpg"
+            alt=""
+            className="pointer-events-none absolute left-1/2 top-[48%] w-[82%] max-w-[470px] -translate-x-1/2 -translate-y-1/2 select-none object-contain opacity-[0.09] grayscale contrast-150 mix-blend-multiply"
+          />
+          <div className="relative z-10">
           <div className="mb-6">
             <p className="mb-2 text-[11px] font-black tracking-[0.28em] text-[#579600] sm:text-xs">BIENVENIDO DE NUEVO</p>
             <h1 className="text-[36px] font-black leading-none tracking-[-0.045em] text-[#07182b] sm:text-[46px]">Iniciar sesión</h1>
             <p className="mt-3 min-h-10 text-sm leading-relaxed text-[#687585] sm:text-base" aria-live="polite">{roleDescription}</p>
           </div>
 
-          <div className="mb-6 grid grid-cols-2 rounded-2xl border border-[#e2e6e8] bg-[#eef1ef] p-1.5 shadow-inner" role="tablist" aria-label="Tipo de acceso">
+          <div className="mb-6 grid grid-cols-2 rounded-2xl border border-[#e2e6e8] bg-[#e8eee7]/90 p-1.5 shadow-inner" role="tablist" aria-label="Tipo de acceso">
             <button type="button" role="tab" aria-selected={accessRole === "profesional"} onClick={() => { setAccessRole("profesional"); setError(""); }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "profesional" ? "bg-gradient-to-r from-[#9af51e] to-[#82e900] text-[#07182b] shadow-[0_9px_24px_rgba(142,229,0,0.28)]" : "text-[#6f7988] hover:text-[#07182b]")}>
               <ProfessionalIcon active={accessRole === "profesional"} /> <span>Profesional</span>
             </button>
@@ -194,7 +203,7 @@ export default function LoginPage() {
               <Label htmlFor="email" className="font-bold text-[#07182b]">Correo electrónico</Label>
               <div className="relative">
                 <svg aria-hidden="true" viewBox="0 0 24 24" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#84909e]" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-                <Input id="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="correo@ejemplo.com" required className="h-14 rounded-xl border-[#d8dee2] bg-[#f5f7f7] pl-12 pr-4 text-base shadow-inner transition focus-visible:border-[#79c900] focus-visible:bg-white focus-visible:ring-[#8ee500]/25" />
+                <Input id="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="correo@ejemplo.com" required className="h-14 rounded-xl border-[#d8dee2] bg-white/72 pl-12 pr-4 text-base shadow-inner transition focus-visible:border-[#79c900] focus-visible:bg-white focus-visible:ring-[#8ee500]/25" />
               </div>
             </div>
 
@@ -202,7 +211,7 @@ export default function LoginPage() {
               <Label htmlFor="password" className="font-bold text-[#07182b]">Contraseña</Label>
               <div className="relative">
                 <svg aria-hidden="true" viewBox="0 0 24 24" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#84909e]" fill="none" stroke="currentColor" strokeWidth="2"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-                <Input id="password" type={showPassword ? "text" : "password"} autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="••••••••" required className="h-14 rounded-xl border-[#d8dee2] bg-[#f5f7f7] pl-12 pr-12 text-base shadow-inner transition focus-visible:border-[#79c900] focus-visible:bg-white focus-visible:ring-[#8ee500]/25" />
+                <Input id="password" type={showPassword ? "text" : "password"} autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="••••••••" required className="h-14 rounded-xl border-[#d8dee2] bg-white/72 pl-12 pr-12 text-base shadow-inner transition focus-visible:border-[#79c900] focus-visible:bg-white focus-visible:ring-[#8ee500]/25" />
                 <button type="button" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#84909e] transition hover:text-[#07182b]">
                   <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg>
                 </button>
@@ -232,7 +241,7 @@ export default function LoginPage() {
               <span className="h-px flex-1 bg-[#dfe4e6]" />
             </div>
 
-            <button type="button" onClick={handleGoogleLogin} disabled={loading || googleLoading} className="flex h-14 w-full items-center justify-center gap-3 rounded-xl border border-[#d6dce0] bg-white text-sm font-bold text-[#07182b] shadow-[0_5px_16px_rgba(7,24,43,0.06)] transition hover:border-[#b9c3ca] hover:bg-[#f9faf9] disabled:cursor-not-allowed disabled:opacity-60 sm:text-base">
+            <button type="button" onClick={handleGoogleLogin} disabled={loading || googleLoading} className="flex h-14 w-full items-center justify-center gap-3 rounded-xl border border-[#d6dce0] bg-white/80 text-sm font-bold text-[#07182b] shadow-[0_5px_16px_rgba(7,24,43,0.06)] transition hover:border-[#b9c3ca] hover:bg-[#f9faf9] disabled:cursor-not-allowed disabled:opacity-60 sm:text-base">
               <GoogleIcon />
               {googleLoading ? "Conectando con Google..." : "Continuar con Google"}
             </button>
@@ -242,6 +251,7 @@ export default function LoginPage() {
               <p>El acceso y los permisos dependen del rol asignado a cada cuenta.</p>
             </div>
           </form>
+          </div>
         </div>
       </section>
     </main>
