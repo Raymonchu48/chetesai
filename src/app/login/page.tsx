@@ -190,10 +190,10 @@ export default function LoginPage() {
           </div>
 
           <div className="mb-6 grid grid-cols-2 rounded-2xl border border-[#e2e6e8] bg-[#e8eee7]/90 p-1.5 shadow-inner" role="tablist" aria-label="Tipo de acceso">
-            <button type="button" role="tab" aria-selected={accessRole === "profesional"} onClick={() => { setAccessRole("profesional"); setError(""); }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "profesional" ? "bg-gradient-to-r from-[#9af51e] to-[#82e900] text-[#07182b] shadow-[0_9px_24px_rgba(142,229,0,0.28)]" : "text-[#6f7988] hover:text-[#07182b]")}>
+            <button type="button" role="tab" aria-selected={accessRole === "profesional"} onClick={() => { setAccessRole("profesional"); setError(""); }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "profesional" ? "bg-gradient-to-r from-[#7f9f52] to-[#66853f] text-[#07182b] shadow-[0_9px_22px_rgba(69,96,42,0.22)]" : "text-[#6f7988] hover:text-[#07182b]")}>
               <ProfessionalIcon active={accessRole === "profesional"} /> <span>Profesional</span>
             </button>
-            <button type="button" role="tab" aria-selected={accessRole === "cliente"} onClick={() => { setAccessRole("cliente"); setError(""); }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "cliente" ? "bg-gradient-to-r from-[#9af51e] to-[#82e900] text-[#07182b] shadow-[0_9px_24px_rgba(142,229,0,0.28)]" : "text-[#6f7988] hover:text-[#07182b]")}>
+            <button type="button" role="tab" aria-selected={accessRole === "cliente"} onClick={() => { setAccessRole("cliente"); setError(""); }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "cliente" ? "bg-gradient-to-r from-[#7f9f52] to-[#66853f] text-[#07182b] shadow-[0_9px_22px_rgba(69,96,42,0.22)]" : "text-[#6f7988] hover:text-[#07182b]")}>
               <ClientIcon /> <span>Cliente</span>
             </button>
           </div>
@@ -231,7 +231,7 @@ export default function LoginPage() {
             {notice ? <div className="rounded-xl border border-[#cbd9b4] bg-[#f7fbef] px-4 py-3 text-sm font-medium text-[#315f22]">{notice}</div> : null}
             {error ? <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</div> : null}
 
-            <Button type="submit" disabled={loading || googleLoading} className="h-16 w-full rounded-xl bg-gradient-to-r from-[#9af51e] to-[#82e900] text-base font-black text-[#07182b] shadow-[0_12px_30px_rgba(142,229,0,0.28)] transition hover:-translate-y-0.5 hover:from-[#a5fa34] hover:to-[#8ef000] hover:shadow-[0_16px_36px_rgba(142,229,0,0.34)] sm:text-lg">
+            <Button type="submit" disabled={loading || googleLoading} className="h-16 w-full rounded-xl bg-gradient-to-r from-[#7f9f52] to-[#66853f] text-base font-black text-[#07182b] shadow-[0_12px_28px_rgba(69,96,42,0.24)] transition hover:-translate-y-0.5 hover:from-[#76964b] hover:to-[#5d7939] hover:shadow-[0_15px_32px_rgba(69,96,42,0.28)] sm:text-lg">
               {loading ? "Comprobando acceso..." : "Entrar como " + (accessRole === "cliente" ? "cliente" : "profesional") + "  →"}
             </Button>
 
