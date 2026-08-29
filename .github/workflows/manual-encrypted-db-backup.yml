@@ -1,15 +1,21 @@
-name: Manual encrypted database backup
+name: Encrypted database and private files backup
 
 on:
+  schedule:
+    - cron: "23 2 * * 0"
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: chetesai-production-backup
+  cancel-in-progress: false
+
 jobs:
   backup:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Prepare PostgreSQL 17 client
         run: |
@@ -19,9 +25,11 @@ jobs:
       - name: Validate required secrets
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           BACKUP_ENCRYPTION_PASSWORD: ${{ secrets.BACKUP_ENCRYPTION_PASSWORD }}
         run: |
           test -n "$SUPABASE_DB_URL" || (echo "Missing SUPABASE_DB_URL" && exit 1)
+          test -n "$SUPABASE_SERVICE_ROLE_KEY" || (echo "Missing SUPABASE_SERVICE_ROLE_KEY" && exit 1)
           test -n "$BACKUP_ENCRYPTION_PASSWORD" || (echo "Missing BACKUP_ENCRYPTION_PASSWORD" && exit 1)
 
       - name: Create PostgreSQL backup
@@ -35,20 +43,55 @@ jobs:
             postgres:17 \
             sh -lc 'pg_dump "$SUPABASE_DB_URL" --format=custom --no-owner --no-acl --file="/backup/chetesai.dump" && pg_restore --list "/backup/chetesai.dump" > /dev/null'
 
+      - name: Back up private progress photos
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          mkdir -p backup/storage/progress-photos
+          docker run --rm \
+            -e SUPABASE_DB_URL \
+            -v "$PWD/backup:/backup" \
+            postgres:17 \
+            sh -lc 'psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -At -c "select name from storage.objects where bucket_id = '\''progress-photos'\'' order by name" > /backup/progress-photo-paths.txt'
+
+          while IFS= read -r object_path; do
+            test -n "$object_path" || continue
+            case "$object_path" in
+              /*|*".."*) echo "Unsafe storage path detected"; exit 1 ;;
+            esac
+            destination="backup/storage/progress-photos/$object_path"
+            mkdir -p "$(dirname "$destination")"
+            encoded_path=$(printf '%s' "$object_path" | jq -sRr @uri | sed 's/%2F/\//g')
+            curl --fail --silent --show-error --location \
+              --header "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+              --header "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+              "https://wbtylhjdhxnddzvekkyw.supabase.co/storage/v1/object/progress-photos/$encoded_path" \
+              --output "$destination"
+          done < backup/progress-photo-paths.txt
+
+          find backup/storage -type f -print0 | sort -z | xargs -0 sha256sum > backup/storage-sha256.txt
+
       - name: Encrypt backup
         env:
           BACKUP_ENCRYPTION_PASSWORD: ${{ secrets.BACKUP_ENCRYPTION_PASSWORD }}
         run: |
+          tar -C backup -czf backup/chetesai-backup.tar.gz \
+            chetesai.dump storage progress-photo-paths.txt storage-sha256.txt
           openssl enc -aes-256-cbc -salt -pbkdf2 \
-            -in "backup/chetesai.dump" \
-            -out "backup/chetesai-${GITHUB_RUN_ID}.dump.enc" \
+            -in "backup/chetesai-backup.tar.gz" \
+            -out "backup/chetesai-${GITHUB_RUN_ID}.tar.gz.enc" \
             -pass env:BACKUP_ENCRYPTION_PASSWORD
-          rm -f "backup/chetesai.dump"
+          openssl enc -d -aes-256-cbc -pbkdf2 \
+            -in "backup/chetesai-${GITHUB_RUN_ID}.tar.gz.enc" \
+            -pass env:BACKUP_ENCRYPTION_PASSWORD | tar -tzf - > /dev/null
+          rm -rf backup/chetesai.dump backup/chetesai-backup.tar.gz backup/storage \
+            backup/progress-photo-paths.txt backup/storage-sha256.txt
 
       - name: Upload encrypted artifact
         uses: actions/upload-artifact@v6
         with:
-          name: chetesai-db-backup-${{ github.run_id }}
+          name: chetesai-encrypted-backup-${{ github.run_id }}
           path: backup/*.enc
-          retention-days: 14
+          retention-days: 30
           if-no-files-found: error

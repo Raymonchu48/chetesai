@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { privacyErrorStatus, requireConsent } from "@/lib/privacy-server";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -62,6 +63,7 @@ export async function GET(request: NextRequest) {
     if (!/^[0-9a-f-]+\/[0-9a-f-]+\/(frontal|lateral|posterior)-\d+\.(jpg|png|webp)$/i.test(path)) {
       return NextResponse.json({ ok: false, error: "Ruta de fotografía no válida" }, { status: 400 });
     }
+    await requireConsent(path.split("/", 1)[0], "progress_photos");
 
     const response = await fetch(`${supabaseUrl}/storage/v1/object/${bucket}/${encodeURI(path)}`, {
       headers: storageHeaders(),
@@ -79,7 +81,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al cargar la fotografía";
-    const status = message === "No autenticado" ? 401 : message === "No autorizado" ? 403 : 500;
+    const status = privacyErrorStatus(message);
     return NextResponse.json({ ok: false, error: message }, { status });
   }
 }
@@ -98,6 +100,7 @@ export async function POST(request: NextRequest) {
     if (!(file instanceof File)) return NextResponse.json({ ok: false, error: "Selecciona una fotografía" }, { status: 400 });
     if (!(pose in fieldByPose)) return NextResponse.json({ ok: false, error: "Posición no válida" }, { status: 400 });
     if (!validUuid(clienteId) || !validUuid(medicionId)) return NextResponse.json({ ok: false, error: "Medición no válida" }, { status: 400 });
+    await requireConsent(clienteId, "progress_photos");
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       return NextResponse.json({ ok: false, error: "Usa una imagen JPG, PNG o WebP" }, { status: 400 });
     }
@@ -147,7 +150,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, data: { pose, field, path } });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al subir la fotografía";
-    const status = message === "No autenticado" ? 401 : message === "No autorizado" ? 403 : 500;
+    const status = privacyErrorStatus(message);
     return NextResponse.json({ ok: false, error: message }, { status });
   }
 }

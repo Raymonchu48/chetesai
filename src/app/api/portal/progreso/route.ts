@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { getConsentState, privacyErrorStatus, requireConsent } from "@/lib/privacy-server";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -52,13 +53,21 @@ function optionalNumber(value: unknown) {
 export async function GET() {
   try {
     const { client } = await getClient();
+    await requireConsent(client.id, "health_data");
+    const photoConsent = (await getConsentState(client.id)).progress_photos.granted === true;
     const rows = await serviceRequest<Array<Record<string, unknown>>>(
       `mediciones_corporales?cliente_id=eq.${encodeURIComponent(client.id)}&select=id,fecha,peso_kg,altura_cm,grasa_corporal_pct,masa_muscular_kg,agua_corporal_pct,pecho_cm,cintura_cm,cadera_cm,brazo_izq_cm,brazo_der_cm,muslo_izq_cm,muslo_der_cm,foto_frontal_path,foto_lateral_path,foto_posterior_path,comentario_cliente,origen,created_at&order=fecha.desc,created_at.desc`
     );
-    return NextResponse.json({ ok: true, data: { cliente: client, mediciones: rows } });
+    const safeRows = photoConsent ? rows : rows.map((row) => ({
+      ...row,
+      foto_frontal_path: null,
+      foto_lateral_path: null,
+      foto_posterior_path: null,
+    }));
+    return NextResponse.json({ ok: true, data: { cliente: client, mediciones: safeRows } });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al cargar tu progreso";
-    const status = message === "No autenticado" ? 401 : 500;
+    const status = privacyErrorStatus(message);
     return NextResponse.json({ ok: false, error: message }, { status });
   }
 }
@@ -66,6 +75,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const { userId, client } = await getClient();
+    await requireConsent(client.id, "health_data");
     const body = (await request.json()) as Record<string, unknown>;
     const payload = {
       cliente_id: client.id,
@@ -90,7 +100,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, data: rows[0] || null });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al guardar tu medición";
-    const status = message === "No autenticado" ? 401 : 500;
+    const status = privacyErrorStatus(message);
     return NextResponse.json({ ok: false, error: message }, { status });
   }
 }

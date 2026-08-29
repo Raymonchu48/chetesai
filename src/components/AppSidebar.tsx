@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   Menu,
   PartyPopper,
+  ShieldCheck,
   Users,
   X,
 } from "lucide-react";
@@ -34,6 +35,7 @@ const navItems = [
   { href: "/eventos", label: "Eventos", icon: PartyPopper },
   { href: "/pagos", label: "Pagos", icon: CreditCard },
   { href: "/informes", label: "Informes", icon: BarChart3 },
+  { href: "/proteccion-datos", label: "Protección de datos", icon: ShieldCheck },
 ];
 
 export default function AppSidebar({ children }: { children: React.ReactNode }) {

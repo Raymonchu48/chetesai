@@ -46,7 +46,7 @@ function fallbackReply(message: string) {
     return "Puedes elegir entrenamiento personal 1:1 o grupos reducidos de 2 a 4 personas. Si no sabes cuál te conviene, solicita una valoración y Ramón te orientará según tus objetivos y disponibilidad.";
   }
   if (/contact|ram[oó]n|correo|email/.test(normalized)) {
-    return "Puedes contactar con Ramón en chetesaifitnnes@gmail.com. La respuesta habitual llega en menos de 24 horas.";
+    return "Puedes contactar con Ramón en chetesaifitness@gmail.com. La respuesta habitual llega en menos de 24 horas.";
   }
   return "Puedo orientarte sobre servicios, tarifas, valoración inicial y funcionamiento de Chetesaí Fitness+. Para una recomendación personal, lo mejor es solicitar una valoración con Ramón.";
 }

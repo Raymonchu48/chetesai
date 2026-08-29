@@ -103,7 +103,7 @@ export function ChetesaiAiAssistant() {
     }
 
     if (action === "contact") {
-      window.location.href = "mailto:chetesaifitnnes@gmail.com?subject=Consulta%20desde%20Chetesa%C3%AD%20Fitness%2B";
+      window.location.href = "mailto:chetesaifitness@gmail.com?subject=Consulta%20desde%20Chetesa%C3%AD%20Fitness%2B";
       return;
     }
 
@@ -153,7 +153,7 @@ export function ChetesaiAiAssistant() {
         ...current,
         createMessage(
           "assistant",
-          "Ahora mismo no puedo responder por chat. Puedes escribir directamente a Ramón en chetesaifitnnes@gmail.com.",
+          "Ahora mismo no puedo responder por chat. Puedes escribir directamente a Ramón en chetesaifitness@gmail.com.",
         ),
       ]);
     } finally {
