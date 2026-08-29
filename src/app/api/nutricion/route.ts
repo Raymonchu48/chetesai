@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { privacyErrorStatus, requireConsent } from "@/lib/privacy-server";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -119,6 +120,7 @@ export async function GET(request: NextRequest) {
     await assertProfessional();
     const clienteId = request.nextUrl.searchParams.get("cliente_id");
     if (!clienteId) return NextResponse.json({ ok: true, data: { plan: null, habitos: [], registros: [] } });
+    await requireConsent(clienteId, "health_data");
 
     const encoded = encodeURIComponent(clienteId);
     const [plans, habits, records] = await Promise.all([
@@ -136,7 +138,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: true, data: { plan: plans[0] || null, habitos: habits, registros: records } });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al cargar nutrición y hábitos";
-    const status = message === "No autenticado" ? 401 : message === "No autorizado" ? 403 : 500;
+    const status = privacyErrorStatus(message);
     return NextResponse.json({ ok: false, error: message }, { status });
   }
 }
@@ -148,6 +150,7 @@ export async function POST(request: NextRequest) {
     const action = String(body.action || "");
     const clienteId = String(body.cliente_id || "");
     if (!clienteId) return NextResponse.json({ ok: false, error: "Selecciona un cliente" }, { status: 400 });
+    await requireConsent(clienteId, "health_data");
 
     if (action === "save_plan") {
       const meals = cleanMeals(body.comidas);
@@ -226,7 +229,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Acción no válida" }, { status: 400 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al guardar nutrición y hábitos";
-    const status = message === "No autenticado" ? 401 : message === "No autorizado" ? 403 : 500;
+    const status = privacyErrorStatus(message);
     return NextResponse.json({ ok: false, error: message }, { status });
   }
 }

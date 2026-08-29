@@ -2,8 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 
-export const LEGAL_UPDATED_AT = "23 de agosto de 2026";
-export const LEGAL_EMAIL = "chetesaifitnnes@gmail.com";
+export const LEGAL_UPDATED_AT = "28 de agosto de 2026";
+export const LEGAL_EMAIL = "chetesaifitness@gmail.com";
 export const LEGAL_NIF = "42411339Y";
 export const LEGAL_FISCAL_ADDRESS = "Porto Cristo, Manacor, 07680, Illes Balears, España";
 

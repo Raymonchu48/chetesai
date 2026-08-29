@@ -461,7 +461,7 @@ export default function Main() {
 
                       <div className="mt-6 grid gap-3 text-xs leading-5 text-white/70 sm:grid-cols-2 lg:grid-cols-1">
                         <p className="flex items-start gap-3"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#8cdb78]" /><span>Mallorca, Islas Baleares</span></p>
-                        <p className="flex items-start gap-3"><Mail className="mt-0.5 h-4 w-4 shrink-0 text-[#8cdb78]" /><span className="break-all">chetesaifitnnes@gmail.com</span></p>
+                        <p className="flex items-start gap-3"><Mail className="mt-0.5 h-4 w-4 shrink-0 text-[#8cdb78]" /><span className="break-all">chetesaifitness@gmail.com</span></p>
                         <p className="flex items-start gap-3"><Clock className="mt-0.5 h-4 w-4 shrink-0 text-[#8cdb78]" /><span>Respuesta habitual en menos de 24 horas</span></p>
                         <p className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#8cdb78]" /><span>Uso exclusivo de los datos para atender tu solicitud</span></p>
                       </div>

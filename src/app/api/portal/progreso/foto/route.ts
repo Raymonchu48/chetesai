@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { privacyErrorStatus, requireConsent } from "@/lib/privacy-server";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -41,6 +42,7 @@ async function getClient() {
 export async function GET(request: NextRequest) {
   try {
     const client = await getClient();
+    await requireConsent(client.id, "progress_photos");
     if (!supabaseUrl || !serviceKey) throw new Error("Supabase no está configurado");
     const path = request.nextUrl.searchParams.get("path") || "";
     if (!path.startsWith(`${client.id}/`) || !/^[0-9a-f-]+\/[0-9a-f-]+\/(frontal|lateral|posterior)-\d+\.(jpg|png|webp)$/i.test(path)) {
@@ -63,7 +65,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al cargar la fotografía";
-    const status = message === "No autenticado" ? 401 : 500;
+    const status = privacyErrorStatus(message);
     return NextResponse.json({ ok: false, error: message }, { status });
   }
 }

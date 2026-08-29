@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Apple, BookOpen, CalendarDays, Dumbbell, Home, MoreHorizontal, PartyPopper, TrendingUp, WalletCards, X } from "lucide-react";
+import { Apple, BookOpen, CalendarDays, Dumbbell, Home, MoreHorizontal, PartyPopper, ShieldCheck, TrendingUp, WalletCards, X } from "lucide-react";
+import PrivacyConsentPrompt from "@/components/privacy/PrivacyConsentPrompt";
 
 const items = [
   { href: "/portal", label: "Entrenamiento", icon: Dumbbell },
@@ -13,6 +14,7 @@ const items = [
   { href: "/portal/progreso", label: "Progreso", icon: TrendingUp },
   { href: "/portal/bienestar", label: "Nutrición", icon: Apple },
   { href: "/portal/pagos", label: "Pagos", icon: WalletCards },
+  { href: "/portal/privacidad", label: "Privacidad", icon: ShieldCheck },
 ];
 
 const primaryItems = [
@@ -28,6 +30,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
 
   return (
     <div className="min-h-screen bg-[#f3f0e8] pb-24 sm:pb-28">
+      <PrivacyConsentPrompt />
       {children}
 
       <div className={`fixed inset-0 z-40 bg-[#07110c]/55 backdrop-blur-sm transition-opacity duration-300 md:hidden ${menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`} onClick={() => setMenuOpen(false)} aria-hidden="true" />

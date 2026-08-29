@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { getConsentState, privacyErrorStatus, requireConsent } from "@/lib/privacy-server";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -81,14 +82,24 @@ export async function GET(request: NextRequest) {
     await assertProfessional();
     const clienteId = request.nextUrl.searchParams.get("cliente_id");
     if (!clienteId) return NextResponse.json({ ok: true, data: [] });
+    await requireConsent(clienteId, "health_data");
+    const photoConsent = (await getConsentState(clienteId)).progress_photos.granted === true;
 
     const rows = await serviceRequest<Measurement[]>(
       `mediciones_corporales?cliente_id=eq.${encodeURIComponent(clienteId)}&select=*&order=fecha.desc,created_at.desc`
     );
-    return NextResponse.json({ ok: true, data: rows });
+    return NextResponse.json({
+      ok: true,
+      data: photoConsent ? rows : rows.map((row) => ({
+        ...row,
+        foto_frontal_path: null,
+        foto_lateral_path: null,
+        foto_posterior_path: null,
+      })),
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al cargar el progreso";
-    const status = message === "No autenticado" ? 401 : message === "No autorizado" ? 403 : 500;
+    const status = privacyErrorStatus(message);
     return NextResponse.json({ ok: false, error: message }, { status });
   }
 }
@@ -99,6 +110,7 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as Record<string, unknown>;
     const clienteId = String(body.cliente_id || "");
     if (!clienteId) return NextResponse.json({ ok: false, error: "Selecciona un cliente" }, { status: 400 });
+    await requireConsent(clienteId, "health_data");
 
     const payload: Record<string, unknown> = {
       cliente_id: clienteId,
@@ -122,7 +134,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, data: rows[0] || null });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al guardar la medición";
-    const status = message === "No autenticado" ? 401 : message === "No autorizado" ? 403 : 500;
+    const status = privacyErrorStatus(message);
     return NextResponse.json({ ok: false, error: message }, { status });
   }
 }

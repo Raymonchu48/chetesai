@@ -39,26 +39,32 @@ export default function PrivacyPolicyPage() {
         </LegalList>
       </LegalSection>
 
-      <LegalSection title="4. Destinatarios y proveedores">
-        <p>No vendemos tus datos. Podrán acceder a ellos proveedores necesarios para prestar el servicio, sujetos a contratos y deberes de confidencialidad: infraestructura y alojamiento en Vercel, plataforma de datos Totalum, autenticación, correo, Stripe para pagos y Google cuando se utilice su acceso.</p>
+      <LegalSection title="4. Consentimientos específicos">
+        <p>El tratamiento de datos de salud y el tratamiento de fotografías de progreso se presentan como decisiones separadas, con información propia y sin casillas premarcadas. Cada decisión queda registrada con fecha, cuenta autenticada, versión de esta política y huella del texto aceptado.</p>
+        <p>Las fotografías son opcionales y se utilizan únicamente en el área privada para comparar la evolución y efectuar el seguimiento profesional. Su consentimiento no autoriza la publicación, el uso publicitario ni la difusión. Puedes retirar cualquiera de los consentimientos desde <Link href="/portal/privacidad">Privacidad y mis datos</Link>.</p>
+      </LegalSection>
+
+      <LegalSection title="5. Destinatarios y proveedores">
+        <p>No vendemos tus datos. Podrán acceder a ellos proveedores necesarios para prestar el servicio, sujetos a contratos y deberes de confidencialidad: infraestructura y alojamiento en Vercel, Supabase para base de datos, autenticación y almacenamiento privado, Resend para correo, Stripe para pagos y Google cuando se utilice su acceso.</p>
         <p>También podrán comunicarse datos a Administraciones, juzgados o autoridades cuando exista una obligación legal. Si un proveedor tratara datos fuera del Espacio Económico Europeo, se aplicarán las garantías previstas por el RGPD.</p>
       </LegalSection>
 
-      <LegalSection title="5. Conservación">
+      <LegalSection title="6. Conservación">
         <p>Los datos se conservarán mientras exista una cuenta o relación activa y durante los plazos necesarios para atender responsabilidades legales, fiscales, mercantiles o contractuales. Los datos basados exclusivamente en el consentimiento se suprimirán o anonimizarán cuando lo retires, salvo que deban conservarse bloqueados por una obligación legal.</p>
       </LegalSection>
 
-      <LegalSection title="6. Tus derechos">
+      <LegalSection title="7. Tus derechos, exportación y supresión">
         <p>Puedes solicitar el acceso, rectificación, supresión, oposición, limitación y portabilidad de tus datos, así como retirar el consentimiento sin que ello afecte a la licitud del tratamiento anterior.</p>
-        <p>Para ejercerlos, escribe a <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a> indicando el derecho solicitado y la información necesaria para verificar tu identidad. También puedes presentar una reclamación ante la <a href="https://www.aepd.es/" target="_blank" rel="noreferrer">Agencia Española de Protección de Datos</a>.</p>
+        <p>Desde <Link href="/portal/privacidad">Privacidad y mis datos</Link> puedes descargar una copia estructurada de tu información o registrar una solicitud de supresión con tu sesión autenticada. También puedes escribir a <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a>. Responderemos sin dilación indebida y, con carácter general, dentro del plazo máximo de un mes.</p>
+        <p>La supresión no implica eliminar información que deba conservarse bloqueada para cumplir obligaciones fiscales, contractuales o atender responsabilidades. El resto se eliminará o anonimizará, incluidas las fotografías cuando corresponda. También puedes presentar una reclamación ante la <a href="https://www.aepd.es/" target="_blank" rel="noreferrer">Agencia Española de Protección de Datos</a>.</p>
       </LegalSection>
 
-      <LegalSection title="7. Menores de edad">
+      <LegalSection title="8. Menores de edad">
         <p>Las cuentas o servicios para menores deberán gestionarse con la intervención de su madre, padre o representante legal. Cuando sea necesario tratar datos de un menor de 14 años, se solicitará el consentimiento de quien ejerza la patria potestad o tutela.</p>
       </LegalSection>
 
-      <LegalSection title="8. Seguridad y actualización">
-        <p>Aplicamos medidas técnicas y organizativas orientadas a proteger la confidencialidad, integridad y disponibilidad de la información. Ningún sistema conectado a Internet es infalible, por lo que revisamos las medidas de seguridad y limitamos el acceso según las funciones de cada usuario.</p>
+      <LegalSection title="9. Seguridad, copias y actualización">
+        <p>Aplicamos medidas técnicas y organizativas orientadas a proteger la confidencialidad, integridad y disponibilidad de la información: control de acceso por rol, almacenamiento privado de fotografías, registros de consentimiento y copias cifradas periódicas. Ningún sistema conectado a Internet es infalible, por lo que revisamos las medidas de seguridad y limitamos el acceso según las funciones de cada usuario.</p>
         <p>Esta política podrá actualizarse cuando cambie la normativa, los proveedores o las funciones de la plataforma. La versión vigente estará siempre disponible en esta dirección.</p>
         <p>Consulta también la <Link href="/politica-cookies">Política de cookies</Link> y los <Link href="/terms-of-service">Términos y condiciones</Link>.</p>
       </LegalSection>

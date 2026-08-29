@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { privacyErrorStatus, requireConsent } from "@/lib/privacy-server";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -54,6 +55,7 @@ function dateDaysAgo(days: number) {
 export async function GET() {
   try {
     const { client } = await getClient();
+    await requireConsent(client.id, "health_data");
     const encoded = encodeURIComponent(client.id);
     const [plans, habits, records] = await Promise.all([
       serviceRequest<Row[]>(
@@ -70,13 +72,14 @@ export async function GET() {
     return NextResponse.json({ ok: true, data: { cliente: client, plan: plans[0] || null, habitos: habits, registros: records } });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al cargar nutrición y hábitos";
-    return NextResponse.json({ ok: false, error: message }, { status: message === "No autenticado" ? 401 : 500 });
+    return NextResponse.json({ ok: false, error: message }, { status: privacyErrorStatus(message) });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const { userId, client } = await getClient();
+    await requireConsent(client.id, "health_data");
     const body = (await request.json()) as Record<string, unknown>;
     const habitId = String(body.habito_id || "");
     const date = String(body.fecha || new Date().toISOString().slice(0, 10));
@@ -113,6 +116,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, data: rows[0] || null });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al guardar el hábito";
-    return NextResponse.json({ ok: false, error: message }, { status: message === "No autenticado" ? 401 : 500 });
+    return NextResponse.json({ ok: false, error: message }, { status: privacyErrorStatus(message) });
   }
 }
