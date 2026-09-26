@@ -1,7 +1,7 @@
 // src/app/layout.tsx
 import React from "react";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Geist, Geist_Mono, Instrument_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import "./mobile-fixes.css";
 import { ScriptExecutor } from "@/components/ScriptExecutor";
@@ -13,6 +13,23 @@ import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument-sans",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "ChetesaíFitness+ - Centro de Entrenamiento Personal",
@@ -26,7 +43,7 @@ export const revalidate = 0;
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${instrumentSans.variable} ${spaceGrotesk.variable} antialiased`}>
         <GlobalErrorCatcher />
         <ScriptExecutor />
         <DevToolsHandler />

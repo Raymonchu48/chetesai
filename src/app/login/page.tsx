@@ -124,7 +124,7 @@ export default function LoginPage() {
 
   return (
     <main
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#041426] px-3 py-4 text-[#07182b] sm:px-6 sm:py-8"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#041426] px-3 py-4 font-interface text-[#07182b] sm:px-6 sm:py-8"
       style={{
         backgroundImage:
           "radial-gradient(circle at 12% 18%, rgba(142,240,0,0.18), transparent 27%), radial-gradient(circle at 88% 82%, rgba(199,162,84,0.16), transparent 28%), linear-gradient(145deg, #03101f 0%, #071d33 48%, #0b2941 100%)",
@@ -150,11 +150,11 @@ export default function LoginPage() {
           </div>
 
           <div className="relative mt-5 hidden lg:block">
-            <p className="text-xs font-black tracking-[0.28em] text-[#9af51e]">TU ESPACIO CHETESAÍ</p>
-            <h2 className="mt-4 max-w-sm text-[34px] font-black leading-[1.05] tracking-[-0.04em]">
+            <p className="font-meta text-xs font-semibold tracking-[0.28em] text-[#9af51e]">TU ESPACIO CHETESAÍ</p>
+            <h2 className="mt-4 max-w-sm font-brand text-[28px] font-medium italic leading-[1.2] tracking-[-0.025em] [font-optical-sizing:auto]">
               Todo tu progreso, en un mismo lugar.
             </h2>
-            <p className="mt-4 max-w-sm text-base leading-relaxed text-white/65">
+            <p className="mt-4 max-w-sm font-meta text-sm leading-relaxed text-white/65">
               Accede de forma segura a las herramientas que te ayudan a avanzar cada día.
             </p>
 
@@ -170,7 +170,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <p className="relative mt-5 hidden text-xs text-white/40 lg:block">Chetesaí Fitness+ · Carga tus energías</p>
+          <p className="relative mt-5 hidden font-meta text-xs text-white/40 lg:block">Chetesaí Fitness+ · Carga tus energías</p>
         </aside>
 
         <div className="relative isolate overflow-hidden bg-[linear-gradient(145deg,#fbfaf5_0%,#f3f7ec_52%,#eaf1ee_100%)] px-5 py-6 sm:px-10 sm:py-9 lg:px-12 lg:py-10">
@@ -184,9 +184,9 @@ export default function LoginPage() {
           />
           <div className="relative z-10">
           <div className="mb-6">
-            <p className="mb-2 text-[11px] font-black tracking-[0.28em] text-[#579600] sm:text-xs">BIENVENIDO DE NUEVO</p>
-            <h1 className="text-[36px] font-black leading-none tracking-[-0.045em] text-[#07182b] sm:text-[46px]">Iniciar sesión</h1>
-            <p className="mt-3 min-h-10 text-sm leading-relaxed text-[#687585] sm:text-base" aria-live="polite">{roleDescription}</p>
+            <p className="mb-2 font-meta text-[11px] font-semibold tracking-[0.28em] text-[#579600] sm:text-xs">BIENVENIDO DE NUEVO</p>
+            <h1 className="text-[38px] font-semibold italic leading-none tracking-[-0.035em] text-[#07182b]">Iniciar sesión</h1>
+            <p className="mt-3 min-h-10 font-meta text-sm leading-relaxed text-[#687585]" aria-live="polite">{roleDescription}</p>
           </div>
 
           <div className="mb-6 grid grid-cols-2 rounded-2xl border border-[#e2e6e8] bg-[#e8eee7]/90 p-1.5 shadow-inner" role="tablist" aria-label="Tipo de acceso">
