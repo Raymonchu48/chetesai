@@ -22,7 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { files } from "@/assets/files";
 
-const PROFILE_IMAGE_URL = "https://raymonchu48.github.io/Deportivo/Mi_imagen.png";
+const PROFILE_IMAGE_URL = "/brand/raymond-vega-profile.webp";
 const PROFILE_PDF_URL = "https://raymonchu48.github.io/Deportivo/Carta_presentacion_deportiva_profesional.pdf";
 
 const services = [
