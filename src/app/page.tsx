@@ -175,34 +175,34 @@ export default function Main() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f4ee] pt-20 text-[#202724]">
-      <header className="fixed inset-x-0 top-0 z-[75] border-b border-[#b38d45]/25 bg-[#0b100d]/95 text-white shadow-xl shadow-black/25 backdrop-blur-xl">
+    <main className="landing-premium min-h-screen bg-landing-bg pt-20 font-landing-sans text-landing-text">
+      <header className="fixed inset-x-0 top-0 z-[75] border-b border-landing-border bg-landing-bg/95 text-landing-text shadow-xl shadow-black/30 backdrop-blur-xl">
         <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-2 pl-[4.75rem] pr-3 sm:gap-3 sm:pl-[5.25rem] sm:pr-5 lg:pr-8 xl:px-8" aria-label="Navegación principal">
-          <button type="button" onClick={() => goTo("inicio")} className="flex min-w-0 flex-1 items-center gap-2 rounded-2xl border border-[#b38d45]/35 bg-[#101713] p-1 text-left shadow-lg sm:max-w-none sm:flex-initial sm:shrink-0 sm:gap-3 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
-            <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl p-1 sm:h-12 sm:w-12 sm:rounded-2xl sm:border sm:border-[#b38d45]/35 sm:bg-[#101713] sm:p-1.5 sm:shadow-lg"><img src={files.logo.url} alt="Chetesaí Fitness+" className="h-full w-full object-contain" /></div>
-            <div className="min-w-0 pr-1 sm:pr-0"><p className="truncate text-[11px] font-bold leading-tight text-white sm:text-base">Chetesaí Fitness+</p><p className="truncate text-[9px] leading-tight text-white/55 sm:text-xs">Entrenamiento personalizado</p></div>
+          <button type="button" onClick={() => goTo("inicio")} className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-landing-border bg-landing-card p-1 text-left shadow-lg sm:max-w-none sm:flex-initial sm:shrink-0 sm:gap-3 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
+            <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl p-1 sm:h-12 sm:w-12 sm:border sm:border-landing-border sm:bg-landing-card sm:p-1.5 sm:shadow-lg"><img src={files.logo.url} alt="Chetesaí Fitness+" className="h-full w-full object-contain" /></div>
+            <div className="min-w-0 pr-1 sm:pr-0"><p className="truncate text-[11px] font-medium leading-tight text-landing-text sm:text-base">Chetesaí Fitness+</p><p className="truncate text-[9px] leading-tight text-landing-muted sm:text-xs">Entrenamiento personalizado</p></div>
           </button>
-          <div className="hidden items-center gap-7 text-sm font-medium text-white/75 xl:flex">
-            <button type="button" onClick={() => goTo("servicios")} className="transition hover:text-white">Servicios</button>
-            <button type="button" onClick={() => goTo("proceso")} className="transition hover:text-white">Cómo funciona</button>
-            <button type="button" onClick={() => goTo("sobre-mi")} className="transition hover:text-white">Sobre mí</button>
-            <button type="button" onClick={() => goTo("faq")} className="transition hover:text-white">FAQ</button>
-            <Link href="/login" className="transition hover:text-white">Acceso clientes</Link>
+          <div className="hidden items-center gap-7 text-sm font-medium text-landing-muted xl:flex">
+            <button type="button" onClick={() => goTo("servicios")} className="transition-colors duration-200 hover:text-landing-lime">Servicios</button>
+            <button type="button" onClick={() => goTo("proceso")} className="transition-colors duration-200 hover:text-landing-lime">Cómo funciona</button>
+            <button type="button" onClick={() => goTo("sobre-mi")} className="transition-colors duration-200 hover:text-landing-lime">Sobre mí</button>
+            <button type="button" onClick={() => goTo("faq")} className="transition-colors duration-200 hover:text-landing-lime">FAQ</button>
+            <Link href="/login" className="transition-colors duration-200 hover:text-landing-lime">Acceso clientes</Link>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <Button className="rounded-xl bg-[#2f9e24] px-3 hover:bg-[#27891e] sm:px-4 lg:px-5" onClick={openValuation}>
+            <Button className="rounded-lg bg-gradient-to-b from-landing-lime to-landing-lime-dark px-3 font-medium text-landing-bg shadow-[0_3px_12px_rgba(200,224,108,0.25)] transition-[filter,box-shadow] duration-200 hover:brightness-105 hover:text-landing-bg hover:shadow-[0_5px_16px_rgba(200,224,108,0.3)] sm:px-4 lg:px-5" onClick={openValuation}>
               <CalendarDays className="mr-2 h-4 w-4" />
               <span className="hidden sm:inline">Reserva tu valoración</span>
               <span className="sm:hidden">Reserva</span>
             </Button>
-            <Button variant="outline" className="hidden rounded-xl border-white/30 bg-white/5 px-4 text-white hover:bg-white/10 hover:text-white sm:inline-flex lg:px-5" onClick={revealRates}>
+            <Button variant="outline" className="hidden rounded-lg border-landing-silver-start bg-transparent px-4 text-landing-text transition-colors duration-200 hover:border-landing-silver-end hover:bg-landing-card hover:text-landing-text sm:inline-flex lg:px-5" onClick={revealRates}>
               Ver tarifas <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </nav>
       </header>
 
-      <section id="inicio" className="relative min-h-[640px] overflow-hidden bg-[#050706]">
+      <section id="inicio" className="relative min-h-[640px] overflow-hidden bg-landing-bg">
         <div
           aria-hidden="true"
           className="hero-media absolute inset-0 bg-cover bg-center"
@@ -224,7 +224,7 @@ export default function Main() {
           className="hero-shade absolute inset-0 xl:hidden"
           style={{
             background:
-              "linear-gradient(90deg, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.58) 38%, rgba(0,0,0,0.18) 67%, rgba(0,0,0,0.05) 100%)",
+              "linear-gradient(90deg, rgba(11,13,12,0.94) 0%, rgba(11,13,12,0.68) 40%, rgba(11,13,12,0.25) 68%, rgba(11,13,12,0.08) 100%)",
           }}
         />
         <div
@@ -232,7 +232,7 @@ export default function Main() {
           className="absolute inset-y-0 left-0 hidden w-[40%] xl:block"
           style={{
             background:
-              "linear-gradient(90deg, rgba(4,7,5,0.97) 0%, rgba(4,7,5,0.94) 78%, rgba(4,7,5,0.72) 90%, rgba(4,7,5,0) 100%)",
+              "linear-gradient(90deg, rgba(11,13,12,0.99) 0%, rgba(11,13,12,0.96) 78%, rgba(11,13,12,0.74) 90%, rgba(11,13,12,0) 100%)",
           }}
         />
         <div
@@ -246,17 +246,17 @@ export default function Main() {
 
         <div className="relative z-10 mx-auto flex max-w-7xl px-5 pb-20 pt-16 sm:pt-10 lg:px-8 lg:pb-24 lg:pt-8 xl:mx-0 xl:max-w-none xl:px-0 xl:pb-20 xl:pt-10">
           <div className="w-full max-w-[560px] xl:w-[36%] xl:max-w-none xl:px-[clamp(2.5rem,4vw,4.75rem)]">
-            <p className="mb-4 text-xs font-bold uppercase tracking-[0.17em] text-[#8cdb78] sm:text-sm">Entrenamiento personal y grupos reducidos en Mallorca</p>
-            <h1 className="max-w-[560px] text-5xl font-black leading-[0.98] tracking-tight text-white md:text-[3.5rem] xl:max-w-full xl:text-[clamp(2.75rem,3vw,3.5rem)]">Entrena con cabeza.<br /><span className="text-[#d8c7a5]">Mejora con método.</span></h1>
-            <p className="mt-6 max-w-[520px] text-lg leading-8 text-white/75 xl:max-w-full xl:text-base xl:leading-7">Un enfoque realista, progresivo y medible para mejorar tu condición física sin rutinas genéricas ni promesas de humo.</p>
+            <p className="mb-4 text-[11px] font-medium uppercase tracking-[1.5px] text-landing-lime">Entrenamiento personal y grupos reducidos en Mallorca</p>
+            <h1 className="max-w-[560px] font-brand text-5xl font-semibold leading-[1] tracking-[-0.025em] text-landing-text md:text-[3.5rem] xl:max-w-full xl:text-[clamp(2.75rem,3vw,3.5rem)]">Entrena con cabeza.<br /><span>Mejora con método.</span></h1>
+            <p className="mt-6 max-w-[520px] text-lg leading-8 text-landing-muted xl:max-w-full xl:text-base xl:leading-7">Un enfoque realista, progresivo y medible para mejorar tu condición física sin rutinas genéricas ni promesas de humo.</p>
             <div className="mt-5">
-              <p className="flex items-center gap-2 text-sm font-semibold text-[#9fe68f]"><Target className="h-4 w-4" />Valoración inicial y planificación personalizada</p>
+              <p className="flex items-center gap-2 text-sm font-medium text-landing-lime"><Target className="h-4 w-4" />Valoración inicial y planificación personalizada</p>
               <button
                 type="button"
                 onClick={() => setShowPresentationVideo(true)}
-                className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-black/35 px-5 py-3 text-sm font-bold text-white shadow-lg backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-[#8cdb78]/70 hover:bg-black/55 focus:outline-none focus:ring-2 focus:ring-[#8cdb78] focus:ring-offset-2 focus:ring-offset-black"
+                className="mt-5 inline-flex items-center gap-2 rounded-lg border border-landing-silver-start bg-transparent px-5 py-3 text-sm font-medium text-landing-text shadow-lg backdrop-blur-sm transition-colors duration-200 hover:border-landing-silver-end hover:bg-landing-card/75 focus:outline-none focus:ring-2 focus:ring-landing-lime focus:ring-offset-2 focus:ring-offset-landing-bg"
               >
-                <PlayCircle className="h-5 w-5 text-[#9fe68f]" />
+                <PlayCircle className="h-5 w-5 text-landing-lime" />
                 Ver presentación
               </button>
             </div>
@@ -273,13 +273,13 @@ export default function Main() {
             className="absolute inset-0 cursor-default bg-black/85 backdrop-blur-md"
             onClick={() => setShowPresentationVideo(false)}
           />
-          <div className="relative z-10 w-full max-w-5xl overflow-hidden rounded-[24px] border border-[#d7b86b]/40 bg-black shadow-2xl shadow-black/60 sm:rounded-[30px]">
+          <div className="relative z-10 w-full max-w-5xl overflow-hidden rounded-xl border border-landing-border bg-black shadow-2xl shadow-black/60">
             <h2 id="presentation-video-title" className="sr-only">Presentación de Chetesaí Fitness+</h2>
             <button
               type="button"
               aria-label="Cerrar vídeo"
               onClick={() => setShowPresentationVideo(false)}
-              className="absolute right-3 top-3 z-20 grid h-11 w-11 place-items-center rounded-full border border-white/25 bg-black/70 text-white shadow-lg backdrop-blur-md transition hover:scale-105 hover:bg-black focus:outline-none focus:ring-2 focus:ring-[#8cdb78] sm:right-4 sm:top-4"
+              className="absolute right-3 top-3 z-20 grid h-11 w-11 place-items-center rounded-full border border-landing-silver-start bg-landing-bg/85 text-landing-text shadow-lg backdrop-blur-md transition-colors duration-200 hover:border-landing-silver-end hover:bg-landing-card focus:outline-none focus:ring-2 focus:ring-landing-lime sm:right-4 sm:top-4"
             >
               <X className="h-5 w-5" />
             </button>
@@ -292,16 +292,16 @@ export default function Main() {
       ) : null}
 
       <section id="servicios" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-16 lg:px-8">
-        <div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Servicios</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Todo lo que necesitas para entrenar mejor</h2><p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Atención cercana, planificación profesional y seguimiento para que el entrenamiento encaje en tu vida.</p></div>
+        <div className="text-center"><p className="font-landing-mono text-[11px] font-medium uppercase tracking-[1px] text-landing-lime">Servicios</p><h2 className="mt-3 font-brand text-3xl font-semibold text-landing-text md:text-5xl">Todo lo que necesitas para entrenar mejor</h2><p className="mx-auto mt-4 max-w-2xl text-landing-muted">Atención cercana, planificación profesional y seguimiento para que el entrenamiento encaje en tu vida.</p></div>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {services.map((service) => {
             return (
               <article
                 key={service.title}
-                className={`overflow-hidden rounded-[22px] border border-[#ded8cd] bg-[#fffdf9] text-center shadow-sm ${service.image ? "" : "p-5"}`}
+                className={`overflow-hidden rounded-xl border-[0.5px] border-landing-border bg-landing-card text-center shadow-[0_2px_10px_rgba(0,0,0,0.25)] transition-[border-color,box-shadow] duration-200 hover:border-landing-silver-start hover:shadow-[0_5px_18px_rgba(0,0,0,0.34)] ${service.image ? "" : "p-5"}`}
               >
                 {service.image ? (
-                  <div className="relative aspect-[3/2] w-full bg-[#e9e4db]">
+                  <div className="relative aspect-[3/2] w-full bg-landing-bg">
                     <Image
                       src={service.image}
                       alt={service.imageAlt ?? service.title}
@@ -310,11 +310,12 @@ export default function Main() {
                       className="object-cover"
                       style={{ objectPosition: service.imagePosition ?? "center" }}
                     />
+                    <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-landing-bg/65 to-transparent" />
                   </div>
                 ) : null}
                 <div className={service.image ? "px-5 pb-5 pt-4" : ""}>
-                  <h3 className={`${service.image ? "" : "mt-4"} text-base font-bold leading-6`}>{service.title}</h3>
-                  <p className="mt-2 text-sm leading-5 text-[#67706b]">{service.description}</p>
+                  <h3 className={`${service.image ? "" : "mt-4"} font-brand text-base font-medium leading-6 text-landing-text`}>{service.title}</h3>
+                  <p className="mt-2 text-sm leading-5 text-landing-muted">{service.description}</p>
                 </div>
               </article>
             );
@@ -322,29 +323,29 @@ export default function Main() {
         </div>
       </section>
 
-      <section id="proceso" className="scroll-mt-20 border-y border-[#d7dfd3] bg-[#eef3eb]">
+      <section id="proceso" className="scroll-mt-20 border-y border-landing-border bg-landing-card/35">
         <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8">
           <div className="text-center">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Cómo funciona</p>
-            <h2 className="mt-3 text-3xl font-black md:text-5xl">Un proceso sencillo y personal</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Tres pasos conectados, con acompañamiento desde la primera conversación hasta cada ajuste del plan.</p>
+            <p className="font-landing-mono text-[11px] font-medium uppercase tracking-[1px] text-landing-lime">Cómo funciona</p>
+            <h2 className="mt-3 font-brand text-3xl font-semibold text-landing-text md:text-5xl">Un proceso sencillo y personal</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-landing-muted">Tres pasos conectados, con acompañamiento desde la primera conversación hasta cada ajuste del plan.</p>
           </div>
 
           <div className="relative mt-11">
-            <div aria-hidden="true" className="absolute bottom-7 left-7 top-7 w-px bg-[#2f9e24]/30 md:hidden" />
-            <div aria-hidden="true" className="absolute left-[16.666%] right-[16.666%] top-7 hidden h-px bg-gradient-to-r from-[#2f9e24]/25 via-[#2f9e24] to-[#2f9e24]/25 md:block" />
+            <div aria-hidden="true" className="absolute bottom-[22px] left-[22px] top-[22px] w-px bg-gradient-to-b from-landing-silver-start via-landing-silver-end to-landing-silver-start md:hidden" />
+            <div aria-hidden="true" className="absolute left-[16.666%] right-[16.666%] top-[22px] hidden h-px bg-gradient-to-r from-landing-silver-start via-landing-silver-end to-landing-silver-start md:block" />
             <div className="grid gap-9 md:grid-cols-3 md:gap-8">
-              {steps.map((step) => {
+              {steps.map((step, index) => {
                 const StepIcon = step.icon;
                 return (
-                  <article key={step.number} className="relative z-10 grid grid-cols-[56px_1fr] items-start gap-5 text-left md:block md:text-center">
-                    <div className="relative grid h-14 w-14 place-items-center rounded-full border-4 border-[#eef3eb] bg-[#2f9e24] text-white shadow-lg shadow-[#2f9e24]/15 md:mx-auto">
-                      <StepIcon className="h-5 w-5" />
-                      <span className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-[#18211d] text-[10px] font-black text-white">{step.number}</span>
+                  <article key={step.number} className="relative z-10 grid grid-cols-[44px_1fr] items-start gap-5 text-left md:block md:text-center">
+                    <div className={`relative grid h-11 w-11 place-items-center rounded-full border bg-gradient-to-br from-landing-step-start to-landing-step-end text-landing-text md:mx-auto ${index === steps.length - 1 ? "border-landing-lime shadow-[0_0_14px_rgba(200,224,108,0.25)]" : "border-landing-silver-start"}`}>
+                      <StepIcon className="h-4 w-4" />
+                      <span className={`absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full border border-landing-border bg-landing-card font-landing-mono text-[10px] font-medium ${index === steps.length - 1 ? "text-landing-lime" : "bg-gradient-to-b from-landing-lime to-landing-lime-dark bg-clip-text text-transparent"}`}>{step.number}</span>
                     </div>
                     <div>
-                      <h3 className="text-lg font-black md:mt-5">{step.title}</h3>
-                      <p className="mt-2 max-w-xs text-sm leading-6 text-[#67706b] md:mx-auto">{step.description}</p>
+                      <h3 className="font-brand text-lg font-medium text-landing-text md:mt-5">{step.title}</h3>
+                      <p className="mt-2 max-w-xs text-sm leading-6 text-landing-muted md:mx-auto">{step.description}</p>
                     </div>
                   </article>
                 );
@@ -355,42 +356,77 @@ export default function Main() {
         </div>
       </section>
 
-      {showRates ? <section id="tarifas" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-20 lg:px-8">
-        <div className="text-center"><p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Bonos mensuales</p><h2 className="mt-3 text-3xl font-black md:text-5xl">Elige el ritmo que encaja contigo</h2><p className="mx-auto mt-4 max-w-2xl text-[#67706b]">Planes flexibles, sin matrícula ni permanencia.</p></div>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">{personalPlans.map((plan) => <article key={plan.name} className={`relative rounded-3xl border bg-[#fffdf9] p-7 shadow-sm ${plan.popular ? "border-[#2f9e24] ring-2 ring-[#2f9e24]/10" : "border-[#ded8cd]"}`}>{plan.popular ? <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#2f9e24] px-4 py-1 text-xs font-bold uppercase text-white">Más popular</span> : null}<p className="text-center text-2xl font-black">{plan.name}</p><p className="mt-2 text-center text-sm font-semibold text-[#2f9e24]">{plan.sessions}</p><p className="mt-6 text-center text-4xl font-black">{plan.price}<span className="text-base font-medium text-[#67706b]"> / mes</span></p><p className="mt-1 text-center text-sm text-[#67706b]">{plan.perSession}</p><div className="mt-7 space-y-3">{plan.features.map((feature) => <p key={feature} className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-[#2f9e24]" />{feature}</p>)}</div><Button className={`mt-7 w-full rounded-xl ${plan.popular ? "bg-[#2f9e24] hover:bg-[#27891e]" : "bg-[#202724] hover:bg-[#303a35]"}`} onClick={openValuation}>Elegir {plan.name}</Button></article>)}</div>
-        <div className="mt-10 rounded-3xl border border-[#ded8cd] bg-[#fffdf9] p-7"><div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-sm font-bold uppercase tracking-[0.16em] text-[#2f9e24]">Grupos reducidos 2–4</p><h3 className="mt-2 text-2xl font-black">Comparte el entrenamiento, no la atención</h3><p className="mt-2 text-[#67706b]">Puedes venir con tu grupo o solicitar plaza en uno compatible.</p></div><div className="grid gap-3 sm:grid-cols-3">{groupPlans.map((plan) => <div key={plan.name} className="rounded-2xl bg-[#f1eee7] px-5 py-4 text-center"><p className="font-bold">{plan.name}</p><p className="mt-1 text-xs text-[#67706b]">{plan.sessions}</p><p className="mt-2 text-xl font-black text-[#2f9e24]">{plan.price}</p></div>)}</div></div></div>
-      </section> : null}
+      {showRates ? (
+        <section id="tarifas" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-20 lg:px-8">
+          <div className="text-center">
+            <p className="font-landing-mono text-[11px] font-medium uppercase tracking-[1px] text-landing-lime">Bonos mensuales</p>
+            <h2 className="mt-3 font-brand text-3xl font-semibold text-landing-text md:text-5xl">Elige el ritmo que encaja contigo</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-landing-muted">Planes flexibles, sin matrícula ni permanencia.</p>
+          </div>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {personalPlans.map((plan) => (
+              <article key={plan.name} className={`relative rounded-xl border-[0.5px] bg-landing-card p-7 shadow-[0_2px_10px_rgba(0,0,0,0.25)] ${plan.popular ? "border-landing-lime ring-1 ring-landing-lime/25" : "border-landing-border"}`}>
+                {plan.popular ? <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-b from-landing-lime to-landing-lime-dark px-4 py-1 font-landing-mono text-[10px] font-medium uppercase tracking-[1px] text-landing-bg">Más popular</span> : null}
+                <p className="text-center font-brand text-2xl font-semibold text-landing-text">{plan.name}</p>
+                <p className="mt-2 text-center font-landing-mono text-xs font-medium text-landing-lime">{plan.sessions}</p>
+                <p className="mt-6 text-center font-brand text-4xl font-semibold text-landing-text">{plan.price}<span className="font-landing-sans text-base font-normal text-landing-muted"> / mes</span></p>
+                <p className="mt-1 text-center text-sm text-landing-muted">{plan.perSession}</p>
+                <div className="mt-7 space-y-3">{plan.features.map((feature) => <p key={feature} className="flex items-center gap-2 text-sm text-landing-text"><CheckCircle2 className="h-4 w-4 text-landing-lime" />{feature}</p>)}</div>
+                <Button className="mt-7 w-full rounded-lg bg-gradient-to-b from-landing-lime to-landing-lime-dark font-medium text-landing-bg shadow-[0_3px_12px_rgba(200,224,108,0.2)] transition-[filter] duration-200 hover:brightness-105 hover:text-landing-bg" onClick={openValuation}>Elegir {plan.name}</Button>
+              </article>
+            ))}
+          </div>
+          <div className="mt-10 rounded-xl border-[0.5px] border-landing-border bg-landing-card p-7 shadow-[0_2px_10px_rgba(0,0,0,0.25)]">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="font-landing-mono text-[10px] font-medium uppercase tracking-[1px] text-landing-lime">Grupos reducidos 2–4</p>
+                <h3 className="mt-2 font-brand text-2xl font-medium text-landing-text">Comparte el entrenamiento, no la atención</h3>
+                <p className="mt-2 text-landing-muted">Puedes venir con tu grupo o solicitar plaza en uno compatible.</p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {groupPlans.map((plan) => (
+                  <div key={plan.name} className="rounded-xl border-[0.5px] border-landing-border bg-landing-bg px-5 py-4 text-center">
+                    <p className="font-brand font-medium text-landing-text">{plan.name}</p>
+                    <p className="mt-1 text-xs text-landing-muted">{plan.sessions}</p>
+                    <p className="mt-2 font-landing-mono text-xl font-medium text-landing-lime">{plan.price}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
-      <section id="faq" className="scroll-mt-20 border-b border-[#ded8cd] bg-[#fffdf9]">
+      <section id="faq" className="scroll-mt-20 border-b border-landing-border bg-landing-bg">
         <div className="mx-auto max-w-4xl px-5 py-16 lg:px-8">
           <div className="text-center">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#2f9e24]">Preguntas frecuentes</p>
-            <h2 className="mt-3 text-3xl font-black md:text-5xl">Antes de empezar</h2>
-            <p className="mx-auto mt-4 max-w-xl text-[#67706b]">Lo esencial, explicado de forma clara antes de reservar tu primera valoración.</p>
+            <p className="font-landing-mono text-[11px] font-medium uppercase tracking-[1px] text-landing-lime">Preguntas frecuentes</p>
+            <h2 className="mt-3 font-brand text-3xl font-semibold text-landing-text md:text-5xl">Antes de empezar</h2>
+            <p className="mx-auto mt-4 max-w-xl text-landing-muted">Lo esencial, explicado de forma clara antes de reservar tu primera valoración.</p>
           </div>
 
-          <div className="mt-10 overflow-hidden rounded-[28px] border border-[#ded8cd] bg-white shadow-sm">
+          <div className="mt-10 overflow-hidden rounded-xl border-[0.5px] border-landing-border bg-landing-card shadow-[0_2px_10px_rgba(0,0,0,0.25)]">
             {faqs.map((faq, index) => {
               const isOpen = openFaqIndex === index;
               const buttonId = `faq-button-${index}`;
               const answerId = `faq-answer-${index}`;
               return (
-                <div key={faq.question} className={index < faqs.length - 1 ? "border-b border-[#e8e2d8]" : ""}>
+                <div key={faq.question} className={index < faqs.length - 1 ? "border-b border-landing-border" : ""}>
                   <button
                     id={buttonId}
                     type="button"
                     onClick={() => setOpenFaqIndex((current) => current === index ? null : index)}
                     aria-expanded={isOpen}
                     aria-controls={answerId}
-                    className="flex w-full items-center justify-between gap-6 px-6 py-5 text-left transition hover:bg-[#f7f4ee] sm:px-7"
+                    className="flex w-full items-center justify-between gap-6 px-6 py-5 text-left transition-colors duration-200 hover:bg-landing-bg/55 sm:px-7"
                   >
-                    <span className="font-bold text-[#202724]">{faq.question}</span>
-                    <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full transition-colors ${isOpen ? "bg-[#2f9e24] text-white" : "bg-[#eef3eb] text-[#2f9e24]"}`}>
+                    <span className="font-medium text-landing-text">{faq.question}</span>
+                    <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full border transition-colors duration-200 ${isOpen ? "border-landing-lime bg-landing-lime text-landing-bg" : "border-landing-border bg-landing-bg text-landing-lime"}`}>
                       <Plus className={`h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-45" : ""}`} />
                     </span>
                   </button>
                   {isOpen ? (
-                    <div id={answerId} role="region" aria-labelledby={buttonId} className="px-6 pb-5 pr-16 text-sm leading-6 text-[#67706b] sm:px-7 sm:pr-20">
+                    <div id={answerId} role="region" aria-labelledby={buttonId} className="px-6 pb-5 pr-16 text-sm leading-6 text-landing-muted sm:px-7 sm:pr-20">
                       {faq.answer}
                     </div>
                   ) : null}
@@ -401,7 +437,7 @@ export default function Main() {
         </div>
       </section>
 
-      <section id="contacto" className="scroll-mt-20 bg-[#18211d] text-white">
+      <section id="contacto" className="scroll-mt-20 bg-landing-bg text-landing-text">
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
           {showValuation ? (
             <div
@@ -417,15 +453,15 @@ export default function Main() {
                 className="absolute inset-0 cursor-default bg-black/80 backdrop-blur-md"
               />
 
-              <div className="relative z-10 flex h-[100dvh] w-full flex-col overflow-hidden bg-[#111612] shadow-2xl shadow-black/60 sm:h-[min(92dvh,900px)] sm:max-w-6xl sm:rounded-[32px] sm:border sm:border-white/15">
-                <header className="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 bg-[#0d120f] px-4 py-3 text-white sm:px-6 sm:py-4">
+              <div className="relative z-10 flex h-[100dvh] w-full flex-col overflow-hidden bg-landing-card shadow-2xl shadow-black/60 sm:h-[min(92dvh,900px)] sm:max-w-6xl sm:rounded-xl sm:border sm:border-landing-border">
+                <header className="flex shrink-0 items-center justify-between gap-4 border-b border-landing-border bg-landing-bg px-4 py-3 text-landing-text sm:px-6 sm:py-4">
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[#d7b86b]/45 bg-black/35 p-1.5">
+                    <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-landing-lime/45 bg-landing-card p-1.5">
                       <Image src="/brand/chetesai-logo-mark.svg" alt="" width={44} height={44} className="h-full w-full object-contain" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8cdb78]">Chetesaí Fitness+</p>
-                      <h2 id="valuation-dialog-title" className="truncate text-base font-black sm:text-lg">Primera valoración</h2>
+                      <p className="font-landing-mono text-[10px] font-medium uppercase tracking-[1px] text-landing-lime">Chetesaí Fitness+</p>
+                      <h2 id="valuation-dialog-title" className="truncate font-brand text-base font-semibold sm:text-lg">Primera valoración</h2>
                     </div>
                   </div>
                   <button
@@ -433,7 +469,7 @@ export default function Main() {
                     autoFocus
                     aria-label="Cerrar y volver a la página"
                     onClick={() => setShowValuation(false)}
-                    className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 text-sm font-bold text-white transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-[#8cdb78] sm:px-4"
+                    className="inline-flex h-11 shrink-0 items-center gap-2 rounded-lg border border-landing-silver-start bg-transparent px-3 text-sm font-medium text-landing-text transition-colors duration-200 hover:border-landing-silver-end hover:bg-landing-card focus:outline-none focus:ring-2 focus:ring-landing-lime sm:px-4"
                   >
                     <span className="hidden sm:inline">Volver a la página</span>
                     <X className="h-5 w-5" />
@@ -442,12 +478,12 @@ export default function Main() {
 
                 <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
                   <div className="lg:grid lg:min-h-full lg:grid-cols-[0.88fr_1.12fr]">
-                    <div className="flex flex-col p-5 text-white sm:p-8 lg:p-10">
-                      <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#8cdb78]">Tu punto de partida</p>
-                      <h3 className="mt-3 text-3xl font-black sm:text-4xl">Cuéntame tu objetivo</h3>
-                      <p className="mt-4 max-w-lg text-sm leading-6 text-white/65 sm:text-base sm:leading-7">Envíame tus datos y te responderé para valorar tu situación y encontrar la modalidad más adecuada.</p>
+                    <div className="flex flex-col p-5 text-landing-text sm:p-8 lg:p-10">
+                      <p className="font-landing-mono text-[10px] font-medium uppercase tracking-[1px] text-landing-lime">Tu punto de partida</p>
+                      <h3 className="mt-3 font-brand text-3xl font-semibold sm:text-4xl">Cuéntame tu objetivo</h3>
+                      <p className="mt-4 max-w-lg text-sm leading-6 text-landing-muted sm:text-base sm:leading-7">Envíame tus datos y te responderé para valorar tu situación y encontrar la modalidad más adecuada.</p>
 
-                      <div className="relative mt-7 hidden min-h-[230px] flex-1 overflow-hidden rounded-[24px] border border-white/10 bg-black/25 shadow-2xl shadow-black/30 lg:block">
+                      <div className="relative mt-7 hidden min-h-[230px] flex-1 overflow-hidden rounded-xl border border-landing-border bg-landing-bg shadow-2xl shadow-black/30 lg:block">
                         <Image
                           src="/brand/chetesai-contacto-entrenador.webp"
                           alt="Entrenador Chetesaí Fitness+ supervisando una sesión personalizada"
@@ -455,43 +491,43 @@ export default function Main() {
                           sizes="420px"
                           className="object-cover object-[center_38%]"
                         />
-                        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#111612]/85 via-transparent to-black/5" />
-                        <p className="absolute bottom-5 left-5 right-5 text-sm font-bold tracking-wide text-white/90">Entrenamiento cercano, técnico y personalizado</p>
+                        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-landing-bg/90 via-transparent to-black/5" />
+                        <p className="absolute bottom-5 left-5 right-5 text-sm font-medium tracking-wide text-landing-text">Entrenamiento cercano, técnico y personalizado</p>
                       </div>
 
-                      <div className="mt-6 grid gap-3 text-xs leading-5 text-white/70 sm:grid-cols-2 lg:grid-cols-1">
-                        <p className="flex items-start gap-3"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#8cdb78]" /><span>Mallorca, Islas Baleares</span></p>
-                        <p className="flex items-start gap-3"><Mail className="mt-0.5 h-4 w-4 shrink-0 text-[#8cdb78]" /><span className="break-all">chetesaifitness@gmail.com</span></p>
-                        <p className="flex items-start gap-3"><Clock className="mt-0.5 h-4 w-4 shrink-0 text-[#8cdb78]" /><span>Respuesta habitual en menos de 24 horas</span></p>
-                        <p className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#8cdb78]" /><span>Uso exclusivo de los datos para atender tu solicitud</span></p>
+                      <div className="mt-6 grid gap-3 text-xs leading-5 text-landing-muted sm:grid-cols-2 lg:grid-cols-1">
+                        <p className="flex items-start gap-3"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-landing-lime" /><span>Mallorca, Islas Baleares</span></p>
+                        <p className="flex items-start gap-3"><Mail className="mt-0.5 h-4 w-4 shrink-0 text-landing-lime" /><span className="break-all">chetesaifitness@gmail.com</span></p>
+                        <p className="flex items-start gap-3"><Clock className="mt-0.5 h-4 w-4 shrink-0 text-landing-lime" /><span>Respuesta habitual en menos de 24 horas</span></p>
+                        <p className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-landing-lime" /><span>Uso exclusivo de los datos para atender tu solicitud</span></p>
                       </div>
                     </div>
 
-                    <form id="formulario-valoracion" onSubmit={submitReservation} className="border-t border-[#ded8cd] bg-white p-5 text-[#202724] sm:p-8 lg:border-l lg:border-t-0 lg:p-10">
+                    <form id="formulario-valoracion" onSubmit={submitReservation} className="border-t border-landing-border bg-landing-card p-5 text-landing-text sm:p-8 lg:border-l lg:border-t-0 lg:p-10">
                       <div className="mb-7">
-                        <p className="text-xs font-black uppercase tracking-[0.18em] text-[#2f9e24]">Formulario de valoración</p>
-                        <h3 className="mt-2 text-2xl font-black sm:text-3xl">Tu valoración empieza aquí</h3>
-                        <p className="mt-2 text-sm leading-6 text-[#67706b]">Completa tus datos y te responderé para confirmar el mejor punto de partida.</p>
+                        <p className="font-landing-mono text-[10px] font-medium uppercase tracking-[1px] text-landing-lime">Formulario de valoración</p>
+                        <h3 className="mt-2 font-brand text-2xl font-semibold sm:text-3xl">Tu valoración empieza aquí</h3>
+                        <p className="mt-2 text-sm leading-6 text-landing-muted">Completa tus datos y te responderé para confirmar el mejor punto de partida.</p>
                       </div>
                       <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
                       <div className="grid gap-4 sm:grid-cols-2">
                         <Field name="nombre" label="Nombre" required />
                         <Field name="email" label="Email" type="email" required />
                         <Field name="telefono" label="Teléfono" type="tel" />
-                        <label className="space-y-2 text-sm font-semibold">Modalidad<select name="modalidad" defaultValue="orientacion" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]"><option value="entrenamiento_personal">Entrenamiento personal</option><option value="grupo_reducido">Grupo reducido</option><option value="orientacion">Quiero orientación</option></select></label>
+                        <label className="space-y-2 text-sm font-medium">Modalidad<select name="modalidad" defaultValue="orientacion" className="w-full rounded-lg border border-landing-border bg-landing-bg px-4 py-3 font-normal text-landing-text outline-none [color-scheme:dark] focus:border-landing-lime"><option value="entrenamiento_personal">Entrenamiento personal</option><option value="grupo_reducido">Grupo reducido</option><option value="orientacion">Quiero orientación</option></select></label>
                         <Field name="fecha_preferida" label="Fecha preferida" type="date" required />
                         <Field name="franja_horaria" label="Hora aproximada" type="time" required />
                       </div>
-                      <p className="mt-2 text-xs text-[#67706b]">La hora solicitada queda pendiente de confirmación según disponibilidad.</p>
-                      <label className="mt-4 block space-y-2 text-sm font-semibold">Objetivo principal<input name="objetivo" className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" placeholder="Mejorar condición física, ganar fuerza, perder grasa..." /></label>
-                      <label className="mt-4 block space-y-2 text-sm font-semibold">Cuéntame un poco más<textarea name="mensaje" rows={4} className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" /></label>
-                      <label className="mt-4 flex items-start gap-3 text-xs leading-5 text-[#67706b]"><input type="checkbox" name="consentimiento" required className="mt-1" />Acepto que mis datos sean utilizados para responder a esta solicitud de información.</label>
+                      <p className="mt-2 text-xs text-landing-muted">La hora solicitada queda pendiente de confirmación según disponibilidad.</p>
+                      <label className="mt-4 block space-y-2 text-sm font-medium">Objetivo principal<input name="objetivo" className="w-full rounded-lg border border-landing-border bg-landing-bg px-4 py-3 font-normal text-landing-text outline-none placeholder:text-landing-muted focus:border-landing-lime" placeholder="Mejorar condición física, ganar fuerza, perder grasa..." /></label>
+                      <label className="mt-4 block space-y-2 text-sm font-medium">Cuéntame un poco más<textarea name="mensaje" rows={4} className="w-full rounded-lg border border-landing-border bg-landing-bg px-4 py-3 font-normal text-landing-text outline-none focus:border-landing-lime" /></label>
+                      <label className="mt-4 flex items-start gap-3 text-xs leading-5 text-landing-muted"><input type="checkbox" name="consentimiento" required className="mt-1 [accent-color:var(--landing-lime)]" />Acepto que mis datos sean utilizados para responder a esta solicitud de información.</label>
                       {formMessage ? <p className={`mt-4 rounded-xl px-4 py-3 text-sm ${formMessage.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{formMessage.text}</p> : null}
-                      <Button type="submit" disabled={sending} className="mt-6 w-full rounded-xl bg-[#2f9e24] py-6 text-base hover:bg-[#27891e]">{sending ? "Enviando solicitud..." : "Solicitar valoración"}</Button>
+                      <Button type="submit" disabled={sending} className="mt-6 w-full rounded-lg bg-gradient-to-b from-landing-lime to-landing-lime-dark py-6 text-base font-medium text-landing-bg shadow-[0_3px_12px_rgba(200,224,108,0.22)] transition-[filter] duration-200 hover:brightness-105 hover:text-landing-bg">{sending ? "Enviando solicitud..." : "Solicitar valoración"}</Button>
                       <button
                         type="button"
                         onClick={returnToStart}
-                        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d8d2c8] px-5 py-3.5 text-sm font-bold text-[#47504b] transition hover:border-[#2f9e24] hover:bg-[#f4f8f2] hover:text-[#27891e] focus:outline-none focus:ring-2 focus:ring-[#2f9e24]/40"
+                        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-landing-silver-start px-5 py-3.5 text-sm font-medium text-landing-text transition-colors duration-200 hover:border-landing-silver-end hover:bg-landing-bg hover:text-landing-lime focus:outline-none focus:ring-2 focus:ring-landing-lime/40"
                       >
                         <ArrowLeft className="h-4 w-4" />
                         Volver al inicio
@@ -503,37 +539,37 @@ export default function Main() {
             </div>
           ) : null}
 
-            <article id="sobre-mi" className="mx-auto mt-10 max-w-5xl scroll-mt-24 rounded-[28px] border border-[#b38d45]/35 bg-[#0f1713]/75 p-5 shadow-2xl shadow-black/25 backdrop-blur-xl sm:p-6">
-              <div className="grid gap-5 sm:grid-cols-[132px_1fr] sm:items-center">
-                <div className="mx-auto overflow-hidden rounded-2xl border border-white/15 bg-black/30 shadow-xl sm:mx-0">
-                  <img src={PROFILE_IMAGE_URL} alt="Raymond Vega, entrenador y profesional del deporte" className="h-44 w-32 object-cover object-top sm:h-48 sm:w-full" />
+            <article id="sobre-mi" className="mx-auto mt-10 max-w-5xl scroll-mt-24 rounded-xl border-[0.5px] border-landing-border bg-landing-card p-5 shadow-[0_2px_10px_rgba(0,0,0,0.25)] sm:p-6">
+              <div className="grid gap-6 sm:grid-cols-[160px_1fr] sm:items-center">
+                <div className="mx-auto h-36 w-36 overflow-hidden rounded-full border-[1.5px] border-landing-lime bg-landing-bg shadow-[0_0_16px_rgba(200,224,108,0.2)] sm:mx-0 sm:h-40 sm:w-40">
+                  <img src={PROFILE_IMAGE_URL} alt="Raymond Vega, entrenador y profesional del deporte" className="h-full w-full object-cover object-top" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#d7b86b]">Sobre mí</p>
-                  <h3 className="mt-2 text-2xl font-black text-white">Raymond Vega</h3>
-                  <p className="mt-3 text-sm leading-6 text-white/70">Profesional del entrenamiento, la nutrición y el rendimiento con una visión integral de la salud y la mejora física.</p>
-                  <p className="mt-3 text-sm font-semibold leading-6 text-[#9fe68f]">Método, seguimiento y adaptación individual para construir un progreso realista, medible y sostenible.</p>
+                  <p className="font-landing-mono text-[10px] font-medium uppercase tracking-[1px] text-landing-lime">Sobre mí</p>
+                  <h3 className="mt-2 font-brand text-2xl font-semibold text-landing-text">Raymond Vega</h3>
+                  <p className="mt-3 text-sm leading-6 text-landing-muted">Profesional del entrenamiento, la nutrición y el rendimiento con una visión integral de la salud y la mejora física.</p>
+                  <p className="mt-3 text-sm font-medium leading-6 text-landing-lime">Método, seguimiento y adaptación individual para construir un progreso realista, medible y sostenible.</p>
                 </div>
               </div>
 
-              <div className="mt-6 space-y-3">
+              <div className="mt-7 grid gap-3 lg:grid-cols-3">
                 {highlightedCredentials.map((credential) => (
-                  <div key={credential.title} className={`rounded-2xl border p-4 ${credential.featured ? "border-[#d7b86b]/55 bg-[#d7b86b]/10" : "border-white/10 bg-white/[0.04]"}`}>
+                  <div key={credential.title} className={`rounded-xl border-[0.5px] border-landing-border border-l-2 bg-landing-card p-[18px] ${credential.featured ? "border-l-landing-lime" : "border-l-landing-silver-end"}`}>
                     <div className="flex items-start gap-3">
-                      <div className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl ${credential.featured ? "bg-[#d7b86b] text-[#111612]" : "bg-[#8cdb78]/15 text-[#9fe68f]"}`}>
+                      <div className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg border ${credential.featured ? "border-landing-lime/35 bg-landing-lime/10 text-landing-lime" : "border-landing-border bg-landing-bg text-landing-silver-end"}`}>
                         <Award className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className={`text-[10px] font-black uppercase tracking-[0.16em] ${credential.featured ? "text-[#e7cb87]" : "text-[#8cdb78]"}`}>{credential.tag}</p>
-                        <p className="mt-1 text-sm font-bold leading-5 text-white">{credential.title}</p>
-                        <p className="mt-1 text-xs leading-5 text-white/60">{credential.detail}</p>
+                        <p className={`font-landing-mono text-[10px] font-medium uppercase tracking-[1px] ${credential.featured ? "text-landing-lime-dark" : "text-landing-muted"}`}>{credential.tag}</p>
+                        <p className="mt-1 font-brand text-[14.5px] font-medium leading-5 text-landing-text">{credential.title}</p>
+                        <p className="mt-1 text-xs leading-5 text-landing-muted">{credential.detail}</p>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <a href={PROFILE_PDF_URL} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#b38d45] px-5 py-3.5 text-sm font-black text-[#111612] transition hover:bg-[#c8a65b] focus:outline-none focus:ring-2 focus:ring-[#d7b86b] focus:ring-offset-2 focus:ring-offset-[#18211d]">
+              <a href={PROFILE_PDF_URL} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-landing-border bg-landing-bg px-5 py-3.5 text-sm font-medium text-landing-lime transition-colors duration-200 hover:border-landing-lime/55 hover:bg-landing-lime/5 focus:outline-none focus:ring-2 focus:ring-landing-lime focus:ring-offset-2 focus:ring-offset-landing-bg">
                 Ver perfil profesional <ExternalLink className="h-4 w-4" />
               </a>
             </article>
@@ -543,10 +579,10 @@ export default function Main() {
                 type="button"
                 onClick={openValuation}
                 aria-label="Abrir el formulario para solicitar una valoración"
-                className="valuation-cta min-h-16 w-full rounded-2xl border border-[#8cdb78]/40 bg-gradient-to-r from-[#278d20] via-[#36ad2b] to-[#278d20] px-7 py-5 text-base font-black text-white shadow-xl shadow-[#2f9e24]/20 hover:from-[#2f9e24] hover:via-[#42bd35] hover:to-[#2f9e24] sm:min-h-[72px] sm:text-lg"
+                className="valuation-cta min-h-16 w-full rounded-lg border border-landing-lime/40 bg-gradient-to-b from-landing-lime to-landing-lime-dark px-7 py-5 text-base font-medium text-landing-bg shadow-[0_3px_12px_rgba(200,224,108,0.25)] transition-[filter,box-shadow] duration-200 hover:brightness-105 hover:text-landing-bg hover:shadow-[0_6px_18px_rgba(200,224,108,0.3)] sm:min-h-[72px] sm:text-lg"
               >
                 <span>Solicitar valoración</span>
-                <span aria-hidden="true" className="grid h-9 w-9 place-items-center rounded-full bg-white/15">
+                <span aria-hidden="true" className="grid h-9 w-9 place-items-center rounded-full bg-landing-bg/10">
                   <ArrowRight className="h-5 w-5" />
                 </span>
               </Button>
@@ -554,23 +590,23 @@ export default function Main() {
         </div>
       </section>
 
-      <footer className="bg-[#111612] text-white/55">
+      <footer className="border-t border-landing-border bg-landing-bg text-landing-muted">
         <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-5 text-sm sm:flex-row">
             <div className="flex items-center gap-3">
-              <div className="grid h-11 w-11 place-items-center overflow-hidden rounded-xl bg-white p-1"><img src={files.logo.url} alt="Chetesaí Fitness+" className="h-full w-full object-contain" /></div>
-              <div><p className="font-bold text-white">Chetesaí Fitness+</p><p>Entrena con cabeza. Mejora con método.</p></div>
+              <div className="grid h-11 w-11 place-items-center overflow-hidden rounded-xl bg-landing-card p-1"><img src={files.logo.url} alt="Chetesaí Fitness+" className="h-full w-full object-contain" /></div>
+              <div><p className="font-medium text-landing-text">Chetesaí Fitness+</p><p>Entrena con cabeza. Mejora con método.</p></div>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-5">
-              <Link href="/login" className="transition hover:text-white">Acceso privado</Link>
+              <Link href="/login" className="transition-colors duration-200 hover:text-landing-lime">Acceso privado</Link>
               <span>© {new Date().getFullYear()} Chetesaí Fitness+</span>
             </div>
           </div>
-          <nav aria-label="Información legal" className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 border-t border-white/10 pt-6 text-sm">
-            <Link href="/privacy-policy" className="transition hover:text-[#8cdb78]">Política de privacidad</Link>
-            <Link href="/terms-of-service" className="transition hover:text-[#8cdb78]">Términos y condiciones</Link>
-            <Link href="/politica-cookies" className="transition hover:text-[#8cdb78]">Política de cookies</Link>
-            <Link href="/aviso-legal" className="transition hover:text-[#8cdb78]">Aviso legal</Link>
+          <nav aria-label="Información legal" className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 border-t border-landing-border pt-6 text-sm">
+            <Link href="/privacy-policy" className="transition-colors duration-200 hover:text-landing-lime">Política de privacidad</Link>
+            <Link href="/terms-of-service" className="transition-colors duration-200 hover:text-landing-lime">Términos y condiciones</Link>
+            <Link href="/politica-cookies" className="transition-colors duration-200 hover:text-landing-lime">Política de cookies</Link>
+            <Link href="/aviso-legal" className="transition-colors duration-200 hover:text-landing-lime">Aviso legal</Link>
           </nav>
         </div>
       </footer>
@@ -579,5 +615,5 @@ export default function Main() {
 }
 
 function Field({ name, label, type = "text", required = false }: { name: string; label: string; type?: string; required?: boolean }) {
-  return <label className="space-y-2 text-sm font-semibold">{label}<input name={name} type={type} required={required} className="w-full rounded-xl border border-[#d8d2c8] px-4 py-3 font-normal outline-none focus:border-[#2f9e24]" /></label>;
+  return <label className="space-y-2 text-sm font-medium">{label}<input name={name} type={type} required={required} className="w-full rounded-lg border border-landing-border bg-landing-bg px-4 py-3 font-normal text-landing-text outline-none [color-scheme:dark] focus:border-landing-lime" /></label>;
 }

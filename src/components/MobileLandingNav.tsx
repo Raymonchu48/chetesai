@@ -105,7 +105,7 @@ export function MobileLandingNav() {
         aria-expanded={open}
         aria-controls="mobile-landing-menu"
         onClick={() => setOpen(true)}
-        className="fixed left-4 top-4 z-[76] grid h-12 w-12 place-items-center rounded-2xl border border-[#b38d45]/40 bg-[#101713] text-white shadow-lg xl:hidden"
+        className="fixed left-4 top-4 z-[76] grid h-12 w-12 place-items-center rounded-xl border border-landing-border bg-landing-card font-landing-sans text-landing-text shadow-lg xl:hidden"
       >
         <Menu className="h-6 w-6" />
       </button>
@@ -121,20 +121,20 @@ export function MobileLandingNav() {
       <aside
         id="mobile-landing-menu"
         aria-label="Navegación móvil"
-        className={`fixed left-0 top-0 z-[90] flex h-dvh w-[86%] max-w-sm flex-col border-r border-[#b38d45]/25 bg-[#101713] text-white shadow-2xl transition-transform duration-300 ease-out xl:hidden ${
+        className={`fixed left-0 top-0 z-[90] flex h-dvh w-[86%] max-w-sm flex-col border-r border-landing-border bg-landing-card font-landing-sans text-landing-text shadow-2xl transition-transform duration-300 ease-out xl:hidden ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between border-b border-white/10 px-5 py-5">
+        <div className="flex items-center justify-between border-b border-landing-border px-5 py-5">
           <div>
-            <p className="text-sm font-black">Chetesaí Fitness+</p>
-            <p className="mt-1 text-xs text-white/55">Navegación</p>
+            <p className="font-brand text-sm font-semibold">Chetesaí Fitness+</p>
+            <p className="mt-1 text-xs text-landing-muted">Navegación</p>
           </div>
           <button
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Cerrar menú"
-            className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-white/5"
+            className="grid h-11 w-11 place-items-center rounded-lg border border-landing-border bg-landing-bg transition-colors duration-200 hover:border-landing-silver-start"
           >
             <X className="h-5 w-5" />
           </button>
@@ -149,9 +149,9 @@ export function MobileLandingNav() {
                   key={item.id}
                   type="button"
                   onClick={() => goToSection(item.id)}
-                  className="flex w-full items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.035] px-4 py-4 text-left transition hover:border-[#8cdb78]/35 hover:bg-[#8cdb78]/10"
+                  className="flex w-full items-center gap-4 rounded-xl border border-landing-border bg-landing-bg px-4 py-4 text-left transition-colors duration-200 hover:border-landing-lime/35 hover:bg-landing-lime/5"
                 >
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#8cdb78]/10 text-[#8cdb78]">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-landing-border bg-landing-card text-landing-lime">
                     <Icon className="h-5 w-5" />
                   </span>
                   <span className="font-semibold">{item.label}</span>
@@ -162,20 +162,20 @@ export function MobileLandingNav() {
             <Link
               href="/login"
               onClick={() => setOpen(false)}
-              className="flex w-full items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.035] px-4 py-4 transition hover:border-[#8cdb78]/35 hover:bg-[#8cdb78]/10"
+              className="flex w-full items-center gap-4 rounded-xl border border-landing-border bg-landing-bg px-4 py-4 transition-colors duration-200 hover:border-landing-lime/35 hover:bg-landing-lime/5"
             >
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#8cdb78]/10 text-[#8cdb78]">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-landing-border bg-landing-card text-landing-lime">
                 <CircleUserRound className="h-5 w-5" />
               </span>
               <span className="font-semibold">Acceso clientes</span>
             </Link>
           </div>
 
-          <div className="mt-6 space-y-3 border-t border-white/10 pt-6">
+          <div className="mt-6 space-y-3 border-t border-landing-border pt-6">
             <button
               type="button"
               onClick={openValuation}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#2f9e24] px-4 py-4 font-bold text-white shadow-lg shadow-[#2f9e24]/15"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-b from-landing-lime to-landing-lime-dark px-4 py-4 font-medium text-landing-bg shadow-[0_3px_12px_rgba(200,224,108,0.25)]"
             >
               <CalendarDays className="h-5 w-5" />
               Reserva tu valoración
@@ -183,7 +183,7 @@ export function MobileLandingNav() {
             <button
               type="button"
               onClick={openRates}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 px-4 py-4 font-bold text-white"
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-landing-silver-start bg-transparent px-4 py-4 font-medium text-landing-text"
             >
               <Tags className="h-5 w-5" />
               Ver tarifas

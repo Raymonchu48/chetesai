@@ -11,6 +11,19 @@
   --font-brand: var(--font-fraunces);
   --font-interface: var(--font-instrument-sans);
   --font-meta: var(--font-space-grotesk);
+  --font-landing-sans: var(--font-inter);
+  --font-landing-mono: var(--font-ibm-plex-mono);
+  --color-landing-bg: var(--landing-bg);
+  --color-landing-card: var(--landing-card);
+  --color-landing-border: var(--landing-border);
+  --color-landing-text: var(--landing-text);
+  --color-landing-muted: var(--landing-muted);
+  --color-landing-lime: var(--landing-lime);
+  --color-landing-lime-dark: var(--landing-lime-dark);
+  --color-landing-silver-start: var(--landing-silver-start);
+  --color-landing-silver-end: var(--landing-silver-end);
+  --color-landing-step-start: var(--landing-step-start);
+  --color-landing-step-end: var(--landing-step-end);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -47,6 +60,17 @@
 }
 
 :root {
+  --landing-bg: #0b0d0c;
+  --landing-card: #151815;
+  --landing-border: #232823;
+  --landing-text: #f3f5ee;
+  --landing-muted: #8f958a;
+  --landing-lime: #c8e06c;
+  --landing-lime-dark: #94a852;
+  --landing-silver-start: #3a3c3a;
+  --landing-silver-end: #8a8d89;
+  --landing-step-start: #1d211d;
+  --landing-step-end: #0f110f;
   --radius: 0.625rem;
   --background: oklch(0.98 0.002 90);
   --foreground: oklch(0.15 0.02 260);
@@ -136,9 +160,9 @@ img[alt="Chetesaí Fitness+"] {
 }
 
 button:has(img[alt="Chetesaí Fitness+"]) {
-  border: 1px solid rgba(199, 162, 84, 0.32);
+  border: 1px solid rgba(138, 141, 137, 0.34);
   border-radius: 1.5rem;
-  background: linear-gradient(145deg, rgba(8, 8, 8, 0.72), rgba(18, 18, 17, 0.5));
+  background: linear-gradient(145deg, rgba(11, 13, 12, 0.92), rgba(21, 24, 21, 0.82));
   padding: 0.5rem 0.75rem;
   box-shadow: 0 14px 38px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(16px);
@@ -147,7 +171,7 @@ button:has(img[alt="Chetesaí Fitness+"]) {
 
 button:has(img[alt="Chetesaí Fitness+"]) > div:first-child {
   background: rgba(0, 0, 0, 0.2) !important;
-  box-shadow: inset 0 0 0 1px rgba(199, 162, 84, 0.18) !important;
+  box-shadow: inset 0 0 0 1px rgba(200, 224, 108, 0.18) !important;
   padding: 0.25rem !important;
 }
 
@@ -208,8 +232,8 @@ button:has(img[alt="Chetesaí Fitness+"]) img {
 }
 
 footer div:has(> img[alt="Chetesaí Fitness+"]) {
-  background: linear-gradient(145deg, rgba(4, 6, 5, 0.96), rgba(14, 16, 14, 0.92)) !important;
-  border: 1px solid rgba(199, 162, 84, 0.32);
+  background: linear-gradient(145deg, rgba(11, 13, 12, 0.98), rgba(21, 24, 21, 0.94)) !important;
+  border: 1px solid rgba(138, 141, 137, 0.34);
   padding: 0.22rem !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 22px rgba(0, 0, 0, 0.35);
 }
@@ -250,15 +274,15 @@ footer img[alt="Chetesaí Fitness+"] {
   position: absolute;
   inset: -6px;
   z-index: -1;
-  border: 2px solid rgba(140, 219, 120, 0.6);
-  border-radius: 1.25rem;
+  border: 1px solid rgba(200, 224, 108, 0.52);
+  border-radius: 0.75rem;
   pointer-events: none;
   animation: valuation-heartbeat 2.8s ease-out infinite;
 }
 
 .valuation-cta:hover {
   transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 20px 42px rgba(47, 158, 36, 0.32);
+  box-shadow: 0 18px 38px rgba(200, 224, 108, 0.22);
   filter: saturate(1.08);
 }
 
