@@ -447,3 +447,86 @@ main :where(a,button,input,select,textarea):focus-visible{outline:2px solid var(
   #sobre-mi>div:nth-child(2){grid-template-columns:1fr}
   #sobre-mi>div:first-child>div:first-child{width:120px;height:120px}
 }
+/* === RESTORE LIGHT PAGE BASE 2026 === */
+:root{
+  --page-warm:#F7F4EE;
+  --page-panel:#FFFDF9;
+  --page-process:#EEF3EB;
+  --page-text:#202724;
+  --page-muted:#67706B;
+}
+
+html,
+body,
+main{
+  background:var(--page-warm)!important;
+  color:var(--page-text)!important;
+}
+
+/* Mantener hero y cabecera oscuros */
+#inicio{
+  background:#050706!important;
+  color:var(--chetesai-text)!important;
+}
+
+/* Recuperar base clara anterior sin tocar las tarjetas */
+#servicios{
+  background:var(--page-warm)!important;
+}
+
+#servicios>div:first-child h2,
+#proceso>div>div:first-child h2,
+#faq>div>div:first-child h2,
+#tarifas>div:first-child h2{
+  color:var(--page-text)!important;
+}
+
+#servicios>div:first-child>p:last-child,
+#proceso>div>div:first-child>p:last-child,
+#faq>div>div:first-child>p:last-child,
+#tarifas>div:first-child>p:last-child{
+  color:var(--page-muted)!important;
+}
+
+/* La infografía conserva círculos, línea, tipografías y acentos */
+#proceso{
+  background:var(--page-process)!important;
+  border-color:#D7DFD3!important;
+}
+
+#proceso article h3{
+  color:var(--page-text)!important;
+}
+
+#proceso article p{
+  color:var(--page-muted)!important;
+}
+
+/* FAQ vuelve a la superficie clara, manteniendo el acordeón premium */
+#faq{
+  background:var(--page-panel)!important;
+  border-color:#DED8CD!important;
+}
+
+/* Tarifas sobre fondo cálido */
+#tarifas{
+  background:var(--page-warm)!important;
+}
+
+/* Sección final como en la versión anterior */
+#contacto{
+  background:#18211D!important;
+  color:white!important;
+}
+
+footer{
+  background:#111612!important;
+}
+
+/* Evitar que el color global claro afecte a las tarjetas premium ya rediseñadas */
+#servicios article,
+#faq .mt-10,
+#sobre-mi,
+#sobre-mi>div:nth-child(2)>div{
+  color:var(--chetesai-text)!important;
+}
