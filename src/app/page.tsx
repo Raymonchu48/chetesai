@@ -114,6 +114,18 @@ export default function Main() {
     setShowValuation(true);
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const directValuation =
+      params.get("valoracion") === "1" ||
+      params.get("valoracion") === "true" ||
+      window.location.hash === "#valoracion";
+
+    if (directValuation) {
+      openValuation();
+    }
+  }, [openValuation]);
+
   const returnToStart = useCallback(() => {
     setShowValuation(false);
     window.setTimeout(() => {
