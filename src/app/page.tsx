@@ -485,11 +485,11 @@ export default function Main() {
 
                       <div className="relative mt-7 hidden min-h-[230px] flex-1 overflow-hidden rounded-xl border border-landing-border bg-landing-bg shadow-2xl shadow-black/30 lg:block">
                         <Image
-                          src="/brand/chetesai-contacto-entrenador.webp"
-                          alt="Entrenador Chetesaí Fitness+ supervisando una sesión personalizada"
+                          src="/brand/chetesai-valoracion-retrato.webp"
+                          alt="Raymond Vega, entrenador de Chetesaí Fitness+"
                           fill
                           sizes="420px"
-                          className="object-cover object-[center_38%]"
+                          className="object-cover object-[center_35%]"
                         />
                         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-landing-bg/90 via-transparent to-black/5" />
                         <p className="absolute bottom-5 left-5 right-5 text-sm font-medium tracking-wide text-landing-text">Entrenamiento cercano, técnico y personalizado</p>
