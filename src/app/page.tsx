@@ -114,6 +114,18 @@ export default function Main() {
     setShowValuation(true);
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const directValuation =
+      params.get("valoracion") === "1" ||
+      params.get("valoracion") === "true" ||
+      window.location.hash === "#valoracion";
+
+    if (directValuation) {
+      openValuation();
+    }
+  }, [openValuation]);
+
   const returnToStart = useCallback(() => {
     setShowValuation(false);
     window.setTimeout(() => {
@@ -449,11 +461,11 @@ export default function Main() {
 
                       <div className="relative mt-7 hidden min-h-[230px] flex-1 overflow-hidden rounded-[24px] border border-white/10 bg-black/25 shadow-2xl shadow-black/30 lg:block">
                         <Image
-                          src="/brand/chetesai-contacto-entrenador.webp"
-                          alt="Entrenador Chetesaí Fitness+ supervisando una sesión personalizada"
+                          src="/brand/chetesai-valoracion-retrato.webp"
+                          alt="Raymond Vega, entrenador de Chetesaí Fitness+"
                           fill
                           sizes="420px"
-                          className="object-cover object-[center_38%]"
+                          className="object-cover object-[center_35%]"
                         />
                         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#111612]/85 via-transparent to-black/5" />
                         <p className="absolute bottom-5 left-5 right-5 text-sm font-bold tracking-wide text-white/90">Entrenamiento cercano, técnico y personalizado</p>
