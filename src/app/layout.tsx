@@ -1,7 +1,7 @@
 // src/app/layout.tsx
 import React from "react";
 import type { Metadata } from "next";
-import { Fraunces, Geist, Geist_Mono, Instrument_Sans, Space_Grotesk } from "next/font/google";
+import { Fraunces, Geist, Geist_Mono, IBM_Plex_Mono, Instrument_Sans, Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import "./mobile-fixes.css";
 import { ScriptExecutor } from "@/components/ScriptExecutor";
@@ -30,6 +30,18 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   display: "swap",
 });
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
+});
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex-mono",
+  subsets: ["latin"],
+  weight: ["500"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "ChetesaíFitness+ - Centro de Entrenamiento Personal",
@@ -43,7 +55,7 @@ export const revalidate = 0;
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${instrumentSans.variable} ${spaceGrotesk.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${instrumentSans.variable} ${spaceGrotesk.variable} ${inter.variable} ${ibmPlexMono.variable} antialiased`}>
         <GlobalErrorCatcher />
         <ScriptExecutor />
         <DevToolsHandler />
