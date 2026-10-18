@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import LogoutButton from "@/components/LogoutButton";
+import "./professional-panel.css";
 
 const BRAND_MARK = "/brand/chetesai-logo-mark.svg";
 
@@ -48,7 +49,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-background md:flex md:h-screen md:overflow-hidden">
+    <div className="professional-panel min-h-screen bg-background md:flex md:h-screen md:overflow-hidden">
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-sidebar-border bg-sidebar px-4 text-sidebar-foreground shadow-sm md:hidden">
         <Link href="/dashboard" className="flex min-w-0 items-center gap-3">
           <img src={BRAND_MARK} alt="Chetesaí Fitness+" className="h-11 w-11 shrink-0 object-contain" />
