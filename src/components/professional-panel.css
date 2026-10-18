@@ -1,0 +1,89 @@
+/* Scope the professional palette to its shell, including Radix portals in body. */
+body:has(.professional-panel) {
+  color-scheme: light;
+  --background: #f7f4ee;
+  --foreground: #1c3022;
+  --card: #c0dfba;
+  --card-foreground: #1c3022;
+  --popover: #dcebd7;
+  --popover-foreground: #1c3022;
+  --primary: #315c3a;
+  --primary-foreground: #ffffff;
+  --secondary: #d2e6cc;
+  --secondary-foreground: #1c3022;
+  --muted: #d7e7d2;
+  --muted-foreground: #304833;
+  --accent: #c7dfbf;
+  --accent-foreground: #1c3022;
+  --border: #8fa98a;
+  --input: #829d7d;
+  --ring: #315c3a;
+  --sidebar: #c0dfba;
+  --sidebar-foreground: #1c3022;
+  --sidebar-primary: #315c3a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #d8ecd2;
+  --sidebar-accent-foreground: #1c3022;
+  --sidebar-border: #8fa98a;
+  --sidebar-ring: #315c3a;
+  --professional-silver-green: linear-gradient(
+    180deg,
+    #85a480 0%,
+    #a4cfa0 30%,
+    #c2f7be 70%,
+    #b2d6ad 100%
+  );
+}
+
+.professional-panel [data-slot="card"],
+.professional-panel > aside,
+.professional-panel > header,
+.professional-panel footer,
+body:has(.professional-panel) :is(
+  [data-slot="dialog-content"],
+  [data-slot="alert-dialog-content"],
+  [data-slot="sheet-content"],
+  [data-slot="select-content"],
+  [data-slot="popover-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="dropdown-menu-sub-content"],
+  [data-slot="context-menu-content"]
+) {
+  background: var(--professional-silver-green);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.professional-panel footer :is(p, span, a) {
+  color: var(--muted-foreground) !important;
+}
+
+.professional-panel :is(aside, header) :is(
+  .text-sidebar-foreground\/60,
+  .text-sidebar-foreground\/70
+) {
+  color: var(--muted-foreground);
+}
+
+/* Override the landing page's global main colors only inside this shell. */
+.professional-panel > main {
+  background: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+body:has(.professional-panel) :is(
+  [data-slot="input"],
+  [data-slot="textarea"],
+  [data-slot="select-trigger"]
+) {
+  background-color: #f4f8f0;
+  color: var(--foreground);
+}
+
+.professional-panel [data-slot="table-row"]:hover {
+  background-color: #e2f1dc80;
+}
+
+body:has(.professional-panel) :is(a, button, input, select, textarea):focus-visible {
+  outline-color: var(--ring) !important;
+}
