@@ -54,6 +54,7 @@ type Ejercicio = {
   errores_frecuentes?: string | null;
   consejos?: string | null;
   imagen_url?: string | null;
+  imagen_mujer_url?: string | null;
   gif_url?: string | null;
   miniatura_url?: string | null;
   video_url?: string | null;
@@ -266,11 +267,10 @@ export default function EntrenamientoVisualPage() {
     if (!wideLayout) setMobileDetailOpen(true);
   }
 
-  function updateExerciseImage(url: string) {
-    const selectedId = selected?._id;
-    if (!selectedId) return;
-    setItems((current) => current.map((item) => item._id === selectedId ? { ...item, imagen_url: url } : item));
-    setSelected((current) => current ? { ...current, imagen_url: url } : current);
+  function updateExerciseImage(exerciseId: string, model: ExerciseVisualModel, url: string) {
+    const field = model === "mujer" ? "imagen_mujer_url" : "imagen_url";
+    setItems((current) => current.map((item) => item._id === exerciseId ? { ...item, [field]: url } : item));
+    setSelected((current) => current?._id === exerciseId ? { ...current, [field]: url } : current);
   }
 
   async function deleteExercise(item: Ejercicio) {
@@ -396,7 +396,7 @@ function ExerciseCard({ item, visualModel, selected, favorite, onSelect, onFavor
   );
 }
 
-function ExerciseDetail({ item, visualModel, favorite, deleting, onFavorite, onImageUploaded, onDelete }: { item: Ejercicio; visualModel: ExerciseVisualModel; favorite: boolean; deleting: boolean; onFavorite: () => void; onImageUploaded: (url: string) => void; onDelete: () => void }) {
+function ExerciseDetail({ item, visualModel, favorite, deleting, onFavorite, onImageUploaded, onDelete }: { item: Ejercicio; visualModel: ExerciseVisualModel; favorite: boolean; deleting: boolean; onFavorite: () => void; onImageUploaded: (exerciseId: string, model: ExerciseVisualModel, url: string) => void; onDelete: () => void }) {
   const errors = listFromText(item.errores_frecuentes);
   const tips = listFromText(item.consejos);
   const technique = listFromText(item.tecnica);
@@ -419,7 +419,7 @@ function ExerciseDetail({ item, visualModel, favorite, deleting, onFavorite, onI
 
       <div className="space-y-3 p-5 pt-4">
         <Button asChild variant="outline" className="w-full"><Link href={`/ejercicios?editar=${item._id}`}><PlayCircle className="mr-2 h-4 w-4"/>Gestionar vídeos y variantes</Link></Button>
-        <div className="rounded-xl border bg-[#f8faf6] p-3"><p className="mb-2 text-xs font-bold">Imagen del ejercicio</p><ExerciseMediaUploader kind="imagen" label="Imagen principal" exerciseName={item.nombre} exerciseId={item._id} value={item.imagen_url || null} onUploaded={onImageUploaded} compact/></div>
+        <div className="rounded-xl border bg-[#f8faf6] p-3"><p className="mb-2 text-xs font-bold">Imagen del ejercicio</p><ExerciseMediaUploader kind="imagen" label={`Imagen ${visualModel}`} exerciseName={item.nombre} exerciseId={item._id} visualModel={visualModel} value={(visualModel === "mujer" ? item.imagen_mujer_url : item.imagen_url) || null} onUploaded={(url) => onImageUploaded(item._id, visualModel, url)} compact/></div>
         <AssignExerciseToClient exerciseId={item._id} exerciseName={item.nombre}/>
         <Button variant="outline" onClick={onDelete} disabled={deleting} className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"><Trash2 className="mr-2 h-4 w-4"/>{deleting ? "Eliminando..." : "Eliminar ejercicio"}</Button>
       </div>

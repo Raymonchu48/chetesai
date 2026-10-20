@@ -15,6 +15,7 @@ type Props = {
   value: string | null;
   onUploaded: (url: string) => void;
   exerciseId?: string;
+  visualModel?: "hombre" | "mujer";
   compact?: boolean;
 };
 
@@ -63,7 +64,7 @@ async function readApiResult(response: Response, fallback: string): Promise<ApiR
   }
 }
 
-export default function ExerciseMediaUploader({ kind, label, exerciseName, value, onUploaded, exerciseId, compact = false }: Props) {
+export default function ExerciseMediaUploader({ kind, label, exerciseName, value, onUploaded, exerciseId, visualModel = "hombre", compact = false }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -86,6 +87,7 @@ export default function ExerciseMediaUploader({ kind, label, exerciseName, value
           kind,
           exerciseName: exerciseName || "ejercicio",
           exerciseId: exerciseId || "",
+          visualModel,
           fileName: file.name,
           fileType: file.type,
           fileSize: file.size,
@@ -121,6 +123,7 @@ export default function ExerciseMediaUploader({ kind, label, exerciseName, value
           kind,
           path,
           exerciseId: exerciseId || "",
+          visualModel,
         }),
       });
       const finalizeResult = await readApiResult(finalizeResponse, "No se pudo guardar la imagen");
