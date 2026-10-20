@@ -7,6 +7,7 @@ type ExerciseMediaItem = {
   grupo_muscular: string;
   material?: string | null;
   imagen_url?: string | null;
+  imagen_mujer_url?: string | null;
   gif_url?: string | null;
   miniatura_url?: string | null;
 };
@@ -17,14 +18,15 @@ type Props = {
 };
 
 export default function ExerciseMediaVisual({ item, visualModel = "hombre" }: Props) {
-  const uploaded = item.imagen_url || item.gif_url || item.miniatura_url;
+  const uploaded = visualModel === "mujer"
+    ? item.imagen_mujer_url
+    : item.imagen_url || item.gif_url || item.miniatura_url;
   const finalLegTile = item.grupo_muscular === "piernas"
     ? getFinalLegTile(item.nombre, item.codigo_interno)
     : -1;
 
-  // En el modelo femenino usamos la ilustración generada para evitar mostrar
-  // fotografías o bancos visuales masculinos que no tienen versión equivalente.
-  if (uploaded && visualModel === "hombre") {
+  // Each model uses its own uploaded image; existing male media stays intact.
+  if (uploaded) {
     return <img src={uploaded} alt={item.nombre} className="h-full w-full object-contain bg-white" />;
   }
 

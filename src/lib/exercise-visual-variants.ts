@@ -21,6 +21,7 @@ export type ExerciseVisualVariantSource = {
   tecnica?: string | null;
   video_url?: string | null;
   imagen_url?: string | null;
+  imagen_mujer_url?: string | null;
   gif_url?: string | null;
   miniatura_url?: string | null;
   variante_facil?: string | null;

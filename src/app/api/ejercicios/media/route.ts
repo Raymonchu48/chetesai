@@ -41,6 +41,7 @@ type UploadPayload = {
   fileType?: string;
   fileSize?: number;
   path?: string;
+  visualModel?: "hombre" | "mujer";
 };
 
 function slugify(value: string) {
@@ -189,7 +190,9 @@ async function finalizeUpload(payload: UploadPayload) {
   }
 
   if (exerciseId) {
-    const field = fieldByKind[kind];
+    const field = kind === "imagen" && payload.visualModel === "mujer"
+      ? "imagen_mujer_url"
+      : fieldByKind[kind];
     const saveResponse = await fetch(
       supabaseUrl + "/rest/v1/ejercicios?id=eq." + encodeURIComponent(exerciseId),
       {
@@ -198,7 +201,7 @@ async function finalizeUpload(payload: UploadPayload) {
           apikey: serviceKey,
           Authorization: "Bearer " + serviceKey,
           "Content-Type": "application/json",
-          Prefer: "return=minimal",
+          Prefer: "return=representation",
         },
         body: JSON.stringify({ [field]: publicUrl }),
         cache: "no-store",
@@ -208,6 +211,8 @@ async function finalizeUpload(payload: UploadPayload) {
       const saveError = await saveResponse.text();
       throw new Error(saveError || "La imagen se subió, pero no pudo vincularse al ejercicio");
     }
+    const saved = await saveResponse.json() as Array<{ id: string }>;
+    if (saved.length !== 1) throw new Error("El ejercicio ya no existe; no se ha guardado la imagen");
   }
 
   return NextResponse.json({
@@ -230,8 +235,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (payload.action === "sign") return createSignedUpload(payload);
-    if (payload.action === "finalize") return finalizeUpload(payload);
+    if (payload.visualModel !== undefined && !["hombre", "mujer"].includes(payload.visualModel)) {
+      return NextResponse.json({ ok: false, error: "Modelo visual no válido" }, { status: 400 });
+    }
+
+    if (payload.action === "sign") return await createSignedUpload(payload);
+    if (payload.action === "finalize") return await finalizeUpload(payload);
 
     return NextResponse.json({ ok: false, error: "Acción de subida no válida" }, { status: 400 });
   } catch (error) {
