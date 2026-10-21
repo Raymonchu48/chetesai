@@ -103,6 +103,18 @@ export async function middleware(request: NextRequest) {
   }
 
   const session = await validateSession(request);
+
+  // Punto de entrada único para la app instalada; nunca pasar por la web pública.
+  if (pathname === "/app") {
+    const target = session.valid && session.role
+      ? (session.role === "cliente" ? "/portal" : "/dashboard")
+      : "/login";
+    const response = NextResponse.redirect(new URL(target, request.url));
+    if (session.valid) persistRefreshedSession(response, session);
+    else clearSessionCookies(response);
+    return response;
+  }
+
   const isPortalApi = pathname.startsWith("/api/portal");
   const isProfessionalApi =
     pathname.startsWith("/api/dashboard") ||
@@ -169,6 +181,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/login",
+    "/app",
     "/dashboard/:path*",
     "/portal/:path*",
     "/clientes/:path*",
