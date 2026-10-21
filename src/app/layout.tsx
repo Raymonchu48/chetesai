@@ -10,6 +10,7 @@ import { GlobalErrorCatcher } from "@/components/GlobalErrorCatcher";
 import { MobileLandingNav } from "@/components/MobileLandingNav";
 import { ChetesaiAiAssistant } from "@/components/ChetesaiAiAssistant";
 import { Toaster } from "@/components/ui/sonner";
+import { PwaServiceWorker } from "@/components/PwaServiceWorker";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -33,6 +34,10 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "ChetesaíFitness+ - Centro de Entrenamiento Personal",
+  applicationName: "Chetesaí Fitness+",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "Chetesaí Fitness+", statusBarStyle: "black-translucent" },
+  icons: { icon: [{ url: "/brand/chetesai-app-192.png", sizes: "192x192", type: "image/png" }], apple: [{ url: "/brand/chetesai-app-192.png" }] },
   description: "Gestiona tu centro de entrenamiento personal: clientes, sesiones, pagos y ejercicios",
 };
 
@@ -47,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GlobalErrorCatcher />
         <ScriptExecutor />
         <DevToolsHandler />
+        <PwaServiceWorker />
         <MobileLandingNav />
         <ChetesaiAiAssistant />
         <div className="min-h-screen flex flex-col">
