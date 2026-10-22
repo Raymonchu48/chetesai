@@ -127,7 +127,7 @@ export function MobileLandingNav() {
       >
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-5">
           <div>
-            <p className="text-sm font-black">Chetesaí Fitness+</p>
+            <img src="/brand/logo-horizontal.svg" alt="Chetesaí Fitness+" width={186} height={50} />
             <p className="mt-1 text-xs text-white/55">Navegación</p>
           </div>
           <button

@@ -1,0 +1,6 @@
+/* Keep the approved access palette independent of global landing styles. */
+main.chetesai-login {
+  background-color: #101713 !important;
+  color: #D1D4D2 !important;
+  color-scheme: dark;
+}
