@@ -131,30 +131,6 @@ button {
   cursor: pointer;
 }
 
-img[alt="Chetesaí Fitness+"] {
-  content: url("/brand/chetesai-logo-mark.svg");
-}
-
-button:has(img[alt="Chetesaí Fitness+"]) {
-  border: 1px solid rgba(199, 162, 84, 0.32);
-  border-radius: 1.5rem;
-  background: linear-gradient(145deg, rgba(8, 8, 8, 0.72), rgba(18, 18, 17, 0.5));
-  padding: 0.5rem 0.75rem;
-  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-button:has(img[alt="Chetesaí Fitness+"]) > div:first-child {
-  background: rgba(0, 0, 0, 0.2) !important;
-  box-shadow: inset 0 0 0 1px rgba(199, 162, 84, 0.18) !important;
-  padding: 0.25rem !important;
-}
-
-button:has(img[alt="Chetesaí Fitness+"]) img {
-  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.45));
-}
-
 #inicio > div.relative.z-10.mx-auto.grid.max-w-7xl {
   display: flex !important;
   align-items: center;
