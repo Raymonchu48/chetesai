@@ -1,44 +1,37 @@
-/* Scope the professional palette to its shell, including Radix portals in body. */
+/* Grafito y salvia: scoped to the professional shell and its Radix portals. */
 body:has(.professional-panel) {
   color-scheme: light;
-  --background: #f7f4ee;
-  --foreground: #1c3022;
-  --card: #c0dfba;
-  --card-foreground: #1c3022;
-  --popover: #dcebd7;
-  --popover-foreground: #1c3022;
-  --primary: #315c3a;
-  --primary-foreground: #ffffff;
-  --secondary: #d2e6cc;
-  --secondary-foreground: #1c3022;
-  --muted: #d7e7d2;
-  --muted-foreground: #304833;
-  --accent: #c7dfbf;
-  --accent-foreground: #1c3022;
-  --border: #8fa98a;
-  --input: #829d7d;
-  --ring: #315c3a;
-  --sidebar: #c0dfba;
-  --sidebar-foreground: #1c3022;
-  --sidebar-primary: #315c3a;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #d8ecd2;
-  --sidebar-accent-foreground: #1c3022;
-  --sidebar-border: #8fa98a;
-  --sidebar-ring: #315c3a;
-  --professional-silver-green: linear-gradient(
-    180deg,
-    #85a480 0%,
-    #a4cfa0 30%,
-    #c2f7be 70%,
-    #b2d6ad 100%
-  );
+  --background: #E9ECE8;
+  --foreground: #26342D;
+  --card: #F7F8F5;
+  --card-foreground: #26342D;
+  --popover: #F7F8F5;
+  --popover-foreground: #26342D;
+  --primary: #78977D;
+  --primary-foreground: #15231B;
+  --secondary: #E1E7DF;
+  --secondary-foreground: #26342D;
+  --muted: #E1E7DF;
+  /* Approved secondary hue is retained for decoration; small text needs 4.5:1. */
+  --professional-secondary: #728278;
+  --muted-foreground: #53655A;
+  --accent: #78977D;
+  --accent-foreground: #15231B;
+  --border: #CDD5CC;
+  --input: #728278;
+  --ring: #536D59;
+  --sidebar: #303B36;
+  --sidebar-foreground: #F7F8F5;
+  --sidebar-primary: #78977D;
+  --sidebar-primary-foreground: #15231B;
+  --sidebar-accent: #46564C;
+  --sidebar-accent-foreground: #F7F8F5;
+  --sidebar-border: #596B5F;
+  --sidebar-ring: #B9CDBB;
 }
 
+/* Respect semantic card borders (e.g. pending payments in amber). */
 .professional-panel [data-slot="card"],
-.professional-panel > aside,
-.professional-panel > header,
-.professional-panel footer,
 body:has(.professional-panel) :is(
   [data-slot="dialog-content"],
   [data-slot="alert-dialog-content"],
@@ -49,23 +42,33 @@ body:has(.professional-panel) :is(
   [data-slot="dropdown-menu-sub-content"],
   [data-slot="context-menu-content"]
 ) {
-  background: var(--professional-silver-green);
+  background: var(--card);
   color: var(--foreground);
-  border-color: var(--border);
+}
+
+.professional-panel > aside,
+.professional-panel > header {
+  background: var(--sidebar);
+  color: var(--sidebar-foreground);
+}
+
+.professional-panel :is(aside, header) :is(
+  .text-sidebar-foreground\/50,
+  .text-sidebar-foreground\/60,
+  .text-sidebar-foreground\/70
+) {
+  color: #CAD4CB;
+}
+
+.professional-panel footer {
+  background: var(--card) !important;
 }
 
 .professional-panel footer :is(p, span, a) {
   color: var(--muted-foreground) !important;
 }
 
-.professional-panel :is(aside, header) :is(
-  .text-sidebar-foreground\/60,
-  .text-sidebar-foreground\/70
-) {
-  color: var(--muted-foreground);
-}
-
-/* Override the landing page's global main colors only inside this shell. */
+/* The landing page has global main colors; override only within this shell. */
 .professional-panel > main {
   background: var(--background) !important;
   color: var(--foreground) !important;
@@ -76,14 +79,28 @@ body:has(.professional-panel) :is(
   [data-slot="textarea"],
   [data-slot="select-trigger"]
 ) {
-  background-color: #f4f8f0;
+  background-color: var(--card);
   color: var(--foreground);
 }
 
+/* Sage fills keep the approved hue; text uses a readable darker shade. */
+body:has(.professional-panel) .text-primary {
+  color: #46624F;
+}
+
+body:has(.professional-panel) .hover\:text-primary:hover {
+  color: #46624F;
+}
+
 .professional-panel [data-slot="table-row"]:hover {
-  background-color: #e2f1dc80;
+  background-color: #E1E7DF80;
 }
 
 body:has(.professional-panel) :is(a, button, input, select, textarea):focus-visible {
   outline-color: var(--ring) !important;
+}
+
+.professional-panel > :is(aside, header) :is(a, button):focus-visible {
+  outline: 2px solid var(--sidebar-ring) !important;
+  outline-offset: 2px;
 }

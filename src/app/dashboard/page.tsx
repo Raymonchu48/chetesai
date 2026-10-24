@@ -104,7 +104,7 @@ const sessionStateLabels: Record<string, string> = {
 const sessionStateClasses: Record<string, string> = {
   pendiente: "bg-amber-100 text-amber-800",
   confirmada: "bg-blue-100 text-blue-800",
-  realizada: "bg-emerald-100 text-emerald-800",
+  realizada: "bg-secondary text-secondary-foreground",
   cancelada: "bg-red-100 text-red-800",
   no_asistio: "bg-slate-200 text-slate-700",
 };
@@ -151,7 +151,7 @@ export default function DashboardPage() {
 
   return (
     <AppSidebar>
-      <div className="mx-auto max-w-7xl p-6 md:p-8">
+      <div className="mx-auto max-w-7xl p-4 sm:p-6 md:p-8">
         <header className="mb-7 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Centro de control</p>
@@ -182,7 +182,7 @@ export default function DashboardPage() {
           <Card><CardContent className="py-20 text-center text-muted-foreground">No se pudo cargar el panel ejecutivo.</CardContent></Card>
         ) : (
           <>
-            <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <section className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <ExecutiveMetric
                 label="Agenda de hoy"
                 value={String(data.resumen.sesiones_hoy)}
@@ -214,7 +214,7 @@ export default function DashboardPage() {
               />
             </section>
 
-            <section className="mb-6 grid gap-4 lg:grid-cols-2">
+            <section className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
               <CoachingStatus
                 icon={<Apple className="h-5 w-5" />}
                 label="Planes nutricionales pendientes"
@@ -231,7 +231,7 @@ export default function DashboardPage() {
               />
             </section>
 
-            <section className="mb-6 grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+            <section className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.05fr_0.95fr]">
               <Card className="overflow-hidden">
                 <CardContent className="p-0">
                   <SectionHeader
@@ -319,7 +319,7 @@ export default function DashboardPage() {
               </Card>
             </section>
 
-            <section className="mb-6 grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
+            <section className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.25fr_0.75fr]">
               <Card>
                 <CardContent className="p-6">
                   <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -479,10 +479,10 @@ function ExecutiveMetric({
 
 function CoachingStatus({ icon, label, value, detail, href }: { icon: ReactNode; label: string; value: number; detail: string; href: string }) {
   const pending = value > 0;
-  return <Link href={href} className={`group flex items-center gap-4 rounded-2xl border p-4 transition hover:-translate-y-0.5 hover:shadow-sm ${pending ? "border-amber-200 bg-amber-50/60" : "border-emerald-200 bg-emerald-50/60"}`}>
-    <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${pending ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>{icon}</div>
+  return <Link href={href} className={`group flex items-center gap-4 rounded-2xl border p-4 transition hover:-translate-y-0.5 hover:shadow-sm ${pending ? "border-amber-200 bg-amber-50/60" : "border-border bg-card"}`}>
+    <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${pending ? "bg-amber-100 text-amber-700" : "bg-primary/15 text-foreground"}`}>{icon}</div>
     <div className="min-w-0 flex-1"><p className="font-bold">{label}</p><p className="mt-1 truncate text-sm text-muted-foreground">{detail}</p></div>
-    <span className={`grid h-10 min-w-10 place-items-center rounded-xl px-2 text-xl font-black ${pending ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>{value}</span>
+    <span className={`grid h-10 min-w-10 place-items-center rounded-xl px-2 text-xl font-black ${pending ? "bg-amber-100 text-amber-700" : "bg-primary/15 text-foreground"}`}>{value}</span>
     <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5" />
   </Link>;
 }
@@ -548,10 +548,10 @@ function EmptyState({ icon, title, text }: { icon: ReactNode; title: string; tex
 function DashboardSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[1, 2, 3, 4].map((item) => <div key={item} className="h-32 animate-pulse rounded-xl border bg-muted/50" />)}
       </div>
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className="h-96 animate-pulse rounded-xl border bg-muted/50" />
         <div className="h-96 animate-pulse rounded-xl border bg-muted/50" />
       </div>
