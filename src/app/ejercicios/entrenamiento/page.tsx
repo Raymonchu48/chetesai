@@ -87,6 +87,9 @@ const labels: Record<string, string> = {
   cardio: "Cardio",
   cuerpo_completo: "Cuerpo completo",
   funcional: "Funcional",
+  funcional_360: "Funcional 360º",
+  pilates_mat: "Pilates Mat",
+  cross_training: "Cross Training",
   calentamiento: "Calentamiento",
   estiramientos: "Estiramientos",
   principiante: "Básico",
@@ -117,11 +120,14 @@ const groupDescriptions: Record<string, { subtitle: string; phrase: string }> = 
   cardio: { subtitle: "Resistencia, ritmo y energía.", phrase: "Mejora tu capacidad paso a paso." },
   cuerpo_completo: { subtitle: "Coordinación, fuerza y eficiencia.", phrase: "Entrena el cuerpo como una unidad." },
   funcional: { subtitle: "Fuerza útil, coordinación y resistencia.", phrase: "Muévete mejor para rendir dentro y fuera del gimnasio." },
+  funcional_360: { subtitle: "10 ejercicios nuevos de entrenamiento funcional.", phrase: "Equilibrio, fuerza unilateral y control postural." },
+  pilates_mat: { subtitle: "10 ejercicios de Pilates suelo.", phrase: "Respiración, movilidad y control del centro." },
+  cross_training: { subtitle: "10 ejercicios de acondicionamiento y potencia.", phrase: "Coordina técnica, resistencia y fuerza." },
   calentamiento: { subtitle: "Movilidad y activación.", phrase: "Prepara el cuerpo antes de exigirlo." },
   estiramientos: { subtitle: "Movilidad, descarga y recuperación.", phrase: "Recuperar también es entrenar." },
 };
 
-const grupos = ["todos", "funcional", "calentamiento", "pecho", "espalda", "hombros", "brazos", "biceps", "triceps", "piernas", "gluteos", "core", "cardio", "cuerpo_completo", "estiramientos"];
+const grupos = ["todos", "funcional_360", "pilates_mat", "cross_training", "funcional", "calentamiento", "pecho", "espalda", "hombros", "brazos", "biceps", "triceps", "piernas", "gluteos", "core", "cardio", "cuerpo_completo", "estiramientos"];
 const functionalExerciseCodes = new Set([
   "CHE-CAR-001",
   "CHE-CAR-002",
@@ -146,9 +152,13 @@ function listFromText(value?: string | null) {
 function belongsToGroup(item: Ejercicio, group: string) {
   if (group === "todos") return true;
   if (group === "brazos") return ["biceps", "triceps", "brazos"].includes(item.grupo_muscular);
+  const code = (item.codigo_interno || "").toUpperCase();
+  const tags = item.etiquetas || [];
+  if (group === "funcional_360") return code.startsWith("CHE-FNC-") || tags.includes("funcional");
+  if (group === "pilates_mat") return code.startsWith("CHE-PIL-") || tags.includes("pilates");
+  if (group === "cross_training") return code.startsWith("CHE-XTR-") || tags.includes("cross_training");
   if (group === "funcional") {
-    const code = (item.codigo_interno || "").toUpperCase();
-    return code.startsWith("CHE-FUN-") || functionalExerciseCodes.has(code) || (item.etiquetas || []).includes("funcional");
+    return code.startsWith("CHE-FNC-") || code.startsWith("CHE-FUN-") || functionalExerciseCodes.has(code) || (item.etiquetas || []).includes("funcional");
   }
   if (group === "calentamiento") return item.grupo_muscular === "calentamiento" || item.categoria === "calentamiento" || (item.etiquetas || []).includes("calentamiento");
   if (group === "estiramientos") return ["estiramientos", "estiramiento", "movilidad"].includes(item.grupo_muscular) || ["estiramientos", "estiramiento", "movilidad"].includes(item.categoria) || (item.etiquetas || []).some((tag) => ["estiramiento", "estiramientos", "movilidad", "vuelta_calma"].includes(tag));
@@ -331,6 +341,26 @@ export default function EntrenamientoVisualPage() {
               <Button asChild className="h-11 rounded-xl bg-[#62b000] px-5 text-white shadow-md hover:bg-[#559b00]"><Link href="/ejercicios"><Plus className="mr-2 h-4 w-4"/>Nuevo ejercicio</Link></Button>
             </div>
           </header>
+
+          <nav aria-label="Disciplinas de entrenamiento" className="mt-5 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-2 text-xs font-black uppercase tracking-wide text-slate-500">Disciplinas</span>
+              {([
+                { group: "funcional_360", label: "Funcional 360º" },
+                { group: "pilates_mat", label: "Pilates Mat" },
+                { group: "cross_training", label: "Cross Training" },
+              ] as const).map(({ group, label }) => (
+                <Link key={group} href={`/ejercicios/entrenamiento?grupo=${group}`} onClick={() => { setGrupo(group); setSearch(""); setDificultad("todos"); setOnlyFavorites(false); }}
+                  aria-current={grupo === group ? "page" : undefined}
+                  className={`inline-flex min-h-10 items-center gap-2 rounded-xl border px-3 py-2 text-sm font-bold transition ${grupo === group ? "border-[#66b512] bg-[#f2f9e9] text-[#467d00]" : "border-slate-200 bg-white text-slate-700 hover:border-[#66b512] hover:bg-[#f7fbf2]"}`}>
+                  {label}<span className="rounded-md bg-[#eef6e5] px-1.5 py-0.5 text-xs text-[#4b8610]">{items.filter((item) => belongsToGroup(item, group)).length}</span>
+                </Link>
+              ))}
+            </div>
+            <Link href="/rutinas" className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-[#bad5a2] px-3 py-2 text-sm font-bold text-[#476d32] transition hover:bg-[#f2f9e9]">
+              Ver programas de entrenamiento <ChevronRight className="h-4 w-4"/>
+            </Link>
+          </nav>
 
           <section className="my-5 flex flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center gap-4">
