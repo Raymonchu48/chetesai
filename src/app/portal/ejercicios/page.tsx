@@ -25,6 +25,7 @@ type ExerciseInfo = {
   miniatura_url: string | null;
   gif_url: string | null;
   video_url: string | null;
+  video_mujer_url?: string | null;
   variante_facil?: string | null;
   variante_avanzada?: string | null;
   regresion?: string | null;

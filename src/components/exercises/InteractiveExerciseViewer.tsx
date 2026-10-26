@@ -34,7 +34,7 @@ function label(value: string) {
 }
 
 export default function InteractiveExerciseViewer({ item, visualModel = "hombre", compact = false, className = "" }: Props) {
-  const variants = useMemo(() => getExerciseVisualVariants(item), [item]);
+  const variants = useMemo(() => getExerciseVisualVariants(item, visualModel), [item, visualModel]);
   const [activeId, setActiveId] = useState(variants[0]?.id || "");
 
   const active = variants.find((variant) => variant.id === activeId) || variants[0];
