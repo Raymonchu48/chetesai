@@ -90,6 +90,7 @@ const labels: Record<string, string> = {
   funcional_360: "Funcional 360º",
   pilates_mat: "Pilates Mat",
   cross_training: "Cross Training",
+  trx: "TRX",
   calentamiento: "Calentamiento",
   estiramientos: "Estiramientos",
   principiante: "Básico",
@@ -123,11 +124,12 @@ const groupDescriptions: Record<string, { subtitle: string; phrase: string }> = 
   funcional_360: { subtitle: "10 ejercicios nuevos de entrenamiento funcional.", phrase: "Equilibrio, fuerza unilateral y control postural." },
   pilates_mat: { subtitle: "10 ejercicios de Pilates suelo.", phrase: "Respiración, movilidad y control del centro." },
   cross_training: { subtitle: "10 ejercicios de acondicionamiento y potencia.", phrase: "Coordina técnica, resistencia y fuerza." },
+  trx: { subtitle: "Entrenamiento en suspensión con resistencia corporal.", phrase: "12 ejercicios de fuerza, estabilidad y control global." },
   calentamiento: { subtitle: "Movilidad y activación.", phrase: "Prepara el cuerpo antes de exigirlo." },
   estiramientos: { subtitle: "Movilidad, descarga y recuperación.", phrase: "Recuperar también es entrenar." },
 };
 
-const grupos = ["todos", "funcional_360", "pilates_mat", "cross_training", "funcional", "calentamiento", "pecho", "espalda", "hombros", "brazos", "biceps", "triceps", "piernas", "gluteos", "core", "cardio", "cuerpo_completo", "estiramientos"];
+const grupos = ["todos", "funcional_360", "pilates_mat", "cross_training", "trx", "funcional", "calentamiento", "pecho", "espalda", "hombros", "brazos", "biceps", "triceps", "piernas", "gluteos", "core", "cardio", "cuerpo_completo", "estiramientos"];
 const functionalExerciseCodes = new Set([
   "CHE-CAR-001",
   "CHE-CAR-002",
@@ -157,6 +159,7 @@ function belongsToGroup(item: Ejercicio, group: string) {
   if (group === "funcional_360") return code.startsWith("CHE-FNC-") || tags.includes("funcional");
   if (group === "pilates_mat") return code.startsWith("CHE-PIL-") || tags.includes("pilates");
   if (group === "cross_training") return code.startsWith("CHE-XTR-") || tags.includes("cross_training");
+  if (group === "trx") return code.startsWith("CHE-TRX-") || tags.includes("trx");
   if (group === "funcional") {
     return code.startsWith("CHE-FNC-") || code.startsWith("CHE-FUN-") || functionalExerciseCodes.has(code) || (item.etiquetas || []).includes("funcional");
   }
@@ -349,6 +352,7 @@ export default function EntrenamientoVisualPage() {
                 { group: "funcional_360", label: "Funcional 360º" },
                 { group: "pilates_mat", label: "Pilates Mat" },
                 { group: "cross_training", label: "Cross Training" },
+                { group: "trx", label: "TRX" },
               ] as const).map(({ group, label }) => (
                 <Link key={group} href={`/ejercicios/entrenamiento?grupo=${group}`} onClick={() => { setGrupo(group); setSearch(""); setDificultad("todos"); setOnlyFavorites(false); }}
                   aria-current={grupo === group ? "page" : undefined}
