@@ -121,7 +121,7 @@ async function createSignedUpload(payload: UploadPayload) {
 
   const extension = extensionByMime[fileType];
   const path =
-    slugify(exerciseName) +
+    slugify(exerciseName + "-" + (payload.visualModel || "hombre")) +
     "/" +
     kind +
     "-" +
@@ -192,7 +192,9 @@ async function finalizeUpload(payload: UploadPayload) {
   if (exerciseId) {
     const field = kind === "imagen" && payload.visualModel === "mujer"
       ? "imagen_mujer_url"
-      : fieldByKind[kind];
+      : kind === "video" && payload.visualModel === "mujer"
+        ? "video_mujer_url"
+        : fieldByKind[kind];
     const saveResponse = await fetch(
       supabaseUrl + "/rest/v1/ejercicios?id=eq." + encodeURIComponent(exerciseId),
       {

@@ -35,6 +35,7 @@ type Ejercicio = {
   gif_url: string | null;
   miniatura_url: string | null;
   video_url: string | null;
+  video_mujer_url?: string | null;
   codigo_interno?: string | null;
   tipo_movimiento: string | null;
   lateralidad: string | null;
@@ -73,7 +74,7 @@ const labels: Record<string, string> = {
 const emptyForm: FormState = {
   nombre: "", grupo_muscular: "pecho", grupo_secundario: null, categoria: "fuerza", dificultad: "principiante",
   material: null, descripcion: null, tecnica: null, errores_frecuentes: null, consejos: null,
-  imagen_url: null, gif_url: null, miniatura_url: null, video_url: null,
+  imagen_url: null, gif_url: null, miniatura_url: null, video_url: null, video_mujer_url: null,
   tipo_movimiento: null, lateralidad: null, plano_movimiento: null, articulacion_principal: null,
   etiquetas: [], objetivos: [], contexto_ia: {}, etiquetasTexto: "", variantesVisuales: [], activo: true,
 };
@@ -204,7 +205,8 @@ export default function EjerciciosPage() {
                     <MediaBlock kind="miniatura" label="Miniatura" value={form.miniatura_url} exerciseName={form.nombre} onChange={(url) => updateField("miniatura_url", url)} />
                     <MediaBlock kind="imagen" label="Imagen principal" value={form.imagen_url} exerciseName={form.nombre} onChange={(url) => updateField("imagen_url", url)} />
                     <MediaBlock kind="gif" label="GIF / animación" value={form.gif_url} exerciseName={form.nombre} onChange={(url) => updateField("gif_url", url)} />
-                    <MediaBlock kind="video" label="Vídeo" value={form.video_url} exerciseName={form.nombre} onChange={(url) => updateField("video_url", url)} />
+                    <MediaBlock kind="video" label="Vídeo hombre" value={form.video_url} exerciseName={form.nombre} onChange={(url) => updateField("video_url", url)} />
+                    <MediaBlock kind="video" label="Vídeo mujer" visualModel="mujer" value={form.video_mujer_url || null} exerciseName={form.nombre} onChange={(url) => updateField("video_mujer_url", url)} />
                   </div>
                 </div>
 
@@ -255,8 +257,8 @@ export default function EjerciciosPage() {
   );
 }
 
-function MediaBlock({ kind, label, value, exerciseName, onChange }: { kind: "miniatura" | "imagen" | "gif" | "video"; label: string; value: string | null; exerciseName: string; onChange: (value: string | null) => void }) {
-  return <div className="space-y-2"><ExerciseMediaUploader kind={kind} label={label} exerciseName={exerciseName} value={value} onUploaded={onChange} /><Input value={value || ""} onChange={(e) => onChange(e.target.value || null)} placeholder="O pega aquí una URL autorizada" /></div>;
+function MediaBlock({ kind, label, value, exerciseName, onChange, visualModel = "hombre" }: { visualModel?: "hombre" | "mujer"; kind: "miniatura" | "imagen" | "gif" | "video"; label: string; value: string | null; exerciseName: string; onChange: (value: string | null) => void }) {
+  return <div className="space-y-2"><ExerciseMediaUploader visualModel={visualModel} kind={kind} label={label} exerciseName={exerciseName} value={value} onUploaded={onChange} /><Input value={value || ""} onChange={(e) => onChange(e.target.value || null)} placeholder="O pega aquí una URL autorizada" /></div>;
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) { return <div className="space-y-2"><Label>{label}</Label>{children}</div>; }

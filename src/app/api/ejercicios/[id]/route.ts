@@ -57,6 +57,7 @@ function normalizePayload(body: Record<string, unknown>) {
     miniatura_url: optionalText(body.miniatura_url),
     gif_url: optionalText(body.gif_url),
     video_url: optionalText(body.video_url),
+    ...(Object.hasOwn(body, "video_mujer_url") ? { video_mujer_url: optionalText(body.video_mujer_url) } : {}),
     tipo_movimiento: optionalText(body.tipo_movimiento),
     lateralidad: optionalText(body.lateralidad),
     plano_movimiento: optionalText(body.plano_movimiento),

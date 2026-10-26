@@ -8,6 +8,7 @@ export type ExerciseVisualVariant = {
   indicacion: string;
   nivel: ExerciseVariantLevel;
   video_url: string | null;
+  video_mujer_url?: string | null;
   imagen_url: string | null;
 };
 
@@ -20,6 +21,7 @@ export type ExerciseVisualVariantSource = {
   descripcion?: string | null;
   tecnica?: string | null;
   video_url?: string | null;
+  video_mujer_url?: string | null;
   imagen_url?: string | null;
   imagen_mujer_url?: string | null;
   gif_url?: string | null;
@@ -77,6 +79,7 @@ export function parseExerciseVisualVariants(context: unknown): ExerciseVisualVar
       indicacion: text(value.indicacion),
       nivel: level(value.nivel),
       video_url: text(value.video_url) || null,
+      video_mujer_url: text(value.video_mujer_url) || null,
       imagen_url: text(value.imagen_url) || null,
     }];
   });
@@ -97,6 +100,7 @@ export function withExerciseVisualVariants(context: unknown, variants: ExerciseV
       indicacion: text(variant.indicacion),
       nivel: level(variant.nivel),
       video_url: text(variant.video_url) || null,
+      video_mujer_url: text(variant.video_mujer_url) || null,
       imagen_url: text(variant.imagen_url) || null,
     })).filter((variant) => variant.nombre),
   };
@@ -155,9 +159,14 @@ export function defaultEditableExerciseVisualVariants(item: ExerciseVisualVarian
   return [];
 }
 
-export function getExerciseVisualVariants(item: ExerciseVisualVariantSource) {
+// Legacy video_url belongs to the male model; never fall back across models.
+export function exerciseVideoUrl(item: { video_url?: string | null; video_mujer_url?: string | null }, model: "hombre" | "mujer" = "hombre") {
+  return text(model === "mujer" ? item.video_mujer_url : item.video_url) || null;
+}
+
+export function getExerciseVisualVariants(item: ExerciseVisualVariantSource, model: "hombre" | "mujer" = "hombre") {
   const editable = defaultEditableExerciseVisualVariants(item);
-  if (editable.length) return editable;
+  if (editable.length) return editable.map(variant => ({ ...variant, video_url: exerciseVideoUrl(variant, model) }));
 
   const fallbackLevel = level(item.dificultad);
   const mainMuscles = [item.grupo_muscular, item.grupo_secundario, ...(item.objetivos || [])].map(text).filter(Boolean).slice(0, 5);
@@ -168,7 +177,7 @@ export function getExerciseVisualVariants(item: ExerciseVisualVariantSource) {
     musculos: mainMuscles,
     indicacion: text(item.tecnica) || text(item.descripcion) || "Sigue las indicaciones de tu entrenador.",
     nivel: fallbackLevel,
-    video_url: text(item.video_url) || null,
+    video_url: exerciseVideoUrl(item, model),
     imagen_url: text(item.imagen_url) || text(item.gif_url) || text(item.miniatura_url) || null,
   }];
 

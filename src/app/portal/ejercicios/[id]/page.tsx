@@ -37,6 +37,7 @@ type ExerciseInfo = {
   miniatura_url: string | null;
   gif_url: string | null;
   video_url: string | null;
+  video_mujer_url?: string | null;
   tipo_movimiento: string | null;
   lateralidad: string | null;
   plano_movimiento: string | null;
