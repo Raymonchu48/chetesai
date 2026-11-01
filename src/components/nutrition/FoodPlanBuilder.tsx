@@ -95,6 +95,10 @@ function totals(foods: PlanFood[]) {
 
 export default function FoodPlanBuilder({ meals, onChange }: { meals: StructuredMeal[]; onChange: (meals: StructuredMeal[]) => void }) {
   const [foods, setFoods] = useState<Food[]>([]);
+  const [selectedDay, setSelectedDay] = useState("Lunes");
+  const weekDays = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+  const isWeekly = meals.some(meal => weekDays.some(day => meal.nombre.startsWith(`${day} · `)));
+  const visibleMeals = meals.map((meal,index)=>({meal,index})).filter(({meal})=>!isWeekly || meal.nombre.startsWith(`${selectedDay} · `));
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("todas");
   const [targetMeal, setTargetMeal] = useState("0");
@@ -129,10 +133,11 @@ export default function FoodPlanBuilder({ meals, onChange }: { meals: Structured
     });
   }, [foods, search, category]);
 
-  const dayTotals = useMemo(() => totals(meals.flatMap((meal) => meal.alimentos || [])), [meals]);
+  const dayTotals = useMemo(() => totals(visibleMeals.flatMap(({meal}) => meal.alimentos || [])), [visibleMeals]);
 
   function addFood(food: Food) {
-    const mealIndex = Number(targetMeal);
+    const mealIndex = isWeekly && !visibleMeals.some(item=>item.index===Number(targetMeal)) ? visibleMeals[0]?.index : Number(targetMeal);
+    if(mealIndex === undefined) return toast.error("No hay comidas para este día");
     const quantity = Number(quantities[food.id] || food.porcion_gramos || 100);
     if (!Number.isFinite(quantity) || quantity <= 0) return toast.error("Indica una cantidad válida");
     const factor = quantity / 100;
@@ -226,7 +231,7 @@ export default function FoodPlanBuilder({ meals, onChange }: { meals: Structured
       <div className="grid gap-3 rounded-2xl border bg-muted/20 p-4 md:grid-cols-[minmax(0,1fr)_220px_220px]">
         <div><Label>Buscar</Label><div className="relative mt-2"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input value={search} onChange={(event) => setSearch(event.target.value)} className="pl-9" placeholder="Avena, pollo, yogur..." /></div></div>
         <div><Label>Categoría</Label><Select value={category} onValueChange={setCategory}><SelectTrigger className="mt-2"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(categories).map(([key, label]) => <SelectItem key={key} value={key}>{label}</SelectItem>)}</SelectContent></Select></div>
-        <div><Label>Añadir a</Label><Select value={targetMeal} onValueChange={setTargetMeal}><SelectTrigger className="mt-2"><SelectValue /></SelectTrigger><SelectContent>{meals.map((meal, index) => <SelectItem key={`${meal.nombre}-${index}`} value={String(index)}>{meal.nombre || `Comida ${index + 1}`}</SelectItem>)}</SelectContent></Select></div>
+        <div><Label>Añadir a</Label><Select value={targetMeal} onValueChange={setTargetMeal}><SelectTrigger className="mt-2"><SelectValue /></SelectTrigger><SelectContent>{visibleMeals.map(({meal,index}) => <SelectItem key={`${meal.nombre}-${index}`} value={String(index)}>{meal.nombre || `Comida ${index + 1}`}</SelectItem>)}</SelectContent></Select></div>
       </div>
 
       <div className="max-h-[430px] overflow-y-auto rounded-2xl border">
@@ -242,12 +247,13 @@ export default function FoodPlanBuilder({ meals, onChange }: { meals: Structured
 
       <div>
         <h3 className="flex items-center gap-2 text-lg font-bold"><Calculator className="h-5 w-5 text-[#46624f]" />Composición del día</h3>
+        {isWeekly && <div className="mt-3 flex flex-wrap gap-2">{weekDays.map(day=><Button key={day} type="button" size="sm" variant={selectedDay === day ? "default":"outline"} onClick={()=>{setSelectedDay(day);const index=meals.findIndex(meal=>meal.nombre.startsWith(`${day} · `));if(index>=0)setTargetMeal(String(index));}}>{day}</Button>)}</div>}
         <div className="mt-3 grid gap-4 xl:grid-cols-2">
-          {meals.map((meal, mealIndex) => {
+          {visibleMeals.map(({meal,index:mealIndex}) => {
             const mealTotals = totals(meal.alimentos || []);
             return <Card key={`${meal.nombre}-${mealIndex}`} className="overflow-hidden"><CardContent className="p-0">
               <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-3"><div><p className="font-bold">{meal.nombre}</p><p className="text-xs text-muted-foreground">{meal.hora}</p></div><p className="text-sm font-bold text-[#46624f]">{round(mealTotals.kcal)} kcal</p></div>
-              {!meal.alimentos?.length ? <p className="p-5 text-center text-sm text-muted-foreground">Sin alimentos seleccionados</p> : <div className="divide-y">{meal.alimentos.map((food, foodIndex) => <div key={`${food.alimento_id}-${foodIndex}`} className="grid grid-cols-[minmax(0,1fr)_90px_80px_36px] items-center gap-2 px-4 py-3">
+              {!meal.alimentos?.length ? <p className="p-5 text-center text-sm text-muted-foreground">{meal.descripcion || "Sin alimentos seleccionados"}</p> : <div className="divide-y">{meal.alimentos.map((food, foodIndex) => <div key={`${food.alimento_id}-${foodIndex}`} className="grid grid-cols-[minmax(0,1fr)_90px_80px_36px] items-center gap-2 px-4 py-3">
                 <div className="flex min-w-0 items-center gap-3"><FoodCategoryVisual category={food.categoria} name={food.nombre} compact /><div className="min-w-0"><p className="truncate text-sm font-medium">{food.nombre}</p><p className="truncate text-xs text-muted-foreground">P {food.proteinas_g} · HC {food.carbohidratos_g} · G {food.grasas_g}</p></div></div>
                 <Input type="number" min="0" className="h-8" value={food.cantidad_g} onChange={(event) => changeQuantity(mealIndex, foodIndex, Number(event.target.value))} />
                 <p className="text-right text-xs font-semibold">{food.energia_kcal} kcal</p>
