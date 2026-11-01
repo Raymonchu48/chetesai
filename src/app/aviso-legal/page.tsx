@@ -28,8 +28,8 @@ export default function LegalNoticePage() {
       </LegalSection>
 
       <LegalSection title="3. Propiedad intelectual e industrial">
-        <p>La marca, identidad visual, textos, diseños, fotografías, vídeos, fichas, software y demás contenidos propios pertenecen a su titular o se utilizan con autorización. La navegación no concede derechos de explotación más allá del uso personal necesario para recibir el servicio.</p>
-        <p>No se permite reproducir, modificar, distribuir o explotar comercialmente estos contenidos sin autorización, salvo en los supuestos permitidos por la ley.</p>
+        <p>La marca, identidad visual, textos, diseños, fotografías, vídeos, fichas de ejercicios, planes, software y demás contenidos propios pertenecen a su titular o se utilizan con autorización. La aplicación instalable (PWA) y sus paneles cliente/profesional forman parte del mismo servicio. Los componentes de terceros conservan sus respectivas licencias. La navegación no concede derechos de explotación más allá del uso personal necesario para recibir el servicio.</p>
+        <p>No se permite reproducir, modificar, distribuir o explotar comercialmente los contenidos propios sin autorización, salvo en los supuestos permitidos por la ley. La publicación del código fuente no supone la concesión automática de una licencia de explotación.</p>
       </LegalSection>
 
       <LegalSection title="4. Responsabilidad">
