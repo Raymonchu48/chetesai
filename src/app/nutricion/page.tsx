@@ -115,9 +115,9 @@ export default function NutritionPage() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [selectedMenuDay,setSelectedMenuDay] = useState("Lunes");
   const weekDays=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
-  const weeklyMenu=plan.comidas.some(meal=>weekDays.some(day=>meal.nombre.startsWith(`${day} · `)));
   const [clienteId, setClienteId] = useState("");
   const [plan, setPlan] = useState<PlanForm>(newPlan);
+  const weeklyMenu=plan.comidas.some(meal=>weekDays.some(day=>meal.nombre.startsWith(`${day} · `)));
   const [habits, setHabits] = useState<Habit[]>([]);
   const [records, setRecords] = useState<HabitRecord[]>([]);
   const [habitForm, setHabitForm] = useState(emptyHabit);
