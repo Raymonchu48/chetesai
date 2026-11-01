@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AppSidebar from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,11 @@ const emptyForm: FormState = {
 };
 
 export default function RutinasPage() {
+  const router = useRouter();
+  const params = useSearchParams();
+  const clientId = params.get("cliente_id") || "";
+  const [clientName, setClientName] = useState("");
+  const [assigningId, setAssigningId] = useState<string | null>(null);
   const [rutinas, setRutinas] = useState<Rutina[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -65,6 +71,28 @@ export default function RutinasPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    if (!clientId) return;
+    fetch(`/api/clientes/${encodeURIComponent(clientId)}`).then(r => r.json()).then((result: { ok: boolean; data?: { nombre: string } }) => {
+      if (result.ok && result.data) setClientName(result.data.nombre);
+    }).catch(() => toast.error("No se pudo comprobar el cliente"));
+  }, [clientId]);
+
+  async function assign(item: Rutina) {
+    if (!clientId || !clientName || assigningId) return;
+    if (!window.confirm(`¿Asignar «${item.nombre}» a ${clientName}?`)) return;
+    setAssigningId(item._id);
+    try {
+      const response = await fetch("/api/rutinas/asignaciones", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cliente_id: clientId, rutina_id: item._id }) });
+      const result = await response.json() as { ok: boolean; error?: string };
+      if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo asignar la rutina");
+      toast.success(`Rutina asignada a ${clientName}`);
+      router.push(`/clientes/${encodeURIComponent(clientId)}`);
+      router.refresh();
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Error al asignar"); }
+    finally { setAssigningId(null); }
+  }
 
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -120,6 +148,7 @@ export default function RutinasPage() {
           <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Nueva rutina</Button>
         </div>
 
+        {clientId ? <div className="mb-5 rounded-xl border border-primary/30 bg-primary/5 p-4"><p className="font-semibold">Asignar una rutina existente {clientName ? `a ${clientName}` : "al cliente seleccionado"}</p><p className="text-sm text-muted-foreground">Elige una rutina de esta biblioteca. Se solicitará confirmación antes de asignarla.</p><Button asChild variant="outline" className="mt-3"><Link href={`/clientes/${encodeURIComponent(clientId)}`}>Volver a la ficha del cliente</Link></Button></div> : null}
         <div className="mb-6 grid gap-3 md:grid-cols-3">
           <div className="relative md:col-span-2"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar rutina..." /></div>
           <Select value={objectiveFilter} onValueChange={setObjectiveFilter}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="todos">Todos los objetivos</SelectItem>{objetivos.map((item) => <SelectItem key={item} value={item}>{labels[item]}</SelectItem>)}</SelectContent></Select>
@@ -135,7 +164,8 @@ export default function RutinasPage() {
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2 text-xs"><span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">{item.dias_semana} días/semana</span>{item.duracion_semanas ? <span className="rounded-full bg-muted px-2.5 py-1">{item.duracion_semanas} semanas</span> : null}{item.duracion_sesion_minutos ? <span className="rounded-full bg-muted px-2.5 py-1">{item.duracion_sesion_minutos} min</span> : null}</div>
                 {item.descripcion ? <p className="mt-4 line-clamp-3 text-sm text-muted-foreground">{item.descripcion}</p> : null}
-                <Button asChild className="mt-5 w-full"><Link href={`/rutinas/${item._id}`}>Abrir editor <ExternalLink className="ml-2 h-4 w-4" /></Link></Button>
+                {clientId ? <Button className="mt-5 w-full" disabled={!clientName || Boolean(assigningId)} onClick={() => assign(item)}>{assigningId === item._id ? "Asignando..." : "Asignar a este cliente"}</Button> : null}
+                <Button asChild variant={clientId ? "outline" : "default"} className="mt-2 w-full"><Link href={`/rutinas/${item._id}`}>Abrir editor <ExternalLink className="ml-2 h-4 w-4" /></Link></Button>
               </CardContent></Card>
             ))}
           </div>
