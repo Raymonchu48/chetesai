@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AppSidebar from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
@@ -44,8 +44,7 @@ const emptyForm: FormState = {
 
 export default function RutinasPage() {
   const router = useRouter();
-  const params = useSearchParams();
-  const clientId = params.get("cliente_id") || "";
+  const [clientId, setClientId] = useState("");
   const [clientName, setClientName] = useState("");
   const [assigningId, setAssigningId] = useState<string | null>(null);
   const [rutinas, setRutinas] = useState<Rutina[]>([]);
@@ -70,6 +69,7 @@ export default function RutinasPage() {
     }
   }, []);
 
+  useEffect(() => { setClientId(new URLSearchParams(window.location.search).get("cliente_id") || ""); }, []);
   useEffect(() => { load(); }, [load]);
 
   useEffect(() => {
