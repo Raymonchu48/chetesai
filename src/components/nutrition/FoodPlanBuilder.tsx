@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Apple, Calculator, Plus, Search, Trash2 } from "lucide-react";
+import { Apple, Calculator, Carrot, Leaf, Plus, Search, Trash2, Wheat } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -251,9 +251,15 @@ export default function FoodPlanBuilder({ meals, onChange }: { meals: Structured
         <div className="mt-3 grid gap-4 xl:grid-cols-2">
           {visibleMeals.map(({meal,index:mealIndex}) => {
             const mealTotals = totals(meal.alimentos || []);
-            return <Card key={`${meal.nombre}-${mealIndex}`} className="overflow-hidden"><CardContent className="p-0">
-              <div className="flex items-center justify-between border-b border-[#d2ddd4] bg-[#edf3ee] px-4 py-3"><div><p className="text-base font-bold text-[#253e31]">{meal.nombre}</p><p className="text-xs font-medium text-[#53645a]">{meal.hora}</p></div><p className="text-sm font-bold text-[#46624f]">{round(mealTotals.kcal)} kcal</p></div>
-              {!meal.alimentos?.length ? <p className="p-5 text-center text-sm text-muted-foreground">{meal.descripcion || "Sin alimentos seleccionados"}</p> : <div className="divide-y">{meal.alimentos.map((food, foodIndex) => <div key={`${food.alimento_id}-${foodIndex}`} className="grid grid-cols-[minmax(0,1fr)_90px_80px_36px] items-center gap-2 border-b border-[#dce5dd] bg-white px-4 py-3 last:border-b-0">
+            return <Card key={`${meal.nombre}-${mealIndex}`} className="relative isolate overflow-hidden border-[#d6e0d7] bg-[#fbfcfa]"><CardContent className="relative p-0">
+              <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden text-[#46624f]">
+                <Leaf className="absolute -left-7 top-12 h-28 w-28 -rotate-45 opacity-[0.09]" strokeWidth={1.15} />
+                <Carrot className="absolute -right-5 top-20 h-32 w-32 rotate-[-24deg] opacity-[0.10]" strokeWidth={1.1} />
+                <Wheat className="absolute -bottom-8 right-16 h-32 w-32 rotate-12 opacity-[0.09]" strokeWidth={1.1} />
+                <Apple className="absolute -bottom-9 -left-9 h-28 w-28 opacity-[0.08]" strokeWidth={1.15} />
+              </div>
+              <div className="relative z-10 flex items-center justify-between border-b border-[#d2ddd4] bg-[#edf3ee] px-4 py-3"><div><p className="text-base font-bold text-[#253e31]">{meal.nombre}</p><p className="text-xs font-medium text-[#53645a]">{meal.hora}</p></div><p className="text-sm font-bold text-[#46624f]">{round(mealTotals.kcal)} kcal</p></div>
+              {!meal.alimentos?.length ? <p className="p-5 text-center text-sm text-muted-foreground">{meal.descripcion || "Sin alimentos seleccionados"}</p> : <div className="divide-y">{meal.alimentos.map((food, foodIndex) => <div key={`${food.alimento_id}-${foodIndex}`} className="relative z-10 grid grid-cols-[minmax(0,1fr)_90px_80px_36px] items-center gap-2 border-b border-[#dce5dd] bg-white/90 px-4 py-3 last:border-b-0">
                 <div className="flex min-w-0 items-center gap-3"><FoodCategoryVisual category={food.categoria} name={food.nombre} compact /><div className="min-w-0"><p className="truncate text-sm font-semibold text-[#253e31]">{food.nombre}</p><p className="mt-1 truncate text-xs font-medium text-[#53645a]">P {food.proteinas_g} · HC {food.carbohidratos_g} · G {food.grasas_g}</p></div></div>
                 <Input type="number" min="0" className="h-8" value={food.cantidad_g} onChange={(event) => changeQuantity(mealIndex, foodIndex, Number(event.target.value))} />
                 <p className="rounded-full bg-[#e6efe8] px-2 py-1 text-right text-xs font-bold text-[#253e31]">{food.energia_kcal} kcal</p>
