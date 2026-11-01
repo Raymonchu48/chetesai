@@ -574,7 +574,7 @@ export default function Main() {
             </div>
             <div className="flex flex-wrap items-center justify-center gap-5">
               <Link href="/login" className="transition hover:text-white">Acceso privado</Link>
-              <span>© {new Date().getFullYear()} Chetesaí Fitness+</span>
+              <span>© {new Date().getFullYear()} Chetesaí Fitness+ · Derechos reservados sobre contenidos propios</span>
             </div>
           </div>
           <nav aria-label="Información legal" className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 border-t border-white/10 pt-6 text-sm">
