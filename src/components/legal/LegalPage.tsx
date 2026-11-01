@@ -12,6 +12,7 @@ const legalLinks = [
   { href: "/terms-of-service", label: "Términos y condiciones" },
   { href: "/politica-cookies", label: "Política de cookies" },
   { href: "/aviso-legal", label: "Aviso legal" },
+  { href: "/condiciones-profesionales", label: "Condiciones profesionales" },
 ];
 
 type LegalPageProps = {
@@ -50,7 +51,7 @@ export function LegalPage({ title, summary, children }: LegalPageProps) {
           {children}
         </article>
 
-        <nav aria-label="Documentos legales" className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <nav aria-label="Documentos legales" className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {legalLinks.map((link) => (
             <Link key={link.href} href={link.href} className="rounded-2xl border border-[#ded8cd] bg-white px-4 py-3 text-center text-sm font-bold transition hover:border-[#2f9e24] hover:text-[#2f9e24]">
               {link.label}
