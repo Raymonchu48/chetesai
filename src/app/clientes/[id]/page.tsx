@@ -57,6 +57,8 @@ export default function ClientWorkspacePage() {
   const clientId = String(params.id || "");
   const [data, setData] = useState<ClientSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [assignments, setAssignments] = useState<Array<{ id: string; rutina_id: string; estado: string; rutinas: { nombre: string } | null }>>([]);
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!clientId) return;
@@ -66,6 +68,9 @@ export default function ClientWorkspacePage() {
       const result = (await response.json()) as { ok: boolean; data?: ClientSummary; error?: string };
       if (!response.ok || !result.ok || !result.data) throw new Error(result.error || "No se pudo cargar el cliente");
       setData(result.data);
+      const listResponse = await fetch(`/api/rutinas/asignaciones?cliente_id=${encodeURIComponent(clientId)}`, { cache: "no-store" });
+      const list = await listResponse.json() as { ok: boolean; data?: typeof assignments };
+      if (listResponse.ok && list.ok) setAssignments(list.data || []);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo cargar el cliente");
     } finally {
@@ -74,6 +79,19 @@ export default function ClientWorkspacePage() {
   }, [clientId]);
 
   useEffect(() => { load(); }, [load]);
+
+  async function removeAssignment(id: string) {
+    if (!window.confirm("¿Quitar esta rutina de la cuenta del cliente? No se eliminará la rutina de la biblioteca. Si existen registros asociados, la base de datos puede impedir la retirada para protegerlos.")) return;
+    setRemovingId(id);
+    try {
+      const response = await fetch("/api/rutinas/asignaciones", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cliente_id: clientId, asignacion_id: id }) });
+      const result = await response.json() as { ok: boolean; error?: string };
+      if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo quitar");
+      toast.success("Rutina retirada del cliente");
+      await load();
+    } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo retirar la rutina"); }
+    finally { setRemovingId(null); }
+  }
 
   const latest = data?.mediciones[0];
   const previous = data?.mediciones[1];
@@ -115,6 +133,10 @@ export default function ClientWorkspacePage() {
           </div>
         </header>
 
+        <section className="mt-5 rounded-2xl border bg-card p-4 sm:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-bold">Rutinas del cliente</h2><p className="text-sm text-muted-foreground">Puedes asignar varias rutinas, consultarlas o quitar una asignación.</p></div><Button asChild size="sm"><Link href={`/rutinas?cliente_id=${encodeURIComponent(clientId)}`}>Añadir rutina</Link></Button></div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">{assignments.filter(item => item.estado === "activa").length ? assignments.filter(item => item.estado === "activa").map(item => <div key={item.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3"><div><p className="font-semibold">{item.rutinas?.nombre || "Rutina asignada"}</p><p className="text-xs text-muted-foreground">Activa</p></div><Button variant="outline" size="sm" disabled={removingId === item.id} onClick={() => removeAssignment(item.id)}>{removingId === item.id ? "Quitando..." : "Quitar del cliente"}</Button></div>) : <p className="text-sm text-muted-foreground">Sin rutinas activas.</p>}</div>
+        </section>
         <section className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <WorkspaceMetric icon={<Scale className="h-5 w-5" />} label="Peso actual" value={formatMetric(latest?.peso_kg, "kg")} detail={measurementDelta(latest?.peso_kg, previous?.peso_kg)} />
           <WorkspaceMetric icon={<Activity className="h-5 w-5" />} label="Adherencia semanal" value={`${data.adherencia_7_dias}%`} detail={`${data.habitos.length} hábitos activos`} attention={data.habitos.length > 0 && data.adherencia_7_dias < 50} />
