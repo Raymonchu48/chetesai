@@ -9,6 +9,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Apple,
+  Carrot,
+  Leaf,
+  Wheat,
   ArrowLeft,
   CalendarDays,
   Check,
@@ -232,21 +235,26 @@ export default function ClientWellbeingPage() {
                     {Array.isArray(data.plan.comidas) && data.plan.comidas.length ? (
                       <div className="space-y-4">
                         {data.plan.comidas.map((meal, index) => (
-                          <Card key={`${meal.nombre}-${index}`} className="overflow-hidden border-[#e3ddd3] bg-[#fffdf9] shadow-sm">
-                            <CardContent className="p-0">
-                              <div className="grid sm:grid-cols-[88px_1fr]">
+                          <Card key={`${meal.nombre}-${index}`} className="relative isolate overflow-hidden border-[#d6ded4] bg-[#fffdf9] shadow-sm">
+                            <CardContent className="relative p-0">
+                              <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden text-[#568257]">
+                                <Leaf className="absolute -right-4 top-2 h-24 w-24 rotate-[-18deg] opacity-25" strokeWidth={1.3} />
+                                <Carrot className="absolute -right-5 bottom-1 h-32 w-32 rotate-[24deg] opacity-20" strokeWidth={1.2} />
+                                <Wheat className="absolute right-24 -bottom-7 h-24 w-24 rotate-[-22deg] opacity-20" strokeWidth={1.2} />
+                              </div>
+                              <div className="relative z-10 grid sm:grid-cols-[88px_1fr]">
                                 <div className="flex items-center justify-center bg-[#f0f4ef] px-4 py-5 sm:flex-col sm:gap-2">
                                   <span className="mr-3 grid h-10 w-10 place-items-center rounded-full bg-[#46624f] text-sm font-black text-white sm:mr-0">{index + 1}</span>
                                   {meal.hora ? <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#46624f]"><Clock3 className="h-3.5 w-3.5" />{meal.hora}</span> : null}
                                 </div>
                                 <div className="p-5 sm:p-6">
-                                  <h4 className="text-lg font-bold">{meal.nombre}</h4>
+                                  <h4 className="text-lg font-bold !text-[#253e31]" style={{ color: "#253e31" }}>{meal.nombre}</h4>
                                   <p className={`mt-2 whitespace-pre-line text-sm leading-7 ${meal.descripcion ? "text-[#4f5c55]" : "italic text-[#929891]"}`}>
                                     {meal.descripcion || (meal.alimentos?.length ? "Selección preparada por tu profesional." : "Pendiente de propuesta profesional.")}
                                   </p>
-                                  {meal.alimentos?.length ? <div className="mt-4 overflow-hidden rounded-2xl border border-[#e3ddd3] bg-white">
-                                    {meal.alimentos.map((food, foodIndex) => <div key={`${food.nombre}-${foodIndex}`} className="flex items-center justify-between gap-4 border-b border-[#eee9e1] px-4 py-3 last:border-b-0">
-                                      <div className="flex min-w-0 items-center gap-3"><FoodCategoryVisual category={food.categoria} name={food.nombre} compact /><div className="min-w-0"><p className="truncate text-sm font-semibold">{food.nombre}</p><p className="mt-0.5 truncate text-xs text-[#707872]">{food.cantidad_g} g · P {food.proteinas_g} g · HC {food.carbohidratos_g} g · G {food.grasas_g} g</p></div></div>
+                                  {meal.alimentos?.length ? <div className="mt-4 overflow-hidden rounded-2xl border border-[#d7e0d6] bg-white/90">
+                                    {meal.alimentos.map((food, foodIndex) => <div key={`${food.nombre}-${foodIndex}`} className="flex items-center justify-between gap-4 border-b border-[#dce4dc] px-4 py-3 last:border-b-0">
+                                      <div className="flex min-w-0 items-center gap-3"><FoodCategoryVisual category={food.categoria} name={food.nombre} compact /><div className="min-w-0"><p className="truncate text-sm font-semibold !text-[#253e31]" style={{ color: "#253e31" }}>{food.nombre}</p><p className="mt-0.5 truncate text-xs text-[#707872]">{food.cantidad_g} g · P {food.proteinas_g} g · HC {food.carbohidratos_g} g · G {food.grasas_g} g</p></div></div>
                                       <span className="shrink-0 rounded-full bg-[#eef5ef] px-3 py-1 text-xs font-bold text-[#46624f]">{food.energia_kcal} kcal</span>
                                     </div>)}
                                   </div> : null}
