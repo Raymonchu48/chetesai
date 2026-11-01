@@ -68,7 +68,7 @@ export async function DELETE(request: NextRequest) {
     if (!uuid.test(id) || !uuid.test(clientId)) return NextResponse.json({ ok: false, error: "Identificador inválido" }, { status: 400 });
     const rows = await supabaseRest<Row[]>(`cliente_rutinas?id=eq.${encodeURIComponent(id)}&cliente_id=eq.${encodeURIComponent(clientId)}&select=id&limit=1`);
     if (!rows.length) return NextResponse.json({ ok: false, error: "Asignación no encontrada" }, { status: 404 });
-    await supabaseRest(`cliente_rutinas?id=eq.${encodeURIComponent(id)}&cliente_id=eq.${encodeURIComponent(clientId)}`, { method: "DELETE" });
+    await supabaseRest(`cliente_rutinas?id=eq.${encodeURIComponent(id)}&cliente_id=eq.${encodeURIComponent(clientId)}`, { method: "PATCH", body: JSON.stringify({ estado: "finalizada", fecha_fin: new Date().toISOString().slice(0, 10) }) });
     return NextResponse.json({ ok: true });
   } catch (e) {
     const message = e instanceof Error ? e.message : "No se pudo retirar la rutina";
