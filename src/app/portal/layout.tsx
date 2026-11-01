@@ -37,6 +37,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         <PwaInstall />
       </header>
       {children}
+      <footer className="mx-auto mb-24 max-w-5xl px-4 pb-4 pt-8 text-center text-xs text-[#59635e] sm:mb-28"><p>© {new Date().getFullYear()} Chetesaí Fitness+ · Contenidos propios: derechos reservados.</p><nav aria-label="Información legal" className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-2"><Link href="/aviso-legal">Aviso legal</Link><Link href="/privacy-policy">Privacidad</Link><Link href="/terms-of-service">Condiciones de uso</Link><Link href="/politica-cookies">Cookies</Link></nav></footer>
 
       <div className={`fixed inset-0 z-40 bg-[#07110c]/55 backdrop-blur-sm transition-opacity duration-300 md:hidden ${menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`} onClick={() => setMenuOpen(false)} aria-hidden="true" />
 
