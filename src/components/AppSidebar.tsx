@@ -90,6 +90,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
 
         <div className="border-t border-sidebar-border p-3">
           {!collapsed ? <PwaInstall /> : null}
+          {!collapsed ? <div className="mt-3 flex flex-col gap-1 text-xs text-sidebar-foreground/70"><Link href="/condiciones-profesionales" className="hover:underline">Condiciones profesionales</Link><Link href="/aviso-legal" className="hover:underline">Aviso legal y derechos reservados</Link><Link href="/privacy-policy" className="hover:underline">Privacidad</Link></div> : null}
           <LogoutButton collapsed={collapsed} />
           <button type="button" onClick={() => setCollapsed(!collapsed)} className="mt-1 hidden w-full items-center justify-center rounded-lg py-2 text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground md:flex" aria-label={collapsed ? "Expandir menú" : "Contraer menú"}>
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
