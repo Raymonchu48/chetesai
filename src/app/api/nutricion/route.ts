@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
     const encoded = encodeURIComponent(clienteId);
     const [plans, habits, records] = await Promise.all([
       serviceRequest<Row[]>(
-        `planes_nutricionales?cliente_id=eq.${encoded}&estado=eq.activo&select=*&order=fecha_inicio.desc,created_at.desc&limit=1`
+        `planes_nutricionales?cliente_id=eq.${encoded}&estado=in.(borrador,activo)&select=*&order=created_at.desc&limit=1`
       ),
       serviceRequest<Row[]>(
         `habitos_cliente?cliente_id=eq.${encoded}&activo=eq.true&select=*&order=created_at.asc`
