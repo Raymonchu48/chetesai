@@ -137,15 +137,35 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await supabaseRest(`rutinas?id=eq.${encodeURIComponent(id)}`, {
-      method: "PATCH",
-      headers: { Prefer: "return=minimal" },
-      body: JSON.stringify({ activa: false }),
-    });
+    const assignments = await supabaseRest<Array<{ id: string }>>(
+      `cliente_rutinas?rutina_id=eq.${encodeURIComponent(id)}&select=id&limit=1`
+    );
+    if (assignments.length) {
+      return NextResponse.json(
+        { ok: false, error: "No se puede eliminar esta rutina porque está asignada a un cliente. Revisa sus asignaciones antes de eliminarla." },
+        { status: 409 }
+      );
+    }
+
+    // La base de datos elimina sus filas de rutina_ejercicios en cascada.
+    const deleted = await supabaseRest<Array<{ id: string }>>(
+      `rutinas?id=eq.${encodeURIComponent(id)}&select=id`,
+      { method: "DELETE", headers: { Prefer: "return=representation" } }
+    );
+    if (!deleted.length) {
+      return NextResponse.json({ ok: false, error: "Rutina no encontrada" }, { status: 404 });
+    }
     return NextResponse.json({ ok: true });
   } catch (error) {
+    // Una asignación creada entre la consulta y el borrado sigue protegida por la FK.
+    if (error instanceof Error && /foreign key constraint/.test(error.message)) {
+      return NextResponse.json(
+        { ok: false, error: "No se puede eliminar esta rutina porque tiene datos vinculados. Revisa sus asignaciones antes de eliminarla." },
+        { status: 409 }
+      );
+    }
     return NextResponse.json(
-      { ok: false, error: error instanceof Error ? error.message : "Error al desactivar rutina" },
+      { ok: false, error: error instanceof Error ? error.message : "Error al eliminar rutina" },
       { status: 500 }
     );
   }

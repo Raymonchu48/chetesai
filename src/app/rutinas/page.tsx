@@ -100,15 +100,16 @@ export default function RutinasPage() {
     } catch (error) { toast.error(error instanceof Error ? error.message : "Error al duplicar"); }
   }
 
-  async function deactivate(id: string) {
-    if (!window.confirm("¿Desactivar esta rutina?")) return;
+  async function deleteRoutine(item: Rutina) {
+    if (!window.confirm(`¿Eliminar definitivamente la rutina «${item.nombre}» y su configuración de ejercicios? Esta acción no se puede deshacer.`)) return;
     try {
-      const response = await fetch(`/api/rutinas/${id}`, { method: "DELETE" });
+      const response = await fetch(`/api/rutinas/${item._id}`, { method: "DELETE" });
       const data = (await response.json()) as { ok: boolean; error?: string };
-      if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo desactivar");
-      toast.success("Rutina desactivada");
+      if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo eliminar la rutina");
+      setRutinas((current) => current.filter((routine) => routine._id !== item._id));
+      toast.success("Rutina eliminada");
       await load();
-    } catch (error) { toast.error(error instanceof Error ? error.message : "Error al desactivar"); }
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Error al eliminar la rutina"); }
   }
 
   return (
@@ -130,7 +131,7 @@ export default function RutinasPage() {
               <Card key={item._id} className="transition-shadow hover:shadow-md"><CardContent className="p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div><h2 className="text-lg font-bold">{item.nombre}</h2><p className="text-sm text-muted-foreground">{labels[item.objetivo]} · {labels[item.nivel]}</p></div>
-                  <div className="flex"><Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Pencil className="h-4 w-4" /></Button><Button variant="ghost" size="icon" onClick={() => duplicate(item._id)}><Copy className="h-4 w-4" /></Button><Button variant="ghost" size="icon" className="text-destructive" onClick={() => deactivate(item._id)}><Trash2 className="h-4 w-4" /></Button></div>
+                  <div className="flex"><Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Pencil className="h-4 w-4" /></Button><Button variant="ghost" size="icon" onClick={() => duplicate(item._id)}><Copy className="h-4 w-4" /></Button><Button variant="ghost" size="icon" className="text-destructive" aria-label={`Eliminar rutina ${item.nombre}`} onClick={() => deleteRoutine(item)}><Trash2 className="h-4 w-4" /></Button></div>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2 text-xs"><span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">{item.dias_semana} días/semana</span>{item.duracion_semanas ? <span className="rounded-full bg-muted px-2.5 py-1">{item.duracion_semanas} semanas</span> : null}{item.duracion_sesion_minutos ? <span className="rounded-full bg-muted px-2.5 py-1">{item.duracion_sesion_minutos} min</span> : null}</div>
                 {item.descripcion ? <p className="mt-4 line-clamp-3 text-sm text-muted-foreground">{item.descripcion}</p> : null}
