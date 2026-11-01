@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -16,7 +16,7 @@ async function serviceRest<T>(path: string): Promise<T> {
   return (text ? JSON.parse(text) : null) as T;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     if (!supabaseUrl || !anonKey) throw new Error("Supabase no está configurado");
     const cookieStore = await cookies();
@@ -38,10 +38,11 @@ export async function GET() {
     if (!cliente) return NextResponse.json({ ok: true, data: null, reason: "cliente_no_vinculado" });
 
     const asignaciones = await serviceRest<Array<Record<string, unknown>>>(
-      `cliente_rutinas?cliente_id=eq.${encodeURIComponent(cliente.id)}&estado=eq.activa&select=*,rutinas(id,nombre,descripcion,objetivo,nivel,dias_semana,duracion_semanas,duracion_sesion_minutos)&order=fecha_inicio.desc&limit=1`
+      `cliente_rutinas?cliente_id=eq.${encodeURIComponent(cliente.id)}&estado=eq.activa&select=*,rutinas(id,nombre,descripcion,objetivo,nivel,dias_semana,duracion_semanas,duracion_sesion_minutos)&order=fecha_inicio.desc`
     );
-    const asignacion = asignaciones[0];
-    if (!asignacion) return NextResponse.json({ ok: true, data: { cliente, asignacion: null, ejercicios: [] } });
+    const requested = new URL(request.url).searchParams.get("asignacion_id");
+    const asignacion = (requested ? asignaciones.find((row) => row.id === requested) : null) || asignaciones[0];
+    if (!asignacion) return NextResponse.json({ ok: true, data: { cliente, asignaciones, asignacion: null, ejercicios: [] } });
 
     const rutina = asignacion.rutinas as Record<string, unknown> | undefined;
     const rutinaId = String(rutina?.id || asignacion.rutina_id || "");
@@ -51,7 +52,7 @@ export async function GET() {
         )
       : [];
 
-    return NextResponse.json({ ok: true, data: { cliente, asignacion, rutina, ejercicios } });
+    return NextResponse.json({ ok: true, data: { cliente, asignaciones, asignacion, rutina, ejercicios } });
   } catch (error) {
     return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "Error al cargar el entrenamiento" }, { status: 500 });
   }

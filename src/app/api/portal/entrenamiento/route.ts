@@ -22,7 +22,7 @@ async function rest<T>(path: string, init?: RequestInit): Promise<T> {
   return (text ? JSON.parse(text) : null) as T;
 }
 
-async function getClientContext() {
+async function getClientContext(requestedAssignmentId?: string) {
   if (!supabaseUrl || !anonKey) throw new Error("Supabase no está configurado");
   const store = await cookies();
   const token = store.get("chetesai_access_token")?.value;
@@ -43,9 +43,9 @@ async function getClientContext() {
   if (!cliente) throw new Error("Cliente no vinculado");
 
   const asignaciones = await rest<Array<Record<string, unknown>>>(
-    `cliente_rutinas?cliente_id=eq.${cliente.id}&estado=eq.activa&select=id,rutina_id,progreso&order=fecha_inicio.desc&limit=1`
+    `cliente_rutinas?cliente_id=eq.${cliente.id}&estado=eq.activa&select=id,rutina_id,progreso&order=fecha_inicio.desc`
   );
-  const asignacion = asignaciones[0];
+  const asignacion = requestedAssignmentId ? asignaciones.find((item) => item.id === requestedAssignmentId) : asignaciones[0];
   if (!asignacion) throw new Error("No tienes una rutina activa");
   return { cliente, asignacion };
 }
@@ -65,7 +65,7 @@ async function getSessionPayload(sessionId: string) {
 
 export async function GET(request: NextRequest) {
   try {
-    const { cliente, asignacion } = await getClientContext();
+    const { cliente, asignacion } = await getClientContext(request.nextUrl.searchParams.get("asignacion_id") || undefined);
     const dia = Number(request.nextUrl.searchParams.get("dia") || 1);
     const sesiones = await rest<Array<Record<string, unknown>>>(
       `sesiones_entrenamiento?cliente_id=eq.${cliente.id}&cliente_rutina_id=eq.${String(asignacion.id)}&dia=eq.${dia}&estado=eq.en_curso&select=*&order=iniciada_at.desc&limit=1`
@@ -79,8 +79,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { cliente, asignacion } = await getClientContext();
-    const body = (await request.json()) as { dia?: number };
+    const body = (await request.json()) as { dia?: number; asignacion_id?: string };
+    const { cliente, asignacion } = await getClientContext(body.asignacion_id);
     const dia = Number(body.dia || 1);
 
     const existing = await rest<Array<Record<string, unknown>>>(

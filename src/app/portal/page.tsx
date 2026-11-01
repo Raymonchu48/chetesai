@@ -62,6 +62,7 @@ type Exercise = {
 type PortalData = {
   cliente: { id: string; nombre: string; email: string | null; modelo_visual: ExerciseVisualModel };
   asignacion: Record<string, unknown> | null;
+  asignaciones?: Array<{ id: string; rutina_id: string; rutinas: { nombre: string } | null }>;
   rutina?: { id: string; nombre: string; descripcion: string | null; objetivo: string; nivel: string; dias_semana: number; duracion_sesion_minutos: number | null };
   ejercicios: Exercise[];
 };
@@ -120,6 +121,7 @@ export default function PortalPage() {
   const autoSelectedDay = useRef(false);
   const [data, setData] = useState<PortalData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState(1);
   const [session, setSession] = useState<WorkoutSession | null>(null);
@@ -145,7 +147,8 @@ export default function PortalPage() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/portal/rutina")
+    setLoading(true);
+    fetch(`/api/portal/rutina${selectedAssignmentId ? `?asignacion_id=${encodeURIComponent(selectedAssignmentId)}` : ""}`)
       .then(async (response) => {
         const result = (await response.json()) as { ok: boolean; data?: PortalData | null; error?: string };
         if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo cargar tu entrenamiento");
@@ -154,19 +157,19 @@ export default function PortalPage() {
       .catch((err) => setError(err instanceof Error ? err.message : "Error al cargar"))
       .finally(() => setLoading(false));
     loadHistory();
-  }, [loadHistory]);
+  }, [loadHistory, selectedAssignmentId]);
 
   useEffect(() => {
     setSession(null);
     setRestSeconds(0);
     setActiveExerciseIndex(0);
-    fetch(`/api/portal/entrenamiento?dia=${selectedDay}`)
+    fetch(`/api/portal/entrenamiento?dia=${selectedDay}${selectedAssignmentId ? `&asignacion_id=${encodeURIComponent(selectedAssignmentId)}` : ""}`)
       .then((response) => response.json())
       .then((result: { ok: boolean; data?: WorkoutSession | null }) => {
         if (result.ok) setSession(result.data || null);
       })
       .catch(() => undefined);
-  }, [selectedDay]);
+  }, [selectedDay, selectedAssignmentId]);
 
   useEffect(() => {
     if (restSeconds <= 0) return;
@@ -232,7 +235,7 @@ export default function PortalPage() {
       const response = await fetch("/api/portal/entrenamiento", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dia: selectedDay }),
+        body: JSON.stringify({ dia: selectedDay, asignacion_id: selectedAssignmentId || data?.asignacion?.id }),
       });
       const result = (await response.json()) as { ok: boolean; data?: WorkoutSession; error?: string };
       if (!response.ok || !result.ok || !result.data) throw new Error(result.error || "No se pudo iniciar el entrenamiento");
@@ -347,6 +350,7 @@ export default function PortalPage() {
         ) : (
           <>
             <section className="mb-6 grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+              {(data.asignaciones?.length || 0) > 1 ? <section className="mb-4 rounded-2xl border border-[#ded8cd] bg-[#fffdf9] p-4"><h2 className="mb-3 text-sm font-bold">Mis rutinas asignadas</h2><div className="flex flex-wrap gap-2">{data.asignaciones!.map((a) => <button key={a.id} type="button" onClick={() => { setSelectedAssignmentId(a.id); setSelectedDay(1); setSession(null); }} className={`rounded-xl border px-4 py-2 text-sm font-semibold ${String(data.asignacion?.id) === a.id ? "border-[#46624f] bg-[#46624f] text-white" : "border-[#ded8cd] bg-white text-[#202724]"}`}>{a.rutinas?.nombre || "Rutina"}</button>)}</div></section> : null}
               <div className="relative overflow-hidden rounded-[28px] border border-[#ded8cd] bg-[#fffdf9]/95 p-6 shadow-sm"><div className="absolute right-0 top-0 h-28 w-28 rounded-bl-full bg-[#e9f5e7]" /><div className="relative"><p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2f9e24]">Tu plan activo</p><h2 className="mt-2 text-2xl font-black tracking-tight">{data.rutina.nombre}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-[#707872]">{data.rutina.descripcion || "Una planificación creada para acompañarte paso a paso hacia tu objetivo."}</p><div className="mt-5 flex flex-wrap gap-2 text-xs font-bold"><span className="rounded-full bg-[#e9f2ea] px-3 py-1.5 text-[#46624f]">{trainingDays.length} {trainingDays.length === 1 ? "día" : "días"}/semana</span><span className="rounded-full bg-[#f0ede7] px-3 py-1.5">Nivel {data.rutina.nivel}</span><span className="rounded-full bg-[#f0ede7] px-3 py-1.5">{data.rutina.duracion_sesion_minutos || 60} min</span></div></div></div>
               <div className="grid grid-cols-2 gap-3">
                 <QuickLink href="/portal/bienestar" icon={<Apple className="h-5 w-5" />} label="Mi nutrición" description="Plan y hábitos" tone="green" />
