@@ -113,6 +113,9 @@ function hasMeaningfulPlan(plan: PlanForm) {
 
 export default function NutritionPage() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [selectedMenuDay,setSelectedMenuDay] = useState("Lunes");
+  const weekDays=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+  const weeklyMenu=plan.comidas.some(meal=>weekDays.some(day=>meal.nombre.startsWith(`${day} · `)));
   const [clienteId, setClienteId] = useState("");
   const [plan, setPlan] = useState<PlanForm>(newPlan);
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -175,7 +178,7 @@ export default function NutritionPage() {
   const todayRecords = records.filter((item) => item.fecha === today && item.completado);
   const adherenceToday = habits.length ? Math.round((todayRecords.length / habits.length) * 100) : 0;
   const selectedClient = clientes.find((item) => item._id === clienteId);
-  const mealProposalCount = plan.comidas.filter((meal) => meal.descripcion.trim().length > 0).length;
+  const mealProposalCount = plan.comidas.filter((meal) => meal.descripcion.trim().length > 0 || meal.alimentos.length > 0).length;
 
   const weeklyCompletion = useMemo(() => {
     const start = new Date();
@@ -301,8 +304,9 @@ export default function NutritionPage() {
               <div><h3 className="text-lg font-bold">Estructura diaria de comidas</h3><p className="mt-1 text-sm text-muted-foreground">Escribe aquí los alimentos, cantidades y alternativas que verá el cliente.</p></div>
               <span className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${mealProposalCount ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>{mealProposalCount}/{plan.comidas.length} comidas con propuesta</span>
             </div>
+            {weeklyMenu && <div className="mt-4 flex flex-wrap gap-2">{weekDays.map(day=><Button type="button" key={day} variant={selectedMenuDay===day?"default":"outline"} size="sm" onClick={()=>setSelectedMenuDay(day)}>{day}</Button>)}</div>}
             <div className="mt-4 grid gap-4 lg:grid-cols-2">
-              {plan.comidas.map((meal, index) => <div key={`${meal.nombre}-${index}`} className="rounded-2xl border bg-muted/20 p-4">
+              {plan.comidas.map((meal, index) => ({meal,index})).filter(({meal})=>!weeklyMenu||meal.nombre.startsWith(`${selectedMenuDay} · `)).map(({meal,index}) => <div key={`${meal.nombre}-${index}`} className="rounded-2xl border bg-muted/20 p-4">
                 <div className="grid gap-3 sm:grid-cols-[1fr_120px]"><Field label="Momento" type="text" value={meal.nombre} onChange={(value) => updateMeal(index, "nombre", value)} /><Field label="Hora" type="time" value={meal.hora} onChange={(value) => updateMeal(index, "hora", value)} /></div>
                 <div className="mt-3"><Label>Propuesta visible para el cliente</Label><Textarea className="mt-2" rows={4} value={meal.descripcion} onChange={(event) => updateMeal(index, "descripcion", event.target.value)} placeholder="Ej.: 60 g de avena + 250 ml de leche + fruta. Alternativa: yogur natural con avena y frutos rojos." /></div>
               </div>)}
