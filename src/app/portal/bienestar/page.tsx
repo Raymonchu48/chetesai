@@ -233,36 +233,41 @@ export default function ClientWellbeingPage() {
                     </div>
 
                     {Array.isArray(data.plan.comidas) && data.plan.comidas.length ? (
-                      <div className="space-y-4">
-                        {data.plan.comidas.map((meal, index) => (
-                          <Card key={`${meal.nombre}-${index}`} className="relative isolate overflow-hidden border-[#d6ded4] bg-[#fffdf9] shadow-sm">
-                            <CardContent className="relative p-0">
-                              <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden text-[#568257]">
-                                <Leaf className="absolute -right-4 top-2 h-24 w-24 rotate-[-18deg] opacity-25" strokeWidth={1.3} />
-                                <Carrot className="absolute -right-5 bottom-1 h-32 w-32 rotate-[24deg] opacity-20" strokeWidth={1.2} />
-                                <Wheat className="absolute right-24 -bottom-7 h-24 w-24 rotate-[-22deg] opacity-20" strokeWidth={1.2} />
+                      <div className="space-y-3">
+                        {["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"].map((day) => {
+                          const dayMeals = data.plan!.comidas.filter(meal => meal.nombre.startsWith(`${day} · `));
+                          if (!dayMeals.length) return null;
+                          const kcal = dayMeals.reduce((total, meal) => total + (meal.alimentos || []).reduce((sum, food) => sum + Number(food.energia_kcal || 0), 0), 0);
+                          return <details key={day} className="group overflow-hidden rounded-[24px] border border-[#dce4d9] bg-[#fffdf9] shadow-sm" open={false}>
+                            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-5 marker:hidden sm:px-6 [&::-webkit-details-marker]:hidden">
+                              <div className="flex items-center gap-3">
+                                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#46624f] text-sm font-bold text-white">{["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"].indexOf(day)+1}</span>
+                                <div><h4 className="text-lg font-bold !text-[#253e31]">{day}</h4><p className="text-xs font-medium text-[#596d5e]">{dayMeals.length} comidas · {Math.round(kcal)} kcal estimadas</p></div>
                               </div>
-                              <div className="relative z-10 grid sm:grid-cols-[88px_1fr]">
-                                <div className="flex items-center justify-center bg-[#f0f4ef] px-4 py-5 sm:flex-col sm:gap-2">
-                                  <span className="mr-3 grid h-10 w-10 place-items-center rounded-full bg-[#46624f] text-sm font-black text-white sm:mr-0">{index + 1}</span>
-                                  {meal.hora ? <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#46624f]"><Clock3 className="h-3.5 w-3.5" />{meal.hora}</span> : null}
-                                </div>
-                                <div className="p-5 sm:p-6">
-                                  <h4 className="text-lg font-bold !text-[#253e31]" style={{ color: "#253e31" }}>{meal.nombre}</h4>
-                                  <p className={`mt-2 whitespace-pre-line text-sm leading-7 ${meal.descripcion ? "text-[#4f5c55]" : "italic text-[#929891]"}`}>
-                                    {meal.descripcion || (meal.alimentos?.length ? "Selección preparada por tu profesional." : "Pendiente de propuesta profesional.")}
-                                  </p>
-                                  {meal.alimentos?.length ? <div className="mt-4 overflow-hidden rounded-2xl border border-[#d7e0d6] bg-white/90">
-                                    {meal.alimentos.map((food, foodIndex) => <div key={`${food.nombre}-${foodIndex}`} className="flex items-center justify-between gap-4 border-b border-[#dce4dc] px-4 py-3 last:border-b-0">
-                                      <div className="flex min-w-0 items-center gap-3"><FoodCategoryVisual category={food.categoria} name={food.nombre} compact /><div className="min-w-0"><p className="truncate text-sm font-semibold !text-[#253e31]" style={{ color: "#253e31" }}>{food.nombre}</p><p className="mt-0.5 truncate text-xs text-[#707872]">{food.cantidad_g} g · P {food.proteinas_g} g · HC {food.carbohidratos_g} g · G {food.grasas_g} g</p></div></div>
-                                      <span className="shrink-0 rounded-full bg-[#eef5ef] px-3 py-1 text-xs font-bold text-[#46624f]">{food.energia_kcal} kcal</span>
-                                    </div>)}
-                                  </div> : null}
-                                </div>
+                              <span className="rounded-full border border-[#cad8ca] bg-[#edf3ec] px-3 py-2 text-sm font-bold text-[#34523c] group-open:bg-[#dceadf]"> <span className="group-open:hidden">Ver comidas +</span><span className="hidden group-open:inline">Cerrar −</span></span>
+                            </summary>
+                            <div className="relative isolate border-t border-[#dce4d9] bg-[#f8faf6] px-3 py-5 sm:px-5">
+                              <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
+                                <div className="absolute -top-6 right-0 flex rotate-[-8deg] gap-2 text-4xl opacity-35 sm:text-5xl"><span>🥕</span><span>🥦</span><span>🍅</span><span>🍋</span></div>
+                                <div className="absolute -bottom-4 left-0 flex -rotate-12 gap-2 text-4xl opacity-25 sm:text-5xl"><span>🍇</span><span>🌽</span><span>🍆</span></div>
+                                <div className="absolute bottom-2 right-1 flex gap-2 text-3xl opacity-20"><span>🥬</span><span>🍄</span><span>🫑</span></div>
                               </div>
-                            </CardContent>
-                          </Card>
-                        ))}
+                              <div className="relative z-10 space-y-3">
+                                {dayMeals.map((meal,index) => <details key={`${day}-${meal.nombre}-${index}`} className="group/meal overflow-hidden rounded-xl border border-[#d7e1d5] bg-white/95">
+                                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-4 marker:hidden [&::-webkit-details-marker]:hidden">
+                                    <div className="min-w-0"><p className="font-semibold !text-[#263f31]">{meal.nombre.split(" · ").slice(1).join(" · ") || meal.nombre}</p><p className="text-xs text-[#59695e]">{meal.hora} · {Math.round((meal.alimentos||[]).reduce((n,f)=>n+Number(f.energia_kcal||0),0))} kcal</p></div>
+                                    <span className="shrink-0 text-sm font-semibold text-[#46624f]"><span className="group-open/meal:hidden">Mostrar +</span><span className="hidden group-open/meal:inline">Ocultar −</span></span>
+                                  </summary>
+                                  <div className="border-t border-[#e1e8df] px-4 pb-4 pt-3">
+                                    <p className="mb-3 text-sm leading-6 text-[#40574a]">{meal.descripcion || "Comida prevista por tu profesional."}</p>
+                                    {meal.alimentos?.length ? <div className="divide-y divide-[#e4e9e1] rounded-lg border border-[#e0e6de] bg-white">{meal.alimentos.map((food,foodIndex)=><div key={`${food.nombre}-${foodIndex}`} className="flex items-center justify-between gap-3 px-3 py-3"><div className="flex min-w-0 items-center gap-3"><FoodCategoryVisual category={food.categoria} name={food.nombre} compact /><div className="min-w-0"><p className="text-sm font-semibold !text-[#253e31]">{food.nombre}</p><p className="text-xs text-[#53665a]">{food.cantidad_g} g · P {food.proteinas_g} g · HC {food.carbohidratos_g} g · G {food.grasas_g} g</p></div></div><span className="shrink-0 rounded-full bg-[#e9f2e9] px-2 py-1 text-xs font-bold text-[#33533c]">{food.energia_kcal} kcal</span></div>)}</div> : null}
+                                  </div>
+                                </details>)}
+                              </div>
+                            </div>
+                          </details>;
+                        })}
+                        {!data.plan.comidas.some(meal=>["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"].some(day=>meal.nombre.startsWith(`${day} · `))) && data.plan.comidas.map((meal,index)=><details key={index} className="rounded-xl border border-[#d7e1d5] bg-white p-4"><summary className="cursor-pointer font-bold text-[#253e31]">{meal.nombre}</summary><p className="mt-3 text-sm text-[#40574a]">{meal.descripcion}</p>{meal.alimentos?.map((food,i)=><p key={i} className="text-sm text-[#253e31]">{food.nombre} · {food.cantidad_g} g · {food.energia_kcal} kcal</p>)}</details>)}
                       </div>
                     ) : (
                       <Card><CardContent className="py-10 text-center text-sm text-[#707872]">Tu plan todavía no contiene comidas publicadas.</CardContent></Card>
