@@ -126,6 +126,7 @@ export default function ClientWorkspacePage() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2 lg:justify-end">
+              <Button asChild variant="secondary"><Link href={`/clientes/${encodeURIComponent(clientId)}/valoracion`}>Valoración inicial</Link></Button>
               <Button asChild variant="secondary"><Link href={`/nutricion?cliente_id=${clientId}`}><Apple className="mr-2 h-4 w-4" />Crear dieta</Link></Button>
               <Button asChild className="bg-white text-[#294435] hover:bg-white/90"><Link href={`/rutinas?cliente_id=${encodeURIComponent(clientId)}`}><Dumbbell className="mr-2 h-4 w-4" />Asignar rutina</Link></Button>
               <Button variant="ghost" size="icon" className="text-white hover:bg-white/15 hover:text-white" onClick={load} aria-label="Actualizar cliente"><RefreshCw className="h-4 w-4" /></Button>
