@@ -1,0 +1,344 @@
+[
+  {
+    "nombre": "Jamón cocido tipo York en lonchas · 95% carne",
+    "categoria": "carnes",
+    "marca": "ElPozo BienStar",
+    "estado_preparacion": "referencia_desayunos_20261102",
+    "porcion_nombre": "40 g",
+    "porcion_gramos": 40,
+    "energia_kcal": 102,
+    "proteinas_g": 20,
+    "carbohidratos_g": 1,
+    "grasas_g": 2,
+    "alergenos": [],
+    "etiquetas": [
+      "unidad_g",
+      "desayuno",
+      "merienda",
+      "york",
+      "fetas",
+      "lonchas"
+    ],
+    "fuente": "https://bienstar.elpozo.com/productos/jamon-cocido-extra-lonchas-finas-95-carne/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Cantidad inicial editable, no recomendación de consumo. Puede contener trazas de proteínas de leche y soja. Pesar las lonchas; sin equivalencia fija por feta. Revisar el envase si cambia el producto.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Pechuga de pavo cocida en lonchas · +proteínas",
+    "categoria": "carnes",
+    "marca": "ElPozo BienStar",
+    "estado_preparacion": "referencia_desayunos_20261102",
+    "porcion_nombre": "40 g",
+    "porcion_gramos": 40,
+    "energia_kcal": 95,
+    "proteinas_g": 22,
+    "carbohidratos_g": 0.5,
+    "grasas_g": 0.5,
+    "alergenos": [],
+    "etiquetas": [
+      "unidad_g",
+      "desayuno",
+      "merienda",
+      "pavo",
+      "fetas",
+      "lonchas"
+    ],
+    "fuente": "https://bienstar.elpozo.com/productos/pechuga-de-pavo-proteinas/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Cantidad inicial editable, no recomendación de consumo. Puede contener trazas de proteínas de leche y soja. Pesar las lonchas; sin equivalencia fija por feta. Revisar el envase si cambia el producto.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Jamón curado en lonchas · con separador",
+    "categoria": "carnes",
+    "marca": "ElPozo",
+    "estado_preparacion": "referencia_desayunos_20261102",
+    "porcion_nombre": "30 g",
+    "porcion_gramos": 30,
+    "energia_kcal": 228,
+    "proteinas_g": 30,
+    "carbohidratos_g": 0,
+    "grasas_g": 12,
+    "alergenos": [],
+    "etiquetas": [
+      "unidad_g",
+      "desayuno",
+      "merienda",
+      "jamon",
+      "serrano",
+      "fetas",
+      "lonchas"
+    ],
+    "fuente": "https://www.elpozo.com/productos/jamon-curado-3/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Cantidad inicial editable, no recomendación de consumo. Comprobar ingredientes y alérgenos en el envase: la ficha del fabricante advierte que pueden cambiar. Pesar las lonchas. Revisar el envase si cambia el producto.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Miel · referencia genérica MAPA",
+    "categoria": "otros",
+    "marca": null,
+    "estado_preparacion": "referencia_desayunos_20261102",
+    "porcion_nombre": "15 g",
+    "porcion_gramos": 15,
+    "energia_kcal": 314,
+    "proteinas_g": 0.5,
+    "carbohidratos_g": 78,
+    "grasas_g": 0,
+    "alergenos": [],
+    "etiquetas": [
+      "unidad_g",
+      "desayuno",
+      "merienda",
+      "miel"
+    ],
+    "fuente": "https://www.mapa.gob.es/es/ministerio/servicios/informacion/miel_tcm30-102350.pdf",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Cantidad inicial editable, no recomendación de consumo. Referencia genérica de composición publicada por MAPA (tabla basada en Moreiras 2013); no corresponde a una marca concreta. Revisar el envase si cambia el producto.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Queso crema para untar · Original",
+    "categoria": "lacteos",
+    "marca": "Philadelphia",
+    "estado_preparacion": "referencia_desayunos_20261102",
+    "porcion_nombre": "30 g",
+    "porcion_gramos": 30,
+    "energia_kcal": 249,
+    "proteinas_g": 3.7,
+    "carbohidratos_g": 2.9,
+    "grasas_g": 25,
+    "alergenos": [
+      "leche"
+    ],
+    "etiquetas": [
+      "unidad_g",
+      "desayuno",
+      "merienda",
+      "queso",
+      "philadelphia",
+      "filadelfia",
+      "fidadelfia",
+      "untar"
+    ],
+    "fuente": "https://www.philadelphia.eu/es/productos/philadelphia-original/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Cantidad inicial editable, no recomendación de consumo. Producto Original; no intercambiar sus valores con Light. Revisar el envase si cambia el producto.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Queso crema para untar · Light",
+    "categoria": "lacteos",
+    "marca": "Philadelphia",
+    "estado_preparacion": "referencia_desayunos_20261102",
+    "porcion_nombre": "30 g",
+    "porcion_gramos": 30,
+    "energia_kcal": 154,
+    "proteinas_g": 5.9,
+    "carbohidratos_g": 4.4,
+    "grasas_g": 12,
+    "alergenos": [
+      "leche"
+    ],
+    "etiquetas": [
+      "unidad_g",
+      "desayuno",
+      "merienda",
+      "queso",
+      "philadelphia",
+      "filadelfia",
+      "fidadelfia",
+      "untar"
+    ],
+    "fuente": "https://www.philadelphia.eu/es/productos/philadelphia-light/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Cantidad inicial editable, no recomendación de consumo. Producto Light; referencia independiente de Original. Revisar el envase si cambia el producto.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Pan de molde integral · Natural 100%",
+    "categoria": "cereales",
+    "marca": "Bimbo",
+    "estado_preparacion": "referencia_desayunos_20261102",
+    "porcion_nombre": "29 g",
+    "porcion_gramos": 29,
+    "energia_kcal": 240,
+    "proteinas_g": 11,
+    "carbohidratos_g": 37,
+    "grasas_g": 3.3,
+    "alergenos": [
+      "gluten"
+    ],
+    "etiquetas": [
+      "unidad_g",
+      "desayuno",
+      "merienda",
+      "pan",
+      "tostadas"
+    ],
+    "fuente": "https://www.bimbo.es/marcas/bimbo-natural-100/natural-100-integral",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Cantidad inicial editable, no recomendación de consumo. Rebanada de referencia del fabricante: 29 g; comprobar el peso real. Puede contener sésamo, soja y mostaza. Revisar el envase si cambia el producto.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Tortitas de arroz · Vitalday",
+    "categoria": "cereales",
+    "marca": "Gullón",
+    "estado_preparacion": "referencia_desayunos_20261102",
+    "porcion_nombre": "20 g",
+    "porcion_gramos": 20,
+    "energia_kcal": 382,
+    "proteinas_g": 8.2,
+    "carbohidratos_g": 81,
+    "grasas_g": 2,
+    "alergenos": [
+      "soja"
+    ],
+    "etiquetas": [
+      "unidad_g",
+      "desayuno",
+      "merienda",
+      "tortitas",
+      "arroz"
+    ],
+    "fuente": "https://gullon.es/galletas/tortitas-arroz-sin-gluten-vitalday-130g/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Cantidad inicial editable, no recomendación de consumo. Contiene lecitina de soja; puede contener leche. Pesar la cantidad; no se asigna un peso fijo por tortita. Revisar el envase si cambia el producto.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Mermelada de fresa · Temporada",
+    "categoria": "otros",
+    "marca": "Hero",
+    "estado_preparacion": "referencia_desayunos_20261102",
+    "porcion_nombre": "15 g",
+    "porcion_gramos": 15,
+    "energia_kcal": 219,
+    "proteinas_g": 0.6,
+    "carbohidratos_g": 53,
+    "grasas_g": 0.1,
+    "alergenos": [],
+    "etiquetas": [
+      "unidad_g",
+      "desayuno",
+      "merienda",
+      "mermelada",
+      "fresa"
+    ],
+    "fuente": "https://mermeladas.hero.es/productos/temporada/mermelada-de-temporada-de-fresa",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Cantidad inicial editable, no recomendación de consumo. Referencia de la gama Temporada; contiene azúcar. Revisar el envase si cambia el producto.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Queso cottage",
+    "categoria": "lacteos",
+    "marca": "Arla",
+    "estado_preparacion": "referencia_desayunos_20261102",
+    "porcion_nombre": "100 g",
+    "porcion_gramos": 100,
+    "energia_kcal": 99,
+    "proteinas_g": 14,
+    "carbohidratos_g": 1.7,
+    "grasas_g": 4,
+    "alergenos": [
+      "leche"
+    ],
+    "etiquetas": [
+      "unidad_g",
+      "desayuno",
+      "merienda",
+      "queso",
+      "cottage",
+      "fresco"
+    ],
+    "fuente": "https://www.arlafoods.es/productos/arla/queso-cottage/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Cantidad inicial editable, no recomendación de consumo. Referencia cottage ordinaria; distinta de la gama Protein. Revisar el envase si cambia el producto.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Queso cottage · Protein",
+    "categoria": "lacteos",
+    "marca": "Arla",
+    "estado_preparacion": "referencia_desayunos_20261102",
+    "porcion_nombre": "100 g",
+    "porcion_gramos": 100,
+    "energia_kcal": 80,
+    "proteinas_g": 15,
+    "carbohidratos_g": 2.1,
+    "grasas_g": 1.5,
+    "alergenos": [
+      "leche"
+    ],
+    "etiquetas": [
+      "unidad_g",
+      "desayuno",
+      "merienda",
+      "queso",
+      "cottage",
+      "fresco",
+      "protein"
+    ],
+    "fuente": "https://www.arlafoods.es/productos/gama-arla-protein/cottage/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Cantidad inicial editable, no recomendación de consumo. Referencia gama Protein; distinta del cottage ordinario. Revisar el envase si cambia el producto.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Hummus clásico · receta con proteína de guisante",
+    "categoria": "legumbres",
+    "marca": "Shukran",
+    "estado_preparacion": "referencia_desayunos_20261102",
+    "porcion_nombre": "40 g",
+    "porcion_gramos": 40,
+    "energia_kcal": 193,
+    "proteinas_g": 11,
+    "carbohidratos_g": 10,
+    "grasas_g": 12,
+    "alergenos": [
+      "sesamo"
+    ],
+    "etiquetas": [
+      "unidad_g",
+      "desayuno",
+      "merienda",
+      "hummus",
+      "garbanzo",
+      "untar"
+    ],
+    "fuente": "https://shukran.es/productos/hummus-clasico/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Cantidad inicial editable, no recomendación de consumo. Receta del fabricante con proteína de guisante y tahini. Azúcares declarados: menos de 0,5 g/100 g. Revisar el envase si cambia el producto.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Crema suave de cacahuetes pelados · 100% cacahuete",
+    "categoria": "frutos_secos",
+    "marca": "HSN FoodSeries",
+    "estado_preparacion": "referencia_desayunos_20261102",
+    "porcion_nombre": "15 g",
+    "porcion_gramos": 15,
+    "energia_kcal": 607,
+    "proteinas_g": 28.2,
+    "carbohidratos_g": 13.2,
+    "grasas_g": 47.2,
+    "alergenos": [
+      "cacahuetes"
+    ],
+    "etiquetas": [
+      "unidad_g",
+      "desayuno",
+      "merienda",
+      "cacahuete",
+      "crema",
+      "untar"
+    ],
+    "fuente": "https://www.hsnstore.com/marcas/food-series/crema-suave-de-cacahuetes-pelados-1kg",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Cantidad inicial editable, no recomendación de consumo. 100% cacahuetes tostados pelados. Puede contener leche, frutos de cáscara, sésamo y soja. Sal declarada: menos de 0,01 g/100 g. Revisar el envase si cambia el producto.",
+    "es_personalizado": false,
+    "activo": true
+  }
+]

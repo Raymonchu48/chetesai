@@ -1,7 +1,10 @@
 // Produces an idempotent INSERT for review. Does not connect to a database.
 const fs = require('node:fs');
 const path = require('node:path');
-const rows = JSON.parse(fs.readFileSync(path.join(__dirname, 'catalogo-bebidas-suplementos.json'), 'utf8'));
+const catalog = process.argv[2] || 'catalogo-bebidas-suplementos.json';
+const allowed = ['catalogo-bebidas-suplementos.json', 'catalogo-desayunos-meriendas.json'];
+if (!allowed.includes(catalog)) throw new Error('Unknown catalog');
+const rows = JSON.parse(fs.readFileSync(path.join(__dirname, catalog), 'utf8'));
 const keys = new Set();
 for (const row of rows) {
   const key = `${row.nombre}|${row.marca}`.toLocaleLowerCase('es');
