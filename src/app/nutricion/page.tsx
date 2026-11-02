@@ -128,6 +128,7 @@ export default function NutritionPage() {
   const [records, setRecords] = useState<HabitRecord[]>([]);
   const [habitForm, setHabitForm] = useState(emptyHabit);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [savingPlan, setSavingPlan] = useState(false);
   const [savingHabit, setSavingHabit] = useState(false);
 
@@ -150,6 +151,7 @@ export default function NutritionPage() {
   const load = useCallback(async (requestedPlanId = selectedPlanId) => {
     if (!clienteId) return;
     const version = ++loadVersion.current;
+    setLoadError(null);
     setLoading(true);
     try {
       const response = await fetch(`/api/nutricion?cliente_id=${encodeURIComponent(clienteId)}${requestedPlanId ? `&plan_id=${encodeURIComponent(requestedPlanId)}` : ""}`, { cache: "no-store" });
@@ -181,6 +183,9 @@ export default function NutritionPage() {
       if (version !== loadVersion.current) return;
       setPlan(newPlan());
       setPlanes([]);
+      setHabits([]);
+      setRecords([]);
+      setLoadError(error instanceof Error ? error.message : "Error al cargar");
       toast.error(error instanceof Error ? error.message : "Error al cargar");
     } finally {
       if (version === loadVersion.current) setLoading(false);
@@ -208,7 +213,7 @@ export default function NutritionPage() {
     if (publicar && !window.confirm("¿Publicar este plan en el portal del cliente? Será visible inmediatamente.")) return;
     if (!clienteId) return toast.error("Selecciona un cliente");
     if (!hasMeaningfulPlan(plan)) {
-      return toast.error("Añade contenido real al plan antes de publicarlo al cliente");
+      return toast.error("Añade contenido real al plan antes de guardarlo");
     }
 
     setSavingPlan(true);
@@ -290,7 +295,7 @@ export default function NutritionPage() {
           </Select>
         </CardContent></Card>
 
-        {loading ? <p className="py-16 text-center text-muted-foreground">Cargando nutrición y hábitos...</p> : <>
+        {loading ? <p className="py-16 text-center text-muted-foreground">Cargando nutrición y hábitos...</p> : loadError ? <Card><CardContent className="p-6"><div role="alert"><h2 className="text-xl font-bold">No se puede cargar la nutrición de {selectedClient?.nombre || "este cliente"}</h2><p className="mt-3">{loadError}</p>{loadError.startsWith("Consentimiento requerido") ? <p className="mt-3 text-sm text-muted-foreground">El cliente debe revisar el consentimiento de datos de salud en Privacidad de su portal. Sus planes conservan su estado; no se ha publicado ningún borrador.</p> : null}</div><Button className="mt-5" variant="secondary" onClick={() => load()}>Volver a comprobar</Button></CardContent></Card> : <>
           <div className="mb-6 grid gap-4 sm:grid-cols-3">
             <Summary label="Cliente" value={selectedClient?.nombre || "—"} />
             <Summary label="Adherencia de hoy" value={`${adherenceToday}%`} />

@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             ok: false,
-            error: "El plan está vacío. Añade al menos una propuesta de comida, una recomendación, un objetivo o valores nutricionales antes de publicarlo.",
+            error: "El plan está vacío. Añade al menos una propuesta de comida, una recomendación, un objetivo o valores nutricionales antes de guardarlo.",
           },
           { status: 400 }
         );
@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
 
       const savedPlan = rows[0] || null;
       if (!savedPlan) {
-        return NextResponse.json({ ok: false, error: "Supabase no confirmó la publicación del plan" }, { status: 500 });
+        return NextResponse.json({ ok: false, error: "Supabase no confirmó el guardado del plan" }, { status: 500 });
       }
 
       return NextResponse.json({ ok: true, data: savedPlan, published: savedPlan.estado === "activo" });
