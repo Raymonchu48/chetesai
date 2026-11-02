@@ -66,8 +66,22 @@ async function serviceRequest<T>(path: string, init: RequestInit = {}): Promise<
     cache: "no-store",
   });
   const text = await response.text();
-  if (!response.ok) throw new Error(text || "Error de Supabase");
+  if (!response.ok) {
+    let message = "No se pudo guardar o cargar la nutrición. Inténtalo de nuevo.";
+    try {
+      const failure = JSON.parse(text) as { code?: string; message?: string };
+      if (failure.code === "23505") message = "El plan activo ha cambiado. Recarga los planes y vuelve a publicar.";
+      else if (["P0001", "P0002"].includes(failure.code || "") && failure.message) message = failure.message;
+    } catch { /* Keep the readable fallback for non-JSON upstream errors. */ }
+    throw new Error(message);
+  }
   return (text ? JSON.parse(text) : null) as T;
+}
+
+function nutritionErrorStatus(message: string) {
+  if (message === "Plan no encontrado para este cliente" || message === "Cliente no encontrado") return 404;
+  if (message.startsWith("Este plan ya está finalizado") || message.startsWith("El plan activo ha cambiado")) return 409;
+  return privacyErrorStatus(message);
 }
 
 function optionalNumber(value: unknown) {
@@ -147,7 +161,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: true, data: { plan: plan || null, planes: plans, health_data_consent: consent.health_data.granted === true, habitos: habits, registros: records } });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al cargar nutrición y hábitos";
-    const status = privacyErrorStatus(message);
+    const status = nutritionErrorStatus(message);
     return NextResponse.json({ ok: false, error: message }, { status });
   }
 }
@@ -202,17 +216,17 @@ export async function POST(request: NextRequest) {
         updated_at: new Date().toISOString(),
       };
 
-      const rows = planId
-        ? await serviceRequest<Row[]>(`planes_nutricionales?id=eq.${encodeURIComponent(planId)}&cliente_id=eq.${encodeURIComponent(clienteId)}`, {
-            method: "PATCH",
-            headers: { Prefer: "return=representation" },
-            body: JSON.stringify(payload),
-          })
-        : await serviceRequest<Row[]>("planes_nutricionales", {
-            method: "POST",
-            headers: { Prefer: "return=representation" },
-            body: JSON.stringify(payload),
-          });
+      // The database serializes saves per client and replaces the active plan atomically.
+      const rows = await serviceRequest<Row[]>("rpc/save_nutrition_plan", {
+        method: "POST",
+        body: JSON.stringify({
+          p_cliente_id: clienteId,
+          p_plan_id: planId || null,
+          p_payload: payload,
+          p_actor_id: user.id,
+          p_publicar: publish,
+        }),
+      });
 
       const savedPlan = rows[0] || null;
       if (!savedPlan) {
@@ -249,7 +263,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Acción no válida" }, { status: 400 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al guardar nutrición y hábitos";
-    const status = privacyErrorStatus(message);
+    const status = nutritionErrorStatus(message);
     return NextResponse.json({ ok: false, error: message }, { status });
   }
 }

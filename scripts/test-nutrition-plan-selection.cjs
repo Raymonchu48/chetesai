@@ -18,6 +18,7 @@ function load(file, mocks, globals = {}) {
 async function main() {
   let role = 'profesional';
   let consent = true;
+  let rpcFailure = null;
   const plans = [
     { id: 'draft', cliente_id: 'client', estado: 'borrador', comidas: Array.from({ length: 35 }, () => ({ nombre: 'Comida', alimentos: [] })) },
     { id: 'active', cliente_id: 'client', estado: 'activo', comidas: [] },
@@ -31,6 +32,18 @@ async function main() {
     const parsed = new URL(url);
     if (parsed.pathname === '/auth/v1/user') return Response.json({ id: 'professional' });
     if (parsed.pathname.endsWith('/profiles')) return Response.json([{ role, activo: true }]);
+    if (parsed.pathname.endsWith('/rpc/save_nutrition_plan')) {
+      assert.equal(init.method, 'POST');
+      if (rpcFailure) return Response.json(rpcFailure, { status: 409 });
+      const args = JSON.parse(init.body);
+      assert.equal(args.p_cliente_id, 'client');
+      assert.equal(args.p_actor_id, 'professional');
+      const existing = plans.find(plan => plan.id === args.p_plan_id);
+      assert.ok(!args.p_plan_id || existing, 'Scoped ID checked before RPC');
+      const payload = { ...args.p_payload, estado: args.p_publicar ? 'activo' : existing?.estado || 'borrador' };
+      mutations.push(payload);
+      return Response.json([{ id: args.p_plan_id || 'new', ...payload }]);
+    }
     if (!parsed.pathname.endsWith('/planes_nutricionales')) return Response.json([]);
     assert.equal(parsed.searchParams.get('cliente_id'), init.method === 'POST' ? null : 'eq.client');
     const id = parsed.searchParams.get('id')?.slice(3);
@@ -84,6 +97,17 @@ async function main() {
   assert.equal((await post({ id: 'active' })).status, 409);
   assert.equal((await post({ publicar: true, health_data_consent: true })).status, 409, 'A forged browser consent flag must not authorize publication');
   assert.equal(mutations.length, beforeBlockedPublication, 'No client-visible writes without consent');
+
+  consent = true;
+  rpcFailure = { code: '23505', message: 'duplicate key', details: 'private client identifier' };
+  response = await post({ id: 'draft', publicar: true });
+  assert.equal(response.status, 409);
+  result = await response.json();
+  assert.match(result.error, /Recarga los planes/);
+  assert.doesNotMatch(result.error, /23505|private client identifier|duplicate key/);
+  rpcFailure = { code: 'P0001', message: 'Este plan ya está finalizado. Recarga los planes antes de continuar.' };
+  assert.equal((await post({ id: 'draft' })).status, 409);
+  rpcFailure = null;
 
   const summary = load('src/app/api/clientes/[id]/resumen/route.ts', {
     'next/server': { NextResponse: { json: (body, init) => Response.json(body, init) } },
