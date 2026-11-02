@@ -119,13 +119,13 @@ export async function GET(request: NextRequest) {
   try {
     await assertProfessional();
     const clienteId = request.nextUrl.searchParams.get("cliente_id");
-    if (!clienteId) return NextResponse.json({ ok: true, data: { plan: null, habitos: [], registros: [] } });
+    if (!clienteId) return NextResponse.json({ ok: true, data: { plan: null, planes: [], habitos: [], registros: [] } });
     await requireConsent(clienteId, "health_data");
 
     const encoded = encodeURIComponent(clienteId);
     const [plans, habits, records] = await Promise.all([
       serviceRequest<Row[]>(
-        `planes_nutricionales?cliente_id=eq.${encoded}&estado=in.(borrador,activo)&select=*&order=created_at.desc&limit=1`
+        `planes_nutricionales?cliente_id=eq.${encoded}&estado=in.(borrador,activo)&select=*&order=created_at.desc,id.desc`
       ),
       serviceRequest<Row[]>(
         `habitos_cliente?cliente_id=eq.${encoded}&activo=eq.true&select=*&order=created_at.asc`
@@ -135,7 +135,10 @@ export async function GET(request: NextRequest) {
       ),
     ]);
 
-    return NextResponse.json({ ok: true, data: { plan: plans[0] || null, habitos: habits, registros: records } });
+    const requestedPlan = request.nextUrl.searchParams.get("plan_id");
+    const plan = requestedPlan ? plans.find((item) => item.id === requestedPlan) : plans[0];
+    if (requestedPlan && !plan) return NextResponse.json({ ok: false, error: "Plan no encontrado para este cliente" }, { status: 404 });
+    return NextResponse.json({ ok: true, data: { plan: plan || null, planes: plans, habitos: habits, registros: records } });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al cargar nutrición y hábitos";
     const status = privacyErrorStatus(message);
@@ -153,6 +156,16 @@ export async function POST(request: NextRequest) {
     await requireConsent(clienteId, "health_data");
 
     if (action === "save_plan") {
+      // Saving preserves status; only explicit publication can activate a draft.
+      const publish = body.publicar === true;
+      const planId = String(body.id || "");
+      let estado = "borrador";
+      if (planId) {
+        const existing = await serviceRequest<Row[]>(`planes_nutricionales?id=eq.${encodeURIComponent(planId)}&cliente_id=eq.${encodeURIComponent(clienteId)}&select=id,estado&limit=1`);
+        if (!existing[0]) return NextResponse.json({ ok: false, error: "Plan no encontrado para este cliente" }, { status: 404 });
+        estado = String(existing[0].estado);
+        if (!["activo", "borrador"].includes(estado)) return NextResponse.json({ ok: false, error: "Este plan no se puede editar" }, { status: 409 });
+      }
       const meals = cleanMeals(body.comidas);
       if (!hasMeaningfulPlanContent(body, meals)) {
         return NextResponse.json(
@@ -177,12 +190,11 @@ export async function POST(request: NextRequest) {
         comidas: meals,
         fecha_inicio: String(body.fecha_inicio || new Date().toISOString().slice(0, 10)),
         fecha_fin: String(body.fecha_fin || "").trim() || null,
-        estado: "activo",
+        estado: publish ? "activo" : estado,
         created_by: user.id,
         updated_at: new Date().toISOString(),
       };
 
-      const planId = String(body.id || "");
       const rows = planId
         ? await serviceRequest<Row[]>(`planes_nutricionales?id=eq.${encodeURIComponent(planId)}&cliente_id=eq.${encodeURIComponent(clienteId)}`, {
             method: "PATCH",
@@ -200,7 +212,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ ok: false, error: "Supabase no confirmó la publicación del plan" }, { status: 500 });
       }
 
-      return NextResponse.json({ ok: true, data: savedPlan, published: true });
+      return NextResponse.json({ ok: true, data: savedPlan, published: savedPlan.estado === "activo" });
     }
 
     if (action === "create_habit") {

@@ -20,7 +20,7 @@ export async function GET(
 
     const [clients, nutritionPlans, routineAssignments, measurements, habits, habitRecords, sessions, payments] = await Promise.all([
       supabaseRest<Row[]>(`clientes?id=eq.${encoded}&select=*&limit=1`),
-      supabaseRest<Row[]>(`planes_nutricionales?cliente_id=eq.${encoded}&estado=eq.activo&select=id,nombre,objetivo,calorias_objetivo,proteinas_g,carbohidratos_g,grasas_g,agua_ml,fecha_inicio,fecha_fin,updated_at&order=updated_at.desc&limit=1`),
+      supabaseRest<Row[]>(`planes_nutricionales?cliente_id=eq.${encoded}&estado=in.(activo,borrador)&select=id,nombre,estado,objetivo,calorias_objetivo,proteinas_g,carbohidratos_g,grasas_g,agua_ml,fecha_inicio,fecha_fin,updated_at&order=created_at.desc,id.desc`),
       supabaseRest<Row[]>(`cliente_rutinas?cliente_id=eq.${encoded}&estado=eq.activa&select=id,rutina_id,fecha_inicio,fecha_fin,estado,progreso,notas,rutinas(id,nombre,objetivo,nivel,dias_semana,duracion_semanas,duracion_sesion_minutos)&order=updated_at.desc&limit=1`),
       supabaseRest<Row[]>(`mediciones_corporales?cliente_id=eq.${encoded}&select=id,fecha,peso_kg,grasa_corporal_pct,masa_muscular_kg,cintura_cm,notas_profesional&order=fecha.desc&limit=12`),
       supabaseRest<Row[]>(`habitos_cliente?cliente_id=eq.${encoded}&activo=eq.true&select=id,nombre,categoria,tipo_registro,objetivo_valor,unidad&order=created_at.asc`),
@@ -45,7 +45,8 @@ export async function GET(
       ok: true,
       data: {
         cliente: { ...client, _id: client.id },
-        plan_nutricional: nutritionPlans[0] || null,
+        plan_nutricional: nutritionPlans.find((plan) => plan.estado === "activo") || null,
+        planes_nutricionales: nutritionPlans,
         rutina_activa: routineAssignments[0] || null,
         mediciones: measurements,
         habitos: habits,
