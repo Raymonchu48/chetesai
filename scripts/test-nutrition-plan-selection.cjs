@@ -26,7 +26,7 @@ async function main() {
   const route = load('src/app/api/nutricion/route.ts', {
     'next/headers': { cookies: async () => ({ get: () => ({ value: 'test-session' }) }) },
     'next/server': { NextResponse: { json: (body, init) => Response.json(body, init) } },
-    '@/lib/privacy-server': { requireConsent: async () => { if (!consent) throw new Error('Consentimiento requerido'); }, privacyErrorStatus: () => 403 },
+    '@/lib/privacy-server': { requireConsent: async () => { if (!consent) throw new Error('Consentimiento requerido'); }, getConsentState: async () => ({ health_data: { granted: consent } }), privacyErrorStatus: message => message.startsWith("Consentimiento requerido") ? 409 : 403 },
   }, { fetch: async (url, init = {}) => {
     const parsed = new URL(url);
     if (parsed.pathname === '/auth/v1/user') return Response.json({ id: 'professional' });
@@ -66,10 +66,20 @@ async function main() {
   role = 'cliente';
   assert.equal((await get('')).status, 403);
   assert.equal((await post({ id: 'draft' })).status, 403);
+  assert.equal(mutations.length, count, 'Unauthorized clients cannot write');
   role = 'profesional'; consent = false;
-  assert.equal((await get('')).status, 403);
-  assert.equal((await post({ id: 'draft' })).status, 403);
-  assert.equal(mutations.length, count);
+  result = await (await get('')).json();
+  assert.equal(result.data.plan.id, 'draft');
+  assert.equal(result.data.health_data_consent, false);
+  assert.equal(result.data.plan.comidas.length, 35);
+  assert.equal((await (await get('&plan_id=active')).json()).data.plan.id, 'active');
+  assert.equal((await (await post({ id: 'draft' })).json()).data.estado, 'borrador');
+  assert.equal((await (await post({})).json()).data.estado, 'borrador');
+  const beforeBlockedPublication = mutations.length;
+  assert.equal((await post({ id: 'draft', publicar: true })).status, 409);
+  assert.equal((await post({ id: 'active' })).status, 409);
+  assert.equal((await post({ publicar: true, health_data_consent: true })).status, 409, 'A forged browser consent flag must not authorize publication');
+  assert.equal(mutations.length, beforeBlockedPublication, 'No client-visible writes without consent');
 
   const summary = load('src/app/api/clientes/[id]/resumen/route.ts', {
     'next/server': { NextResponse: { json: (body, init) => Response.json(body, init) } },
