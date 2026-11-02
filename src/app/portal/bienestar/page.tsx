@@ -163,8 +163,8 @@ export default function ClientWellbeingPage() {
               </p>
             </div>
             <div className="flex w-full flex-wrap gap-2 lg:w-auto">
-              <Button asChild variant="outline"><Link href="/portal"><ArrowLeft className="mr-2 h-4 w-4" />Entrenamiento</Link></Button>
-              <Button asChild variant="outline"><Link href="/portal/progreso"><TrendingUp className="mr-2 h-4 w-4" />Mi progreso</Link></Button>
+              <Button asChild variant="outline" className="border-[#bccdbd] !bg-[#eef5ef] !text-[#254532] hover:!bg-[#dbe9dd] hover:!text-[#183b28] focus-visible:ring-[#46624f]"><Link href="/portal" className="!text-inherit"><ArrowLeft className="mr-2 h-4 w-4" />Entrenamiento</Link></Button>
+              <Button asChild variant="outline" className="border-[#bccdbd] !bg-[#eef5ef] !text-[#254532] hover:!bg-[#dbe9dd] hover:!text-[#183b28] focus-visible:ring-[#46624f]"><Link href="/portal/progreso" className="!text-inherit"><TrendingUp className="mr-2 h-4 w-4" />Mi progreso</Link></Button>
               <div className="w-full rounded-xl border border-[#e7dfd3] bg-white p-1 text-[#46624f] sm:w-48"><LogoutButton /></div>
             </div>
           </div>
