@@ -214,7 +214,7 @@ export default function NutritionPage() {
 
   async function savePlan(publicar = false) {
     if ((publicar || plan.estado === "activo") && !healthConsent) return toast.error("El cliente debe dar su consentimiento antes de publicar o actualizar un plan activo. Puedes trabajar en un borrador privado.");
-    if (publicar && !window.confirm("¿Publicar este plan en el portal del cliente? Será visible inmediatamente.")) return;
+    if (publicar && !window.confirm("¿Publicar este plan en el portal del cliente? Será visible inmediatamente y sustituirá al plan activo anterior, que quedará finalizado.")) return;
     if (!clienteId) return toast.error("Selecciona un cliente");
     if (!hasMeaningfulPlan(plan)) {
       return toast.error("Añade contenido real al plan antes de guardarlo");
