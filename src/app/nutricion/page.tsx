@@ -39,7 +39,7 @@ type Habit = {
   instrucciones: string | null;
 };
 type HabitRecord = { habito_id: string; fecha: string; completado: boolean; valor: number | null };
-type NutritionData = { plan: Plan | null; planes: Plan[]; habitos: Habit[]; registros: HabitRecord[] };
+type NutritionData = { plan: Plan | null; planes: Plan[]; health_data_consent: boolean; habitos: Habit[]; registros: HabitRecord[] };
 
 type PlanForm = {
   estado: "activo" | "borrador";
@@ -128,6 +128,7 @@ export default function NutritionPage() {
   const [records, setRecords] = useState<HabitRecord[]>([]);
   const [habitForm, setHabitForm] = useState(emptyHabit);
   const [loading, setLoading] = useState(false);
+  const [healthConsent, setHealthConsent] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [savingPlan, setSavingPlan] = useState(false);
   const [savingHabit, setSavingHabit] = useState(false);
@@ -159,6 +160,7 @@ export default function NutritionPage() {
       if (!response.ok || !result.ok || !result.data) throw new Error(result.error || "No se pudo cargar la información");
       if (version !== loadVersion.current) return;
       setPlanes(result.data.planes || []);
+      setHealthConsent(result.data.health_data_consent === true);
       const current = result.data.plan;
       setPlan(current ? {
         id: current.id,
@@ -183,6 +185,7 @@ export default function NutritionPage() {
       if (version !== loadVersion.current) return;
       setPlan(newPlan());
       setPlanes([]);
+      setHealthConsent(false);
       setHabits([]);
       setRecords([]);
       setLoadError(error instanceof Error ? error.message : "Error al cargar");
@@ -210,6 +213,7 @@ export default function NutritionPage() {
   }, [records, habits]);
 
   async function savePlan(publicar = false) {
+    if ((publicar || plan.estado === "activo") && !healthConsent) return toast.error("El cliente debe dar su consentimiento antes de publicar o actualizar un plan activo. Puedes trabajar en un borrador privado.");
     if (publicar && !window.confirm("¿Publicar este plan en el portal del cliente? Será visible inmediatamente.")) return;
     if (!clienteId) return toast.error("Selecciona un cliente");
     if (!hasMeaningfulPlan(plan)) {
@@ -302,13 +306,17 @@ export default function NutritionPage() {
             <Summary label="Adherencia últimos 7 días" value={`${weeklyCompletion}%`} />
           </div>
 
+          {!healthConsent ? <div role="status" className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-950"><p className="font-semibold">Consentimiento del cliente pendiente</p><p className="mt-1 text-sm">Puedes consultar, preparar y guardar borradores privados. Para publicar o actualizar un plan visible, el cliente debe aceptar el consentimiento de datos de salud en Privacidad de su portal.</p></div> : null}
+
           <Card className="mb-6"><CardContent className="p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div><h2 className="text-xl font-bold">Plan nutricional · {plan.estado === "borrador" ? "Borrador" : "Activo"}</h2><p className="mt-1 text-sm text-muted-foreground">{plan.estado === "borrador" ? "Pendiente de aprobación profesional. No visible para el cliente." : "Este plan está visible en el portal del cliente."}</p></div>
-              <Button onClick={() => savePlan()} disabled={savingPlan || !clienteId}><Save className="mr-2 h-4 w-4" />{savingPlan ? "Guardando..." : plan.estado === "borrador" ? "Guardar borrador" : "Guardar cambios del activo"}</Button>
+              <Button onClick={() => savePlan()} disabled={savingPlan || !clienteId || (plan.estado === "activo" && !healthConsent)}><Save className="mr-2 h-4 w-4" />{savingPlan ? "Guardando..." : plan.estado === "borrador" ? "Guardar borrador" : "Guardar cambios del activo"}</Button>
             </div>
 
-            <div className="mt-5"><Label htmlFor="nutrition-plan">Planes activos y borradores</Label><select id="nutrition-plan" className="mt-2 w-full rounded-md border bg-background p-3" value={plan.id} disabled={savingPlan} onChange={(event) => { if (window.confirm("¿Cambiar de plan? Los cambios sin guardar se perderán.")) setSelectedPlanId(event.target.value); }}><option value="" disabled>Sin plan</option>{planes.map((item) => <option key={item.id} value={item.id}>{item.nombre} · {item.estado === "borrador" ? "Borrador · Solo profesional" : "Activo · Visible al cliente"} · {item.comidas?.length || 0} comidas</option>)}</select></div>
+            <div className="mt-5"><Label htmlFor="nutrition-plan">Planes activos y borradores</Label><select id="nutrition-plan" className="mt-2 w-full rounded-md border bg-background p-3" value={plan.id} disabled={savingPlan} onChange={(event) => { if (window.confirm("¿Cambiar de plan? Los cambios sin guardar se perderán.")) setSelectedPlanId(event.target.value); }}><option value="" disabled>{planes.length ? "Nuevo borrador" : "Sin plan"}</option>{planes.map((item) => <option key={item.id} value={item.id}>{item.nombre} · {item.estado === "borrador" ? "Borrador · Solo profesional" : "Activo · Visible al cliente"} · {item.comidas?.length || 0} comidas</option>)}</select></div>
+
+            {plan.id ? <Button variant="outline" className="mt-3" disabled={savingPlan} onClick={() => setPlan((current) => ({ ...current, id: "", estado: "borrador", nombre: `${current.nombre} · Copia en borrador` }))}>Trabajar en una copia en borrador</Button> : null}
 
             <div className="mt-6 grid gap-4 md:grid-cols-4">
               <Field label="Nombre del plan" type="text" value={plan.nombre} onChange={(value) => setPlan({ ...plan, nombre: value })} className="md:col-span-2" />
@@ -340,7 +348,7 @@ export default function NutritionPage() {
 
             <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div><p className="font-bold text-emerald-900">Estado y publicación</p><p className="mt-1 text-sm text-emerald-800">Guardar conserva el estado actual. Publicar requiere confirmación y hará visible el plan al cliente.</p></div>
-              <Button onClick={() => savePlan(true)} disabled={savingPlan || !clienteId} className="shrink-0 bg-[#46624f] hover:bg-[#3b5543]"><Save className="mr-2 h-4 w-4" />{savingPlan ? "Publicando..." : "Guardar y publicar al cliente"}</Button>
+              <Button onClick={() => savePlan(true)} disabled={savingPlan || !clienteId || !healthConsent} className="shrink-0 bg-[#46624f] hover:bg-[#3b5543]"><Save className="mr-2 h-4 w-4" />{savingPlan ? "Publicando..." : "Guardar y publicar al cliente"}</Button>
             </div>
           </CardContent></Card>
 

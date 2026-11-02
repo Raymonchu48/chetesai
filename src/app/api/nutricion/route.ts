@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { privacyErrorStatus, requireConsent } from "@/lib/privacy-server";
+import { getConsentState, privacyErrorStatus, requireConsent } from "@/lib/privacy-server";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -119,11 +119,10 @@ export async function GET(request: NextRequest) {
   try {
     await assertProfessional();
     const clienteId = request.nextUrl.searchParams.get("cliente_id");
-    if (!clienteId) return NextResponse.json({ ok: true, data: { plan: null, planes: [], habitos: [], registros: [] } });
-    await requireConsent(clienteId, "health_data");
+    if (!clienteId) return NextResponse.json({ ok: true, data: { plan: null, planes: [], health_data_consent: false, habitos: [], registros: [] } });
 
     const encoded = encodeURIComponent(clienteId);
-    const [plans, habits, records] = await Promise.all([
+    const [plans, habits, records, consent] = await Promise.all([
       serviceRequest<Row[]>(
         `planes_nutricionales?cliente_id=eq.${encoded}&estado=in.(borrador,activo)&select=*&order=created_at.desc,id.desc`
       ),
@@ -133,12 +132,13 @@ export async function GET(request: NextRequest) {
       serviceRequest<Row[]>(
         `registros_habitos?cliente_id=eq.${encoded}&select=*&order=fecha.desc,created_at.desc&limit=200`
       ),
+      getConsentState(clienteId),
     ]);
 
     const requestedPlan = request.nextUrl.searchParams.get("plan_id");
     const plan = requestedPlan ? plans.find((item) => item.id === requestedPlan) : plans[0];
     if (requestedPlan && !plan) return NextResponse.json({ ok: false, error: "Plan no encontrado para este cliente" }, { status: 404 });
-    return NextResponse.json({ ok: true, data: { plan: plan || null, planes: plans, habitos: habits, registros: records } });
+    return NextResponse.json({ ok: true, data: { plan: plan || null, planes: plans, health_data_consent: consent.health_data.granted === true, habitos: habits, registros: records } });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error al cargar nutrición y hábitos";
     const status = privacyErrorStatus(message);
@@ -153,7 +153,6 @@ export async function POST(request: NextRequest) {
     const action = String(body.action || "");
     const clienteId = String(body.cliente_id || "");
     if (!clienteId) return NextResponse.json({ ok: false, error: "Selecciona un cliente" }, { status: 400 });
-    await requireConsent(clienteId, "health_data");
 
     if (action === "save_plan") {
       // Saving preserves status; only explicit publication can activate a draft.
@@ -166,6 +165,8 @@ export async function POST(request: NextRequest) {
         estado = String(existing[0].estado);
         if (!["activo", "borrador"].includes(estado)) return NextResponse.json({ ok: false, error: "Este plan no se puede editar" }, { status: 409 });
       }
+      // Private professional drafts do not require client publication consent.
+      if (publish || estado === "activo") await requireConsent(clienteId, "health_data");
       const meals = cleanMeals(body.comidas);
       if (!hasMeaningfulPlanContent(body, meals)) {
         return NextResponse.json(
@@ -216,6 +217,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === "create_habit") {
+      await requireConsent(clienteId, "health_data");
       const name = String(body.nombre || "").trim();
       if (!name) return NextResponse.json({ ok: false, error: "Escribe el nombre del hábito" }, { status: 400 });
       const type = body.tipo_registro === "cantidad" ? "cantidad" : "booleano";
