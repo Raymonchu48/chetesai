@@ -75,6 +75,10 @@ async function main() {
   assert.equal((await (await get('&plan_id=active')).json()).data.plan.id, 'active');
   assert.equal((await (await post({ id: 'draft' })).json()).data.estado, 'borrador');
   assert.equal((await (await post({})).json()).data.estado, 'borrador');
+  const savedUnits = await (await post({ id: 'draft', comidas: [{ nombre: 'Comida', alimentos: [{ nombre: 'Bebida', cantidad_g: 200, unidad_medida: 'ml', categoria: 'suplementos', macros_no_declarados: true }] }] })).json();
+  assert.equal(savedUnits.data.comidas[0].alimentos[0].unidad_medida, 'ml');
+  assert.equal(savedUnits.data.comidas[0].alimentos[0].macros_no_declarados, true);
+  assert.equal(savedUnits.data.comidas[0].alimentos[0].categoria, 'suplementos');
   const beforeBlockedPublication = mutations.length;
   assert.equal((await post({ id: 'draft', publicar: true })).status, 409);
   assert.equal((await post({ id: 'active' })).status, 409);

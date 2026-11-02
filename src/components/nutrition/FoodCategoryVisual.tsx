@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Apple, Bean, Beef, CircleHelp, CookingPot, Egg, Fish, Milk, Nut, Salad, Soup, Vegan, Wheat } from "lucide-react";
+import { Apple, Bean, Beef, Coffee, FlaskConical, CircleHelp, CookingPot, Egg, Fish, Milk, Nut, Salad, Soup, Vegan, Wheat } from "lucide-react";
 
 type FoodTheme = {
   label: string;
@@ -21,6 +21,9 @@ const themes: Record<string, FoodTheme> = {
   verduras: { label: "Verduras", Icon: Salad, background: "from-[#dff0dd] to-[#c7e2c3]", foreground: "text-[#3d7b42]", accent: "bg-[#55945b]" },
   grasas: { label: "Aceites y grasas", Icon: Vegan, background: "from-[#eef0d2] to-[#dfe3ae]", foreground: "text-[#727a2c]", accent: "bg-[#919b3e]" },
   frutos_secos: { label: "Frutos secos", Icon: Nut, background: "from-[#eee0ce] to-[#dec7a9]", foreground: "text-[#805d36]", accent: "bg-[#a27a4c]" },
+  bebidas: { label: "Bebidas y café", Icon: Coffee, background: "from-[#eee0ce] to-[#dec7a9]", foreground: "text-[#805d36]", accent: "bg-[#a27a4c]" },
+  bebidas_vegetales: { label: "Bebidas vegetales", Icon: Milk, background: "from-[#dff0dd] to-[#c7e2c3]", foreground: "text-[#3d7b42]", accent: "bg-[#55945b]" },
+  suplementos: { label: "Batidos y suplementos", Icon: FlaskConical, background: "from-[#e5eaf3] to-[#d4dced]", foreground: "text-[#536d9b]", accent: "bg-[#7187b0]" },
   otros: { label: "Otros", Icon: Soup, background: "from-[#e6e7e3] to-[#d5d8d1]", foreground: "text-[#59645d]", accent: "bg-[#758078]" },
 };
 
@@ -31,6 +34,9 @@ export function foodCategoryLabel(category?: string | null) {
 }
 
 const categoryKeywords: Array<[string, string[]]> = [
+  ["bebidas_vegetales", ["bebida vegetal", "leche vegetal"]],
+  ["suplementos", ["proteína para batido", "batido de proteína", "aminoácido", "aminoacido", "creatina"]],
+  ["bebidas", ["café", "cafe"]],
   ["pescados", ["salmón", "salmon", "atún", "atun", "merluza", "bacalao", "sardina", "pescado"]],
   ["carnes", ["pollo", "pavo", "ternera", "cerdo", "carne", "jamón", "jamon"]],
   ["huevos", ["huevo", "clara"]],
@@ -97,7 +103,7 @@ function inferCategory(category?: string | null, name?: string | null) {
 export default function FoodCategoryVisual({ category, name, compact = false }: { category?: string | null; name?: string | null; compact?: boolean }) {
   const theme = themes[inferCategory(category, name)] || fallback;
   const Icon = theme.Icon;
-  const spriteStyle = foodSpriteStyle(name);
+  const spriteStyle = ["bebidas", "bebidas_vegetales", "suplementos"].includes(inferCategory(category, name)) ? null : foodSpriteStyle(name);
 
   if (compact) {
     if (spriteStyle) {

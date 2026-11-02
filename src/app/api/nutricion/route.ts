@@ -12,6 +12,9 @@ type CleanFood = {
   alimento_id: string;
   nombre: string;
   cantidad_g: number;
+  unidad_medida: "g" | "ml";
+  macros_no_declarados: boolean;
+  categoria: string;
   energia_kcal: number;
   proteinas_g: number;
   carbohidratos_g: number;
@@ -85,6 +88,9 @@ function cleanMeals(value: unknown): CleanMeal[] {
               alimento_id: String(item.alimento_id || ""),
               nombre: String(item.nombre || "").trim(),
               cantidad_g: Math.max(optionalNumber(item.cantidad_g) || 0, 0),
+              unidad_medida: item.unidad_medida === "ml" ? "ml" as const : "g" as const,
+              macros_no_declarados: item.macros_no_declarados === true,
+              categoria: String(item.categoria || ""),
               energia_kcal: Math.max(optionalNumber(item.energia_kcal) || 0, 0),
               proteinas_g: Math.max(optionalNumber(item.proteinas_g) || 0, 0),
               carbohidratos_g: Math.max(optionalNumber(item.carbohidratos_g) || 0, 0),

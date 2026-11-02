@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { foodUnit, nutritionUndeclared } from "@/lib/nutrition-foods";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -77,7 +78,7 @@ export async function GET(request: NextRequest) {
     const rows = await serviceRequest<Row[]>(
       `alimentos?${filters.join("&")}&select=*&order=categoria.asc,nombre.asc&limit=500`
     );
-    return NextResponse.json({ ok: true, data: rows });
+    return NextResponse.json({ ok: true, data: rows.map((row) => ({ ...row, unidad_medida: foodUnit(row), macros_no_declarados: nutritionUndeclared(row) })) });
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo cargar la biblioteca";
     return NextResponse.json({ ok: false, error: message }, { status: statusFor(message) });
@@ -91,6 +92,12 @@ export async function POST(request: NextRequest) {
     const nombre = String(body.nombre || "").trim();
     if (!nombre) return NextResponse.json({ ok: false, error: "Escribe el nombre del alimento" }, { status: 400 });
 
+    const unit = body.unidad_medida === "ml" ? "ml" : "g";
+    const unknown = body.macros_no_declarados === true;
+    if (!unknown && [body.energia_kcal, body.proteinas_g, body.carbohidratos_g, body.grasas_g].some((value) => value === "" || value === null || value === undefined || !Number.isFinite(Number(value)) || Number(value) < 0)) {
+      return NextResponse.json({ ok: false, error: "Completa las kcal y los tres macros, o indica que no están declarados" }, { status: 400 });
+    }
+
     const rows = await serviceRequest<Row[]>("alimentos", {
       method: "POST",
       headers: { Prefer: "return=representation" },
@@ -99,18 +106,18 @@ export async function POST(request: NextRequest) {
         categoria: String(body.categoria || "otros"),
         marca: String(body.marca || "").trim() || null,
         estado_preparacion: String(body.estado_preparacion || "tal_como_se_compra"),
-        porcion_nombre: String(body.porcion_nombre || "100 g").trim(),
+        porcion_nombre: String(body.porcion_nombre || `100 ${unit}`).trim(),
         porcion_gramos: Math.max(numberValue(body.porcion_gramos), 1),
-        energia_kcal: numberValue(body.energia_kcal),
-        proteinas_g: numberValue(body.proteinas_g),
-        carbohidratos_g: numberValue(body.carbohidratos_g),
-        grasas_g: numberValue(body.grasas_g),
+        energia_kcal: unknown ? 0 : numberValue(body.energia_kcal),
+        proteinas_g: unknown ? 0 : numberValue(body.proteinas_g),
+        carbohidratos_g: unknown ? 0 : numberValue(body.carbohidratos_g),
+        grasas_g: unknown ? 0 : numberValue(body.grasas_g),
         fibra_g: numberValue(body.fibra_g),
         azucares_g: numberValue(body.azucares_g),
         grasas_saturadas_g: numberValue(body.grasas_saturadas_g),
         sodio_mg: numberValue(body.sodio_mg),
         alergenos: Array.isArray(body.alergenos) ? body.alergenos : [],
-        etiquetas: Array.isArray(body.etiquetas) ? body.etiquetas : [],
+        etiquetas: [...(Array.isArray(body.etiquetas) ? body.etiquetas.filter((tag) => !["unidad_g", "unidad_ml", "macros_no_declarados"].includes(String(tag))) : []), `unidad_${unit}`, ...(unknown ? ["macros_no_declarados"] : [])],
         fuente: String(body.fuente || "Introducido por el profesional"),
         notas: String(body.notas || "").trim() || null,
         es_personalizado: true,

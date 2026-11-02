@@ -1,0 +1,327 @@
+[
+  {
+    "nombre": "Café soluble natural en polvo",
+    "categoria": "bebidas",
+    "marca": "NESCAFÉ Classic Vending",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "2 g",
+    "porcion_gramos": 2,
+    "energia_kcal": 118,
+    "proteinas_g": 7.8,
+    "carbohidratos_g": 3.1,
+    "grasas_g": 0.2,
+    "alergenos": [],
+    "etiquetas": [
+      "unidad_g"
+    ],
+    "fuente": "https://www.nestleprofessional.sk/nescafe/nescafe-classic-vending-500g",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Producto de referencia del fabricante, mercado eslovaco. Añadir agua o leche por separado.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Café solo sin azúcar · preparado",
+    "categoria": "bebidas",
+    "marca": "Receta de referencia · NESCAFÉ Classic Vending",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "200 ml",
+    "porcion_gramos": 200,
+    "energia_kcal": 1.18,
+    "proteinas_g": 0.08,
+    "carbohidratos_g": 0.03,
+    "grasas_g": 0,
+    "alergenos": [],
+    "etiquetas": [
+      "unidad_ml"
+    ],
+    "fuente": "https://www.nestleprofessional.sk/nescafe/nescafe-classic-vending-500g",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 ml. Calculado: 2 g de café soluble, agua hasta 200 ml de volumen final. Sin azúcar ni leche. No equivale a todos los cafés de máquina.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Café con leche semidesnatada sin azúcar · preparado",
+    "categoria": "bebidas",
+    "marca": "Receta · NESCAFÉ y Central Lechera Asturiana",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "200 ml",
+    "porcion_gramos": 200,
+    "energia_kcal": 23.68,
+    "proteinas_g": 1.65,
+    "carbohidratos_g": 2.36,
+    "grasas_g": 0.78,
+    "alergenos": [
+      "leche"
+    ],
+    "etiquetas": [
+      "unidad_ml"
+    ],
+    "fuente": "https://www.nestleprofessional.sk/nescafe/nescafe-classic-vending-500g",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 ml. Calculado: 2 g de café soluble + 100 ml de leche semidesnatada, agua hasta 200 ml de volumen final. Leche: 45 kcal, P 3.15 g, HC 4.65 g, G 1.55 g/100 ml. Fuente leche: https://www.centrallecheraasturiana.es/productos/leche/tradicional-botella/semidesnatada-botella/leche-en-botella-semidesnatada-1l/ No añadir de nuevo estos ingredientes.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Leche semidesnatada · botella 1 L",
+    "categoria": "lacteos",
+    "marca": "Central Lechera Asturiana",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "200 ml",
+    "porcion_gramos": 200,
+    "energia_kcal": 45,
+    "proteinas_g": 3.15,
+    "carbohidratos_g": 4.65,
+    "grasas_g": 1.55,
+    "alergenos": [
+      "leche"
+    ],
+    "etiquetas": [
+      "unidad_ml"
+    ],
+    "fuente": "https://www.centrallecheraasturiana.es/productos/leche/tradicional-botella/semidesnatada-botella/leche-en-botella-semidesnatada-1l/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 ml. Referencia identificada; se conserva la leche genérica existente.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Bebida vegetal de soja sin azúcar",
+    "categoria": "bebidas_vegetales",
+    "marca": "Alpro",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "200 ml",
+    "porcion_gramos": 200,
+    "energia_kcal": 33,
+    "proteinas_g": 3.3,
+    "carbohidratos_g": 0,
+    "grasas_g": 1.9,
+    "alergenos": [
+      "soja"
+    ],
+    "etiquetas": [
+      "unidad_ml"
+    ],
+    "fuente": "https://www.alpro.com/es/productos/bebidas/soja-sin-azucar",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 ml. Producto tal como se vende.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Bebida vegetal de avena sin azúcar",
+    "categoria": "bebidas_vegetales",
+    "marca": "Alpro",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "200 ml",
+    "porcion_gramos": 200,
+    "energia_kcal": 44,
+    "proteinas_g": 0.7,
+    "carbohidratos_g": 5.5,
+    "grasas_g": 1.8,
+    "alergenos": [
+      "gluten"
+    ],
+    "etiquetas": [
+      "unidad_ml"
+    ],
+    "fuente": "https://www.alpro.com/es/productos/bebidas/avena-sin-azucar/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 ml. Producto tal como se vende. Revisar advertencia de otros cereales con gluten.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Bebida vegetal de almendras sin azúcar",
+    "categoria": "bebidas_vegetales",
+    "marca": "Alpro",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "200 ml",
+    "porcion_gramos": 200,
+    "energia_kcal": 14,
+    "proteinas_g": 0.4,
+    "carbohidratos_g": 0,
+    "grasas_g": 1.1,
+    "alergenos": [
+      "frutos_de_cascara"
+    ],
+    "etiquetas": [
+      "unidad_ml"
+    ],
+    "fuente": "https://www.alpro.com/es/productos/bebidas/almendras-sin-azucar",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 ml. Referencia no BIO; no intercambiar con la versión BIO.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Yogur griego natural · 110 g",
+    "categoria": "lacteos",
+    "marca": "Danone",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "110 g",
+    "porcion_gramos": 110,
+    "energia_kcal": 96,
+    "proteinas_g": 3.6,
+    "carbohidratos_g": 4.6,
+    "grasas_g": 7,
+    "alergenos": [
+      "leche"
+    ],
+    "etiquetas": [
+      "unidad_g"
+    ],
+    "fuente": "https://www.danone.es/producto/griego-natural-2/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Referencia 4 x 110 g.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Yogur desnatado proteico natural · 105 g",
+    "categoria": "lacteos",
+    "marca": "Danone Proteína",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "105 g",
+    "porcion_gramos": 105,
+    "energia_kcal": 49,
+    "proteinas_g": 6.9,
+    "carbohidratos_g": 4.9,
+    "grasas_g": 0.2,
+    "alergenos": [
+      "leche"
+    ],
+    "etiquetas": [
+      "unidad_g"
+    ],
+    "fuente": "https://www.danone.es/producto/danone-proteina-natural-x4/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Referencia 4 x 105 g.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Yogur proteico natural",
+    "categoria": "lacteos",
+    "marca": "Danone YoPRO",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "100 g",
+    "porcion_gramos": 100,
+    "energia_kcal": 56,
+    "proteinas_g": 10.3,
+    "carbohidratos_g": 3.4,
+    "grasas_g": 0.1,
+    "alergenos": [
+      "leche"
+    ],
+    "etiquetas": [
+      "unidad_g"
+    ],
+    "fuente": "https://foodservice.danone.es/product/yopro-natural/",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Valores de ficha Foodservice. Ajustar cantidad al envase utilizado.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Proteína para batido · whey y colágeno · fresa",
+    "categoria": "suplementos",
+    "marca": "Myprotein Impact Whey · Strawberry Cream (+Collagen)",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "24 g",
+    "porcion_gramos": 24,
+    "energia_kcal": 387,
+    "proteinas_g": 84,
+    "carbohidratos_g": 5.4,
+    "grasas_g": 3.2,
+    "alergenos": [
+      "leche",
+      "soja"
+    ],
+    "etiquetas": [
+      "unidad_g"
+    ],
+    "fuente": "https://www.myprotein.es/p/nutricion-deportiva/impact-whey-protein/10530943/?variation=17829497",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Referencia exacta con colágeno y sabor fresa. No es whey pura ni representa otros sabores. Se pesa el polvo; añadir leche por separado si se usa.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Batido de proteína con agua · whey y colágeno · fresa",
+    "categoria": "suplementos",
+    "marca": "Receta · Myprotein Strawberry Cream (+Collagen)",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "250 ml",
+    "porcion_gramos": 250,
+    "energia_kcal": 37.15,
+    "proteinas_g": 8.06,
+    "carbohidratos_g": 0.52,
+    "grasas_g": 0.31,
+    "alergenos": [
+      "leche",
+      "soja"
+    ],
+    "etiquetas": [
+      "unidad_ml"
+    ],
+    "fuente": "https://www.myprotein.es/p/nutricion-deportiva/impact-whey-protein/10530943/?variation=17829497",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 ml. Calculado: 24 g del polvo de referencia y agua hasta 250 ml de volumen final. No añadir de nuevo el polvo. Si se prepara con leche, registrar el polvo y la leche por separado.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Aminoácidos esenciales EAA · polvo sin sabor",
+    "categoria": "suplementos",
+    "marca": "HSN Raw Series",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "1 g",
+    "porcion_gramos": 1,
+    "energia_kcal": 0,
+    "proteinas_g": 0,
+    "carbohidratos_g": 0,
+    "grasas_g": 0,
+    "alergenos": [],
+    "etiquetas": [
+      "unidad_g",
+      "macros_no_declarados"
+    ],
+    "fuente": "https://www.hsnstore.com/marcas/raw-series/aminoacidos-esenciales-eaa-s-en-polvo-1kg-sin-sabor",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. La ficha declara aminoácidos individuales, no kcal/macros completos. No se incluyen en los totales de energía y macros. Indicar cantidad de polvo; pauta a definir por el profesional.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Batido de aminoácidos EAA con agua · referencia",
+    "categoria": "suplementos",
+    "marca": "Receta · HSN Raw Series sin sabor",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "250 ml",
+    "porcion_gramos": 250,
+    "energia_kcal": 0,
+    "proteinas_g": 0,
+    "carbohidratos_g": 0,
+    "grasas_g": 0,
+    "alergenos": [],
+    "etiquetas": [
+      "unidad_ml",
+      "macros_no_declarados"
+    ],
+    "fuente": "https://www.hsnstore.com/marcas/raw-series/aminoacidos-esenciales-eaa-s-en-polvo-1kg-sin-sabor",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 ml. Receta de catálogo: 15 g de EAA de referencia, agua hasta 250 ml. No es una pauta de uso. Sin declaración completa de kcal/macros. No añadir de nuevo el polvo.",
+    "es_personalizado": false,
+    "activo": true
+  },
+  {
+    "nombre": "Creatina monohidrato · polvo sin sabor",
+    "categoria": "suplementos",
+    "marca": "HSN Raw Series · 200 mesh",
+    "estado_preparacion": "referencia_catalogo_20261102",
+    "porcion_nombre": "1 g",
+    "porcion_gramos": 1,
+    "energia_kcal": 0,
+    "proteinas_g": 0,
+    "carbohidratos_g": 0,
+    "grasas_g": 0,
+    "alergenos": [],
+    "etiquetas": [
+      "unidad_g",
+      "macros_no_declarados"
+    ],
+    "fuente": "https://www.hsnstore.com/marcas/raw-series/creatina-monohidrato-en-polvo-200-mesh",
+    "notas": "Referencia consultada 02/11/2026. Valores por 100 g. Ficha de creatina monohidrato sin sabor. No se atribuyen kcal/macros no declarados. Indicar gramos de polvo; pauta a definir por el profesional.",
+    "es_personalizado": false,
+    "activo": true
+  }
+]
