@@ -239,12 +239,15 @@ export default function ClientWellbeingPage() {
                           if (!dayMeals.length) return null;
                           const kcal = dayMeals.reduce((total, meal) => total + (meal.alimentos || []).reduce((sum, food) => sum + Number(food.energia_kcal || 0), 0), 0);
                           return <details key={day} className="group overflow-hidden rounded-[24px] border border-[#dce4d9] bg-[#fffdf9] shadow-sm" open={false}>
-                            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-5 marker:hidden sm:px-6 [&::-webkit-details-marker]:hidden">
-                              <div className="flex items-center gap-3">
+                            <summary className="relative flex cursor-pointer list-none items-center justify-between gap-3 overflow-hidden px-4 py-5 marker:hidden sm:px-6 [&::-webkit-details-marker]:hidden">
+                              <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-[31%] right-[110px] hidden items-center justify-center gap-1 overflow-hidden opacity-55 sm:flex lg:left-[28%] lg:right-[145px]">
+                                <span className="text-3xl opacity-80 lg:text-4xl">🥕</span><span className="translate-y-2 text-3xl lg:text-4xl">🥦</span><span className="-translate-y-1 text-3xl lg:text-4xl">🍅</span><span className="translate-y-2 text-3xl lg:text-4xl">🌽</span><span className="text-3xl lg:text-4xl">🍆</span><span className="-translate-y-2 text-3xl lg:text-4xl">🍋</span><span className="translate-y-1 text-3xl lg:text-4xl">🍇</span>
+                              </div>
+                              <div className="relative z-10 flex items-center gap-3">
                                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#46624f] text-sm font-bold text-white">{["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"].indexOf(day)+1}</span>
                                 <div><h4 className="text-lg font-bold !text-[#253e31]">{day}</h4><p className="text-xs font-medium text-[#596d5e]">{dayMeals.length} comidas · {Math.round(kcal)} kcal estimadas</p></div>
                               </div>
-                              <span className="rounded-full border border-[#cad8ca] bg-[#edf3ec] px-3 py-2 text-sm font-bold text-[#34523c] group-open:bg-[#dceadf]"> <span className="group-open:hidden">Ver comidas +</span><span className="hidden group-open:inline">Cerrar −</span></span>
+                              <span className="relative z-10 rounded-full border border-[#cad8ca] bg-[#edf3ec] px-3 py-2 text-sm font-bold text-[#34523c] group-open:bg-[#dceadf]"> <span className="group-open:hidden">Ver comidas +</span><span className="hidden group-open:inline">Cerrar −</span></span>
                             </summary>
                             <div className="relative isolate border-t border-[#dce4d9] bg-[#f8faf6] px-3 py-5 sm:px-5">
                               <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
