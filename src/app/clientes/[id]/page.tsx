@@ -35,13 +35,13 @@ import {
 import { toast } from "sonner";
 
 type Client = { _id: string; nombre: string; email: string | null; telefono: string | null; objetivo: string; estado: string; fecha_alta: string; fecha_nacimiento: string | null; notas: string | null };
-type NutritionPlan = { id: string; nombre: string; objetivo: string | null; calorias_objetivo: number | null; proteinas_g: number | null; carbohidratos_g: number | null; grasas_g: number | null; agua_ml: number | null; fecha_inicio: string; fecha_fin: string | null };
+type NutritionPlan = { estado: "activo" | "borrador"; id: string; nombre: string; objetivo: string | null; calorias_objetivo: number | null; proteinas_g: number | null; carbohidratos_g: number | null; grasas_g: number | null; agua_ml: number | null; fecha_inicio: string; fecha_fin: string | null };
 type Routine = { id: string; rutina_id: string; fecha_inicio: string; fecha_fin: string | null; progreso: number; rutinas: { nombre: string; objetivo: string; nivel: string; dias_semana: number; duracion_semanas: number | null; duracion_sesion_minutos: number | null } | Array<{ nombre: string; objetivo: string; nivel: string; dias_semana: number; duracion_semanas: number | null; duracion_sesion_minutos: number | null }> | null };
 type Measurement = { id: string; fecha: string; peso_kg: number | null; grasa_corporal_pct: number | null; masa_muscular_kg: number | null; cintura_cm: number | null; notas_profesional: string | null };
 type Habit = { id: string; nombre: string; categoria: string; tipo_registro: string; objetivo_valor: number | null; unidad: string | null };
 type Session = { id: string; titulo: string; inicio_at: string; duracion_minutos: number; tipo_sesion: string; estado: string; modalidad: string; ubicacion: string | null };
 type Payment = { id: string; concepto: string; importe_eur: number; fecha_emision: string; fecha_vencimiento: string | null; fecha_pago: string | null; estado: string; metodo_pago: string | null };
-type ClientSummary = { cliente: Client; plan_nutricional: NutritionPlan | null; rutina_activa: Routine | null; mediciones: Measurement[]; habitos: Habit[]; adherencia_7_dias: number; sesiones: Session[]; proximas_sesiones: Session[]; pagos: Payment[]; pagos_pendientes: number; importe_pendiente: number };
+type ClientSummary = { cliente: Client; plan_nutricional: NutritionPlan | null; planes_nutricionales: NutritionPlan[]; rutina_activa: Routine | null; mediciones: Measurement[]; habitos: Habit[]; adherencia_7_dias: number; sesiones: Session[]; proximas_sesiones: Session[]; pagos: Payment[]; pagos_pendientes: number; importe_pendiente: number };
 
 const objectiveLabels: Record<string, string> = {
   perdida_peso: "Pérdida de peso",
@@ -56,6 +56,7 @@ export default function ClientWorkspacePage() {
   const params = useParams<{ id: string }>();
   const clientId = String(params.id || "");
   const [data, setData] = useState<ClientSummary | null>(null);
+  const [selectedPlanId, setSelectedPlanId] = useState("");
   const [loading, setLoading] = useState(true);
   const [assignments, setAssignments] = useState<Array<{ id: string; rutina_id: string; estado: string; rutinas: { nombre: string } | null }>>([]);
   const [removingId, setRemovingId] = useState<string | null>(null);
@@ -93,6 +94,7 @@ export default function ClientWorkspacePage() {
     finally { setRemovingId(null); }
   }
 
+  const selectedPlan = data?.planes_nutricionales?.find((plan) => plan.id === selectedPlanId) || data?.planes_nutricionales?.[0] || null;
   const latest = data?.mediciones[0];
   const previous = data?.mediciones[1];
   const coachingAreas = [
@@ -165,7 +167,7 @@ export default function ClientWorkspacePage() {
 
           <TabsContent value="entrenamiento" className="mt-5"><PlanPanel icon={<Dumbbell className="h-6 w-6" />} title="Plan de entrenamiento" exists={Boolean(data.rutina_activa)} empty="Este cliente todavía no tiene una rutina activa." action="Asignar rutina" href={`/rutinas?cliente_id=${encodeURIComponent(clientId)}`}>{data.rutina_activa ? <div className="grid gap-4 sm:grid-cols-4"><Mini label="Rutina" value={routineName(data.rutina_activa) || "—"} /><Mini label="Nivel" value={routineInfo(data.rutina_activa)?.nivel || "—"} /><Mini label="Días/semana" value={String(routineInfo(data.rutina_activa)?.dias_semana || "—")} /><Mini label="Progreso" value={`${Number(data.rutina_activa.progreso || 0)}%`} /></div> : null}</PlanPanel></TabsContent>
 
-          <TabsContent value="nutricion" className="mt-5"><PlanPanel icon={<Apple className="h-6 w-6" />} title="Plan nutricional" exists={Boolean(data.plan_nutricional)} empty="Este cliente todavía no tiene un plan nutricional activo." action="Crear dieta" href={`/nutricion?cliente_id=${clientId}`}>{data.plan_nutricional ? <div className="grid gap-4 sm:grid-cols-5"><Mini label="Plan" value={data.plan_nutricional.nombre} /><Mini label="Energía" value={formatMetric(data.plan_nutricional.calorias_objetivo, "kcal")} /><Mini label="Proteínas" value={formatMetric(data.plan_nutricional.proteinas_g, "g")} /><Mini label="Hidratos" value={formatMetric(data.plan_nutricional.carbohidratos_g, "g")} /><Mini label="Grasas" value={formatMetric(data.plan_nutricional.grasas_g, "g")} /></div> : null}</PlanPanel></TabsContent>
+          <TabsContent value="nutricion" className="mt-5"><div className="mb-4"><label htmlFor="client-nutrition-plan" className="text-sm font-semibold">Planes activos y borradores</label><select id="client-nutrition-plan" className="mt-2 w-full rounded-md border bg-background p-3" value={selectedPlan?.id || ""} onChange={(event) => setSelectedPlanId(event.target.value)}><option value="" disabled>Sin plan</option>{data.planes_nutricionales.map((plan) => <option key={plan.id} value={plan.id}>{plan.nombre} · {plan.estado === "borrador" ? "Borrador · Solo profesional" : "Activo · Visible al cliente"}</option>)}</select></div><PlanPanel icon={<Apple className="h-6 w-6" />} title={`Plan nutricional · ${selectedPlan?.estado === "borrador" ? "Borrador · Solo profesional" : "Activo"}`} exists={Boolean(selectedPlan)} empty="Este cliente todavía no tiene planes activos ni borradores." action="Abrir plan" href={`/nutricion?cliente_id=${clientId}${selectedPlan ? `&plan_id=${selectedPlan.id}` : ""}`}>{selectedPlan ? <div className="grid gap-4 sm:grid-cols-5"><Mini label="Plan" value={selectedPlan.nombre} /><Mini label="Energía" value={formatMetric(selectedPlan.calorias_objetivo, "kcal")} /><Mini label="Proteínas" value={formatMetric(selectedPlan.proteinas_g, "g")} /><Mini label="Hidratos" value={formatMetric(selectedPlan.carbohidratos_g, "g")} /><Mini label="Grasas" value={formatMetric(selectedPlan.grasas_g, "g")} /></div> : null}</PlanPanel></TabsContent>
 
           <TabsContent value="progreso" className="mt-5"><Card><CardContent className="p-6"><div className="flex flex-wrap items-center justify-between gap-3"><SectionTitle eyebrow="Evolución" title="Peso y composición corporal" /><Button asChild><Link href={`/progreso?cliente_id=${clientId}`}><Plus className="mr-2 h-4 w-4" />Nueva medición</Link></Button></div><div className="mt-6"><WeightChart rows={data.mediciones} /></div></CardContent></Card></TabsContent>
 

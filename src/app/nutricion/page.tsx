@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppSidebar from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import FoodPlanBuilder, { type StructuredMeal } from "@/components/nutrition/Foo
 type Cliente = { _id: string; nombre: string; email: string };
 type Meal = StructuredMeal;
 type Plan = {
+  estado: "activo" | "borrador";
   id: string;
   nombre: string;
   objetivo: string | null;
@@ -38,9 +39,10 @@ type Habit = {
   instrucciones: string | null;
 };
 type HabitRecord = { habito_id: string; fecha: string; completado: boolean; valor: number | null };
-type NutritionData = { plan: Plan | null; habitos: Habit[]; registros: HabitRecord[] };
+type NutritionData = { plan: Plan | null; planes: Plan[]; habitos: Habit[]; registros: HabitRecord[] };
 
 type PlanForm = {
+  estado: "activo" | "borrador";
   id: string;
   nombre: string;
   objetivo: string;
@@ -66,6 +68,7 @@ const defaultMeals: Meal[] = [
 function newPlan(): PlanForm {
   return {
     id: "",
+    estado: "borrador",
     nombre: "Plan nutricional personalizado",
     objetivo: "",
     calorias_objetivo: "",
@@ -116,6 +119,9 @@ export default function NutritionPage() {
   const [selectedMenuDay,setSelectedMenuDay] = useState("Lunes");
   const weekDays=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
   const [clienteId, setClienteId] = useState("");
+  const [planes, setPlanes] = useState<Plan[]>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState("");
+  const loadVersion = useRef(0);
   const [plan, setPlan] = useState<PlanForm>(newPlan);
   const weeklyMenu=plan.comidas.some(meal=>weekDays.some(day=>meal.nombre.startsWith(`${day} · `)));
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -132,23 +138,29 @@ export default function NutritionPage() {
         if (!result.ok) return;
         const rows = result.data || [];
         setClientes(rows);
-        const requested = new URLSearchParams(window.location.search).get("cliente_id");
+        const search = new URLSearchParams(window.location.search);
+        const requested = search.get("cliente_id");
+        setSelectedPlanId(search.get("plan_id") || "");
         const selected = rows.find((row) => row._id === requested) || rows[0];
         if (selected) setClienteId(selected._id);
       })
       .catch(() => toast.error("No se pudieron cargar los clientes"));
   }, []);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (requestedPlanId = selectedPlanId) => {
     if (!clienteId) return;
+    const version = ++loadVersion.current;
     setLoading(true);
     try {
-      const response = await fetch(`/api/nutricion?cliente_id=${encodeURIComponent(clienteId)}`);
+      const response = await fetch(`/api/nutricion?cliente_id=${encodeURIComponent(clienteId)}${requestedPlanId ? `&plan_id=${encodeURIComponent(requestedPlanId)}` : ""}`, { cache: "no-store" });
       const result = (await response.json()) as { ok: boolean; data?: NutritionData; error?: string };
       if (!response.ok || !result.ok || !result.data) throw new Error(result.error || "No se pudo cargar la información");
+      if (version !== loadVersion.current) return;
+      setPlanes(result.data.planes || []);
       const current = result.data.plan;
       setPlan(current ? {
         id: current.id,
+        estado: current.estado,
         nombre: current.nombre || "Plan nutricional personalizado",
         objetivo: current.objetivo || "",
         calorias_objetivo: current.calorias_objetivo?.toString() || "",
@@ -166,11 +178,14 @@ export default function NutritionPage() {
       setHabits(result.data.habitos || []);
       setRecords(result.data.registros || []);
     } catch (error) {
+      if (version !== loadVersion.current) return;
+      setPlan(newPlan());
+      setPlanes([]);
       toast.error(error instanceof Error ? error.message : "Error al cargar");
     } finally {
-      setLoading(false);
+      if (version === loadVersion.current) setLoading(false);
     }
-  }, [clienteId]);
+  }, [clienteId, selectedPlanId]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -189,7 +204,8 @@ export default function NutritionPage() {
     return possible ? Math.round((completed / possible) * 100) : 0;
   }, [records, habits]);
 
-  async function savePlan() {
+  async function savePlan(publicar = false) {
+    if (publicar && !window.confirm("¿Publicar este plan en el portal del cliente? Será visible inmediatamente.")) return;
     if (!clienteId) return toast.error("Selecciona un cliente");
     if (!hasMeaningfulPlan(plan)) {
       return toast.error("Añade contenido real al plan antes de publicarlo al cliente");
@@ -200,19 +216,20 @@ export default function NutritionPage() {
       const response = await fetch("/api/nutricion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "save_plan", cliente_id: clienteId, ...plan }),
+        body: JSON.stringify({ action: "save_plan", cliente_id: clienteId, ...plan, publicar }),
       });
       const result = (await response.json()) as { ok: boolean; error?: string; data?: Plan };
       if (!response.ok || !result.ok || !result.data) throw new Error(result.error || "No se pudo guardar el plan");
 
-      const verifyResponse = await fetch(`/api/nutricion?cliente_id=${encodeURIComponent(clienteId)}`, { cache: "no-store" });
+      const verifyResponse = await fetch(`/api/nutricion?cliente_id=${encodeURIComponent(clienteId)}&plan_id=${encodeURIComponent(result.data.id)}`, { cache: "no-store" });
       const verifyResult = (await verifyResponse.json()) as { ok: boolean; data?: NutritionData; error?: string };
-      if (!verifyResponse.ok || !verifyResult.ok || !verifyResult.data?.plan) {
-        throw new Error(verifyResult.error || "El plan se guardó, pero no pudo verificarse como publicado");
+      if (!verifyResponse.ok || !verifyResult.ok || !verifyResult.data?.plan || verifyResult.data.plan.id !== result.data.id || verifyResult.data.plan.estado !== result.data.estado) {
+        throw new Error(verifyResult.error || "El plan se guardó, pero no pudo verificarse su estado");
       }
 
-      toast.success("Plan guardado y publicado en el portal del cliente");
-      await load();
+      toast.success(result.data.estado === "borrador" ? "Borrador guardado. No visible para el cliente" : "Plan activo guardado");
+      setSelectedPlanId(result.data.id);
+      await load(result.data.id);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error al guardar");
     } finally {
@@ -267,7 +284,7 @@ export default function NutritionPage() {
 
         <Card className="mb-6"><CardContent className="p-5">
           <Label>Cliente</Label>
-          <Select value={clienteId} onValueChange={setClienteId}>
+          <Select value={clienteId} disabled={loading || savingPlan} onValueChange={(id) => { setSelectedPlanId(""); setClienteId(id); }}>
             <SelectTrigger className="mt-2 max-w-md"><SelectValue placeholder="Seleccionar cliente" /></SelectTrigger>
             <SelectContent>{clientes.map((client) => <SelectItem key={client._id} value={client._id}>{client.nombre} · {client.email}</SelectItem>)}</SelectContent>
           </Select>
@@ -282,9 +299,11 @@ export default function NutritionPage() {
 
           <Card className="mb-6"><CardContent className="p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div><h2 className="text-xl font-bold">Plan nutricional activo</h2><p className="mt-1 text-sm text-muted-foreground">Objetivos y estructura diaria orientativa. Al publicar, el cliente lo verá inmediatamente en Nutrición.</p></div>
-              <Button onClick={savePlan} disabled={savingPlan || !clienteId}><Save className="mr-2 h-4 w-4" />{savingPlan ? "Publicando..." : "Guardar y publicar"}</Button>
+              <div><h2 className="text-xl font-bold">Plan nutricional · {plan.estado === "borrador" ? "Borrador" : "Activo"}</h2><p className="mt-1 text-sm text-muted-foreground">{plan.estado === "borrador" ? "Pendiente de aprobación profesional. No visible para el cliente." : "Este plan está visible en el portal del cliente."}</p></div>
+              <Button onClick={() => savePlan()} disabled={savingPlan || !clienteId}><Save className="mr-2 h-4 w-4" />{savingPlan ? "Guardando..." : plan.estado === "borrador" ? "Guardar borrador" : "Guardar cambios del activo"}</Button>
             </div>
+
+            <div className="mt-5"><Label htmlFor="nutrition-plan">Planes activos y borradores</Label><select id="nutrition-plan" className="mt-2 w-full rounded-md border bg-background p-3" value={plan.id} disabled={savingPlan} onChange={(event) => { if (window.confirm("¿Cambiar de plan? Los cambios sin guardar se perderán.")) setSelectedPlanId(event.target.value); }}><option value="" disabled>Sin plan</option>{planes.map((item) => <option key={item.id} value={item.id}>{item.nombre} · {item.estado === "borrador" ? "Borrador · Solo profesional" : "Activo · Visible al cliente"} · {item.comidas?.length || 0} comidas</option>)}</select></div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-4">
               <Field label="Nombre del plan" type="text" value={plan.nombre} onChange={(value) => setPlan({ ...plan, nombre: value })} className="md:col-span-2" />
@@ -315,8 +334,8 @@ export default function NutritionPage() {
             <FoodPlanBuilder meals={plan.comidas} onChange={(comidas) => setPlan((current) => ({ ...current, comidas }))} />
 
             <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div><p className="font-bold text-emerald-900">Publicación en el portal del cliente</p><p className="mt-1 text-sm text-emerald-800">Este botón guarda el plan en Supabase y verifica que haya quedado activo antes de confirmar.</p></div>
-              <Button onClick={savePlan} disabled={savingPlan || !clienteId} className="shrink-0 bg-[#46624f] hover:bg-[#3b5543]"><Save className="mr-2 h-4 w-4" />{savingPlan ? "Publicando..." : "Guardar y publicar al cliente"}</Button>
+              <div><p className="font-bold text-emerald-900">Estado y publicación</p><p className="mt-1 text-sm text-emerald-800">Guardar conserva el estado actual. Publicar requiere confirmación y hará visible el plan al cliente.</p></div>
+              <Button onClick={() => savePlan(true)} disabled={savingPlan || !clienteId} className="shrink-0 bg-[#46624f] hover:bg-[#3b5543]"><Save className="mr-2 h-4 w-4" />{savingPlan ? "Publicando..." : "Guardar y publicar al cliente"}</Button>
             </div>
           </CardContent></Card>
 
