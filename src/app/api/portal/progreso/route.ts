@@ -77,10 +77,20 @@ export async function POST(request: NextRequest) {
     const { userId, client } = await getClient();
     await requireConsent(client.id, "health_data");
     const body = (await request.json()) as Record<string, unknown>;
+    const alturaProvided = body.altura_cm !== "" && body.altura_cm !== undefined && body.altura_cm !== null;
+    const alturaNueva = optionalNumber(body.altura_cm);
+    if (alturaProvided && (alturaNueva === null || alturaNueva < 60 || alturaNueva > 250)) {
+      return NextResponse.json({ ok: false, error: "Introduce una altura válida en centímetros (60–250)" }, { status: 400 });
+    }
+    const anteriores = alturaNueva === null ? await serviceRequest<Array<{ altura_cm: number | null }>>(
+      `mediciones_corporales?cliente_id=eq.${encodeURIComponent(client.id)}&altura_cm=not.is.null&select=altura_cm&order=fecha.desc,created_at.desc&limit=1`
+    ) : [];
+    const alturaEfectiva = alturaNueva ?? anteriores[0]?.altura_cm ?? null;
     const payload = {
       cliente_id: client.id,
       fecha: String(body.fecha || new Date().toISOString().slice(0, 10)),
       peso_kg: optionalNumber(body.peso_kg),
+      altura_cm: alturaEfectiva,
       grasa_corporal_pct: optionalNumber(body.grasa_corporal_pct),
       masa_muscular_kg: optionalNumber(body.masa_muscular_kg),
       agua_corporal_pct: optionalNumber(body.agua_corporal_pct),
@@ -88,7 +98,7 @@ export async function POST(request: NextRequest) {
       origen: "cliente",
       created_by: userId,
     };
-    if (!payload.peso_kg && !payload.grasa_corporal_pct && !payload.masa_muscular_kg && !payload.agua_corporal_pct) {
+    if (payload.peso_kg === null && payload.grasa_corporal_pct === null && payload.masa_muscular_kg === null && payload.agua_corporal_pct === null && payload.altura_cm === null) {
       return NextResponse.json({ ok: false, error: "Introduce al menos una medición" }, { status: 400 });
     }
 
