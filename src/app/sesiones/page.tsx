@@ -66,6 +66,9 @@ type Solicitud = {
   estado: string;
   cliente_id: string | null;
   created_at: string;
+  notificacion_email_estado?: "pendiente" | "enviada" | "fallida";
+  notificacion_email_enviada_at?: string | null;
+  notificacion_email_error?: string | null;
 };
 
 type SessionForm = {
@@ -142,6 +145,7 @@ export default function SessionsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [emailingId, setEmailingId] = useState<string | null>(null);
+  const [notifyingRequestId, setNotifyingRequestId] = useState<string | null>(null);
   const [stateFilter, setStateFilter] = useState("todos");
   const [clientFilter, setClientFilter] = useState("todos");
 
@@ -168,6 +172,9 @@ export default function SessionsPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("tab") === "solicitudes") setActiveTab("solicitudes");
+  }, []);
 
   const filteredSessions = useMemo(() => sessions.filter((session) => {
     const stateMatch = stateFilter === "todos" || session.estado === stateFilter;
@@ -328,6 +335,27 @@ export default function SessionsPage() {
     await load();
   }
 
+  async function retryRequestNotification(request: Solicitud) {
+    if (notifyingRequestId || request.notificacion_email_estado === "enviada") return;
+    setNotifyingRequestId(request.id);
+    try {
+      const response = await fetch("/api/reservas", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: request.id, action: "reenviar_notificacion" }),
+      });
+      const result = (await response.json()) as { ok: boolean; error?: string; email_status?: string };
+      if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo enviar la notificación");
+      toast.success("Aviso aceptado por el servicio de correo. Comprueba la bandeja de entrada.");
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Fallo al enviar la notificación");
+      await load();
+    } finally {
+      setNotifyingRequestId(null);
+    }
+  }
+
   async function updateRequest(id: string, estado: string) {
     const response = await fetch("/api/reservas", {
       method: "PATCH",
@@ -390,7 +418,7 @@ export default function SessionsPage() {
 
           {!groupedSessions.length ? <Card><CardContent className="py-16 text-center"><CalendarDays className="mx-auto h-10 w-10 text-muted-foreground" /><h2 className="mt-4 text-xl font-bold">No hay sesiones en este filtro</h2></CardContent></Card> : <div className="space-y-7">{groupedSessions.map(([date, daySessions]) => <section key={date}><h2 className="mb-3 capitalize text-lg font-bold">{date}</h2><div className="space-y-3">{daySessions.map((session) => <Card key={session.id}><CardContent className="p-5"><div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"><div className="flex gap-4"><div className="min-w-20 rounded-2xl bg-primary/10 px-3 py-3 text-center text-primary"><p className="text-xl font-bold">{formatTime(session.inicio_at)}</p><p className="text-xs">{session.duracion_minutos} min</p></div><div><div className="flex flex-wrap items-center gap-2"><h3 className="text-lg font-bold">{session.titulo}</h3><Badge className={stateClasses[session.estado]}>{stateLabels[session.estado] || session.estado}</Badge></div><p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground"><UserRound className="h-4 w-4" />{session.clientes?.nombre || "Cliente"} · {typeLabels[session.tipo_sesion] || session.tipo_sesion}</p>{session.ubicacion ? <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="h-4 w-4" />{session.ubicacion}</p> : null}{session.motivo_cancelacion ? <p className="mt-2 text-sm text-red-600">{session.motivo_cancelacion}</p> : null}</div></div><div className="flex flex-wrap gap-2"><Button variant="outline" size="sm" onClick={() => sendAppointmentEmail(session)} disabled={emailingId === session.id || session.estado === "cancelada" || session.estado === "realizada"}><Mail className="mr-2 h-4 w-4" />{emailingId === session.id ? "Enviando..." : session.estado === "confirmada" ? "Enviar confirmación" : "Proponer hora"}</Button><Button variant="outline" size="sm" onClick={() => openEdit(session)}><Pencil className="mr-2 h-4 w-4" />Editar</Button><Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteSession(session.id)}><Trash2 className="h-4 w-4" /></Button></div></div></CardContent></Card>)}</div></section>)}</div>}
         </> : <>
-          {!requests.length ? <Card><CardContent className="py-16 text-center"><Inbox className="mx-auto h-10 w-10 text-muted-foreground" /><h2 className="mt-4 text-xl font-bold">Todavía no hay solicitudes</h2></CardContent></Card> : <div className="space-y-4">{requests.map((request) => <Card key={request.id}><CardContent className="p-5"><div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"><div><div className="flex flex-wrap items-center gap-2"><h3 className="text-lg font-bold">{request.nombre}</h3><Badge className={requestStateClasses[request.estado]}>{request.estado}</Badge></div><p className="mt-1 text-sm text-muted-foreground">{request.email}{request.telefono ? ` · ${request.telefono}` : ""}</p><p className="mt-3 text-sm"><strong>Modalidad:</strong> {request.modalidad.replaceAll("_", " ")}</p>{request.fecha_preferida ? <p className="mt-1 text-sm"><strong>Preferencia:</strong> {formatRequestedDate(request.fecha_preferida, request.franja_horaria)}</p> : null}{request.objetivo ? <p className="mt-1 text-sm"><strong>Objetivo:</strong> {request.objetivo}</p> : null}{request.mensaje ? <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{request.mensaje}</p> : null}<p className="mt-3 text-xs text-muted-foreground">Recibida el {formatDateTime(request.created_at)}</p></div><div className="flex flex-wrap gap-2"><Button size="sm" onClick={() => prepareFromRequest(request)} disabled={request.estado === "convertida"}><Plus className="mr-2 h-4 w-4" />Preparar cita</Button>{request.estado === "nueva" ? <Button variant="outline" size="sm" onClick={() => updateRequest(request.id, "contactada")}><CheckCircle2 className="mr-2 h-4 w-4" />Contactada</Button> : null}{request.estado !== "descartada" && request.estado !== "convertida" ? <Button variant="ghost" size="sm" className="text-destructive" onClick={() => updateRequest(request.id, "descartada")}><XCircle className="mr-2 h-4 w-4" />Descartar</Button> : null}</div></div></CardContent></Card>)}</div>}
+          {!requests.length ? <Card><CardContent className="py-16 text-center"><Inbox className="mx-auto h-10 w-10 text-muted-foreground" /><h2 className="mt-4 text-xl font-bold">Todavía no hay solicitudes</h2></CardContent></Card> : <div className="space-y-4">{requests.map((request) => <Card key={request.id}><CardContent className="p-5"><div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"><div><div className="flex flex-wrap items-center gap-2"><h3 className="text-lg font-bold">{request.nombre}</h3><Badge className={requestStateClasses[request.estado]}>{request.estado}</Badge></div><p className="mt-1 text-sm text-muted-foreground">{request.email}{request.telefono ? ` · ${request.telefono}` : ""}</p><p className="mt-3 text-sm"><strong>Modalidad:</strong> {request.modalidad.replaceAll("_", " ")}</p>{request.fecha_preferida ? <p className="mt-1 text-sm"><strong>Preferencia:</strong> {formatRequestedDate(request.fecha_preferida, request.franja_horaria)}</p> : null}{request.objetivo ? <p className="mt-1 text-sm"><strong>Objetivo:</strong> {request.objetivo}</p> : null}{request.mensaje ? <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{request.mensaje}</p> : null}<p className="mt-3 text-xs text-muted-foreground">Recibida el {formatDateTime(request.created_at)}</p><div className="mt-2 flex flex-wrap items-center gap-2 text-xs"><span className={`rounded-full px-2.5 py-1 font-semibold ${request.notificacion_email_estado === "enviada" ? "bg-emerald-100 text-emerald-800" : request.notificacion_email_estado === "fallida" ? "bg-red-100 text-red-800" : "bg-amber-100 text-amber-900"}`}>Correo: {request.notificacion_email_estado === "enviada" ? "aceptado por Resend" : request.notificacion_email_estado === "fallida" ? "envío fallido" : "pendiente de envío"}</span>{request.notificacion_email_enviada_at ? <span className="text-muted-foreground">Enviado: {formatDateTime(request.notificacion_email_enviada_at)}</span> : null}</div>{request.notificacion_email_estado === "fallida" && request.notificacion_email_error ? <p className="mt-2 max-w-xl text-xs text-red-700">Motivo del fallo: {request.notificacion_email_error}</p> : null}</div><div className="flex flex-wrap gap-2"><Button variant="outline" size="sm" disabled={Boolean(notifyingRequestId) || request.notificacion_email_estado === "enviada"} onClick={() => retryRequestNotification(request)}><Mail className="mr-2 h-4 w-4" />{notifyingRequestId === request.id ? "Enviando aviso..." : request.notificacion_email_estado === "enviada" ? "Aviso enviado" : "Reenviar notificación"}</Button><Button size="sm" onClick={() => prepareFromRequest(request)} disabled={request.estado === "convertida"}><Plus className="mr-2 h-4 w-4" />Preparar cita</Button>{request.estado === "nueva" ? <Button variant="outline" size="sm" onClick={() => updateRequest(request.id, "contactada")}><CheckCircle2 className="mr-2 h-4 w-4" />Contactada</Button> : null}{request.estado !== "descartada" && request.estado !== "convertida" ? <Button variant="ghost" size="sm" className="text-destructive" onClick={() => updateRequest(request.id, "descartada")}><XCircle className="mr-2 h-4 w-4" />Descartar</Button> : null}</div></div></CardContent></Card>)}</div>}
         </>}
       </div>
     </AppSidebar>
