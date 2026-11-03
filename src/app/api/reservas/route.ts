@@ -1,3 +1,4 @@
+import { sendBookingNotification } from "@/lib/booking-notification";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -95,7 +96,36 @@ export async function POST(request: NextRequest) {
         origen: "web",
       }),
     });
-    return NextResponse.json({ ok: true, data: { id: rows[0]?.id || null } }, { status: 201 });
+    const id = String(rows[0]?.id || "");
+    // The booking is always preserved, even if the email service is unavailable.
+    let emailStatus: "enviada" | "fallida" = "fallida";
+    let emailId: string | null = null;
+    let emailError: string | null = null;
+    try {
+      if (!id) throw new Error("La solicitud no tiene identificador de seguimiento");
+      const result = await sendBookingNotification({ id, nombre, email, modalidad });
+      emailStatus = "enviada";
+      emailId = result.id;
+    } catch (error) {
+      emailError = error instanceof Error ? error.message.slice(0,300) : "Error al notificar";
+      console.error("Fallo de notificación de reserva", { id, reason: emailError });
+    }
+    if (id) {
+      try {
+        await serviceRequest(`solicitudes_reserva?id=eq.${encodeURIComponent(id)}`, {
+          method: "PATCH",
+          body: JSON.stringify({
+            notificacion_email_estado: emailStatus,
+            notificacion_email_enviada_at: emailStatus === "enviada" ? new Date().toISOString() : null,
+            notificacion_email_id: emailId,
+            notificacion_email_error: emailError,
+          }),
+        });
+      } catch (auditError) {
+        console.error("No se pudo registrar el resultado de la notificación", { id, reason: auditError instanceof Error ? auditError.message : "error" });
+      }
+    }
+    return NextResponse.json({ ok: true, data: { id: id || null } }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
       { ok: false, error: error instanceof Error ? error.message : "No se pudo enviar la solicitud" },
@@ -125,6 +155,26 @@ export async function PATCH(request: NextRequest) {
     await assertProfessional();
     const body = (await request.json()) as Record<string, unknown>;
     const id = clean(body.id, 80);
+    if (body.action === "reenviar_notificacion") {
+      if (!/^[0-9a-f-]{36}$/i.test(id)) return NextResponse.json({ ok: false, error: "Solicitud no válida" }, { status: 400 });
+      const entries = await serviceRequest<Array<{ id: string; nombre: string; email: string; modalidad: string; notificacion_email_estado: string }>>(`solicitudes_reserva?id=eq.${encodeURIComponent(id)}&select=id,nombre,email,modalidad,notificacion_email_estado&limit=1`);
+      const entry = entries[0];
+      if (!entry) return NextResponse.json({ ok: false, error: "Solicitud no encontrada" }, { status: 404 });
+      if (entry.notificacion_email_estado === "enviada") return NextResponse.json({ ok: true, email_status: "enviada", message: "Ya se ha enviado la notificación" });
+      try {
+        const sent = await sendBookingNotification(entry);
+        await serviceRequest(`solicitudes_reserva?id=eq.${encodeURIComponent(id)}`, {
+          method: "PATCH", body: JSON.stringify({ notificacion_email_estado: "enviada", notificacion_email_enviada_at: new Date().toISOString(), notificacion_email_id: sent.id, notificacion_email_error: null }),
+        });
+        return NextResponse.json({ ok: true, email_status: "enviada" });
+      } catch (error) {
+        const reason = error instanceof Error ? error.message.slice(0,300) : "Fallo de correo";
+        await serviceRequest(`solicitudes_reserva?id=eq.${encodeURIComponent(id)}`, {
+          method: "PATCH", body: JSON.stringify({ notificacion_email_estado: "fallida", notificacion_email_error: reason }),
+        });
+        return NextResponse.json({ ok: false, error: "No se pudo enviar la notificación; comprueba Resend y el remitente autorizado" }, { status: 502 });
+      }
+    }
     const estado = clean(body.estado, 30);
     if (!id || !allowedStates.has(estado)) {
       return NextResponse.json({ ok: false, error: "Solicitud o estado no válido" }, { status: 400 });
