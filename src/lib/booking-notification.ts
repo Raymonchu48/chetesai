@@ -25,7 +25,7 @@ export async function sendBookingNotification(entry: RequestEntry): Promise<{ id
     `Contacto: ${entry.email}`,
     "",
     "Consulta la información completa desde el panel profesional:",
-    "https://www.chetesaifitness.com/reservas",
+    "https://www.chetesaifitness.com/sesiones?tab=solicitudes",
     "",
     `Identificador de solicitud: ${entry.id}`,
   ].join("\n");
