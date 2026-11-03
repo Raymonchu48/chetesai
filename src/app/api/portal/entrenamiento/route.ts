@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    await getClientContext();
+    const { cliente } = await getClientContext();
     const body = (await request.json()) as Record<string, unknown>;
     const action = String(body.action || "update_set");
 
@@ -140,6 +140,11 @@ export async function PATCH(request: NextRequest) {
       const id = String(body.serie_id || "");
       if (!id) return NextResponse.json({ ok: false, error: "Serie no válida" }, { status: 400 });
       const completed = body.completada === true;
+      const own = await rest<Array<{ id: string }>>(`series_entrenamiento?id=eq.${encodeURIComponent(id)}&select=id,sesiones_entrenamiento!inner(cliente_id)&sesiones_entrenamiento.cliente_id=eq.${encodeURIComponent(String(cliente.id))}&limit=1`);
+      if (!own.length) return NextResponse.json({ ok: false, error: "Serie no encontrada para este cliente" }, { status: 404 });
+      const duration = body.duracion_real_segundos === "" || body.duracion_real_segundos == null ? null : Number(body.duracion_real_segundos);
+      const resistance = body.resistencia_nivel === "" || body.resistencia_nivel == null ? null : Number(body.resistencia_nivel);
+      if ((duration !== null && (!Number.isInteger(duration) || duration < 0 || duration > 86400)) || (resistance !== null && (!Number.isFinite(resistance) || resistance < 0 || resistance > 1000))) return NextResponse.json({ ok: false, error: "Tiempo o resistencia no válidos" }, { status: 400 });
       await rest(`series_entrenamiento?id=eq.${id}`, {
         method: "PATCH",
         headers: { Prefer: "return=minimal" },
@@ -148,6 +153,8 @@ export async function PATCH(request: NextRequest) {
           peso_real: body.peso_real === "" ? null : Number(body.peso_real),
           rpe_real: body.rpe_real === "" ? null : Number(body.rpe_real),
           comentario: body.comentario ? String(body.comentario) : null,
+          duracion_real_segundos: duration,
+          resistencia_nivel: resistance,
           completada: completed,
           completada_at: completed ? new Date().toISOString() : null,
           updated_at: new Date().toISOString(),
