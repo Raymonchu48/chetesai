@@ -31,6 +31,7 @@ export default function OptimizationPage() {
   const [publishing, setPublishing] = useState(false);
   const [published, setPublished] = useState<Published[]>([]);
   const [publishProgress, setPublishProgress] = useState(0);
+  const [alreadyPublished, setAlreadyPublished] = useState(0);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -42,6 +43,12 @@ export default function OptimizationPage() {
       })
       .catch((e: unknown) => setError(e instanceof Error ? e.message : "Error de lectura"))
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/ejercicios/optimizacion/publicar", { cache: "no-store" })
+      .then(async (r) => { if (!r.ok) return; const j = await r.json() as { data?: unknown[] }; setAlreadyPublished(j.data?.length || 0); })
+      .catch(() => {});
   }, []);
 
   async function analyze(count: number) {
@@ -69,7 +76,7 @@ export default function OptimizationPage() {
 
   async function publishBatch() {
     if (publishing || processing || chosen.length === 0) return;
-    const selected = chosen.slice(0, 20);
+    const selected = chosen.slice(0, firstBatchRemaining);
     if (!window.confirm(`¿Publicar hasta ${selected.length} imágenes WebP? Se conservarán los originales, se actualizarán las referencias y se registrarán los resultados. Solo continuar si ya has revisado la calidad.`)) return;
     setPublishing(true);
     setPublished([]);
@@ -91,12 +98,14 @@ export default function OptimizationPage() {
       setPublishProgress(results.length);
     }
     setItems((prev) => prev.filter((entry) => !results.some((r) => r.path === entry.path && !r.error)));
+    setAlreadyPublished((prev) => prev + results.filter((r) => !r.error).length);
     setPublishing(false);
     const good = results.filter((r) => !r.error).length;
     toast[good === results.length ? "success" : "warning"](`Lote terminado: ${good} imágenes publicadas, ${results.length - good} pendientes. Ningún original eliminado.`);
   }
 
   const chosen = [...new Set(items.map((i) => i.path))];
+  const firstBatchRemaining = alreadyPublished > 0 && alreadyPublished < 20 ? 20 - alreadyPublished : 20;
   return (
     <AppSidebar>
       <div className="mx-auto max-w-6xl space-y-6 p-6 md:p-8">
@@ -118,7 +127,7 @@ export default function OptimizationPage() {
             <div className="flex flex-wrap gap-3">
               <Button disabled={processing || chosen.length < 1} onClick={() => analyze(1)}>{processing ? "Analizando..." : "Analizar una imagen"}</Button>
               <Button variant="outline" disabled={processing || publishing || chosen.length < 2} onClick={() => analyze(20)}>{processing ? "Analizando..." : "Analizar lote (hasta 20)"}</Button>
-              <Button variant="outline" disabled={processing || publishing || chosen.length === 0} onClick={publishBatch}>{publishing ? `Publicando ${publishProgress}/20...` : "Publicar lote (hasta 20) · conservar originales"}</Button>
+              <Button variant="outline" disabled={processing || publishing || chosen.length === 0} onClick={publishBatch}>{publishing ? `Publicando ${publishProgress}/${Math.min(chosen.length, firstBatchRemaining)}...` : `Publicar ${Math.min(chosen.length, firstBatchRemaining)} imágenes · conservar originales`}</Button>
             </div>
           </>}
         </CardContent></Card>
