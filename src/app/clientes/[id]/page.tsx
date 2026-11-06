@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import AppSidebar from "@/components/AppSidebar";
+import ClientPhysicalAssessments from "@/components/clients/ClientPhysicalAssessments";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -153,6 +154,7 @@ export default function ClientWorkspacePage() {
             <Tab value="entrenamiento" icon={<Dumbbell className="h-4 w-4" />} label="Entrenamiento" />
             <Tab value="nutricion" icon={<Apple className="h-4 w-4" />} label="Nutrición" />
             <Tab value="progreso" icon={<TrendingUp className="h-4 w-4" />} label="Progreso" />
+            <Tab value="valoracion" icon={<ClipboardList className="h-4 w-4" />} label="Valoración física" />
             <Tab value="habitos" icon={<CheckCircle2 className="h-4 w-4" />} label="Hábitos" />
             <Tab value="agenda" icon={<CalendarDays className="h-4 w-4" />} label="Agenda" />
             <Tab value="pagos" icon={<CircleDollarSign className="h-4 w-4" />} label="Pagos" />
@@ -170,6 +172,8 @@ export default function ClientWorkspacePage() {
           <TabsContent value="nutricion" className="mt-5"><div className="mb-4"><label htmlFor="client-nutrition-plan" className="text-sm font-semibold">Planes activos y borradores</label><select id="client-nutrition-plan" className="mt-2 w-full rounded-md border bg-background p-3" value={selectedPlan?.id || ""} onChange={(event) => setSelectedPlanId(event.target.value)}><option value="" disabled>Sin plan</option>{data.planes_nutricionales.map((plan) => <option key={plan.id} value={plan.id}>{plan.nombre} · {plan.estado === "borrador" ? "Borrador · Solo profesional" : "Activo · Visible al cliente"}</option>)}</select></div><PlanPanel icon={<Apple className="h-6 w-6" />} title={`Plan nutricional · ${selectedPlan?.estado === "borrador" ? "Borrador · Solo profesional" : "Activo"}`} exists={Boolean(selectedPlan)} empty="Este cliente todavía no tiene planes activos ni borradores." action="Abrir plan" href={`/nutricion?cliente_id=${clientId}${selectedPlan ? `&plan_id=${selectedPlan.id}` : ""}`}>{selectedPlan ? <div className="grid gap-4 sm:grid-cols-5"><Mini label="Plan" value={selectedPlan.nombre} /><Mini label="Energía" value={formatMetric(selectedPlan.calorias_objetivo, "kcal")} /><Mini label="Proteínas" value={formatMetric(selectedPlan.proteinas_g, "g")} /><Mini label="Hidratos" value={formatMetric(selectedPlan.carbohidratos_g, "g")} /><Mini label="Grasas" value={formatMetric(selectedPlan.grasas_g, "g")} /></div> : null}</PlanPanel></TabsContent>
 
           <TabsContent value="progreso" className="mt-5"><Card><CardContent className="p-6"><div className="flex flex-wrap items-center justify-between gap-3"><SectionTitle eyebrow="Evolución" title="Peso y composición corporal" /><Button asChild><Link href={`/progreso?cliente_id=${clientId}`}><Plus className="mr-2 h-4 w-4" />Nueva medición</Link></Button></div><div className="mt-6"><WeightChart rows={data.mediciones} /></div></CardContent></Card></TabsContent>
+
+          <TabsContent value="valoracion" className="mt-5"><ClientPhysicalAssessments clientId={clientId} /></TabsContent>
 
           <TabsContent value="habitos" className="mt-5"><Card><CardContent className="p-0"><ListHeader title={`Hábitos activos · ${data.adherencia_7_dias}% semanal`} href={`/nutricion?cliente_id=${clientId}`} />{data.habitos.length ? data.habitos.map((habit) => <div key={habit.id} className="flex items-center gap-4 border-t px-6 py-4"><div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-100 text-emerald-700"><CheckCircle2 className="h-5 w-5" /></div><div><p className="font-semibold">{habit.nombre}</p><p className="text-sm text-muted-foreground">{habit.categoria}{habit.objetivo_valor ? ` · ${habit.objetivo_valor} ${habit.unidad || ""}` : ""}</p></div></div>) : <Empty text="No hay hábitos configurados." />}</CardContent></Card></TabsContent>
 
