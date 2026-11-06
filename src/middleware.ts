@@ -95,6 +95,11 @@ function persistRefreshedSession(response: NextResponse, session: SessionResult)
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  // Dedicated maintenance endpoint authenticates itself with a short-lived admin secret.
+  // Keep it outside the generic cookie middleware so server-side maintenance can run.
+  if (pathname === "/api/ejercicios/optimizacion/publicar") {
+    return NextResponse.next();
+  }
 
   if (pathname === "/login") {
     const response = NextResponse.next();
