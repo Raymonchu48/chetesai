@@ -53,7 +53,7 @@ export default function ClientPhysicalAssessments({clientId}:{clientId:string}) 
   try{
    const result=Object.fromEntries(Object.entries(values).filter(([,v])=>v.trim()!=="").map(([k,v])=>[k,Number(v)]));
    if(!Object.keys(result).length) throw new Error("Introduce al menos un resultado");
-   const r=await fetch("/api/valoraciones-fisicas",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cliente_id:clientId,fecha:date,fase,resultados:result,observaciones_profesional:notes})});
+   const r=await fetch("/api/valoraciones-fisicas",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cliente_id:clientId,fecha:date,fase:phase,resultados:result,observaciones_profesional:notes})});
    const j=await r.json() as {ok:boolean;error?:string};
    if(!r.ok||!j.ok) throw new Error(j.error||"No se pudo guardar");
    toast.success("Valoración registrada exclusivamente para profesionales");
