@@ -69,7 +69,7 @@ async function candidates(): Promise<Candidate[]> {
   return results.sort((a, b) => a.name.localeCompare(b.name, "es") || a.field.localeCompare(b.field));
 }
 
-async function analyze(candidate: Candidate) {
+async function analyze(candidate: Candidate, includePreview: boolean) {
   if (!apiUrl || !serviceKey) throw new Error("Servicio no configurado");
   const storagePath = candidate.path.split("/").map(encodeURIComponent).join("/");
   const response = await fetch(`${apiUrl}/storage/v1/object/${bucket}/${storagePath}`, {
@@ -122,6 +122,7 @@ async function analyze(candidate: Candidate) {
     psnr: Number(psnr.toFixed(2)),
     passed,
     notes: passed ? "Apta para revisión visual" : "Revisión manual necesaria",
+    ...(includePreview ? { originalUrl: candidate.url, previewDataUrl: `data:image/webp;base64,${optimized.toString("base64")}` } : {}),
   };
 }
 
@@ -151,7 +152,7 @@ export async function POST(request: NextRequest) {
     }
     const results = [];
     for (const path of requested as string[]) {
-      try { results.push(await analyze(byPath.get(path)!)); }
+      try { results.push(await analyze(byPath.get(path)!, requested.length === 1)); }
       catch (error) {
         results.push({ path, passed: false, error: error instanceof Error ? error.message : "Error al procesar" });
       }
