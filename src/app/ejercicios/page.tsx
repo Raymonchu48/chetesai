@@ -1,3 +1,4 @@
+import Link from "next/link";
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -181,7 +182,7 @@ export default function EjerciciosPage() {
     <AppSidebar>
       <div className="mx-auto max-w-7xl p-6 md:p-8">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div><h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight"><Dumbbell className="h-8 w-8 text-primary" /> Biblioteca de ejercicios</h1><p className="mt-1 text-muted-foreground">{ejercicios.length} ejercicios registrados · {filtered.length} visibles</p></div>
+          <div><h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight"><Dumbbell className="h-8 w-8 text-primary" /> Biblioteca de ejercicios</h1><p className="mt-1 text-muted-foreground">{ejercicios.length} ejercicios registrados · {filtered.length} visibles</p><Link href="/ejercicios/optimizacion" className="mt-2 inline-flex text-sm font-medium text-primary hover:underline">Mantenimiento de imágenes · Solo administrador</Link></div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild><Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Nuevo ejercicio</Button></DialogTrigger>
             <DialogContent className="max-h-[92vh] max-w-5xl overflow-y-auto">
