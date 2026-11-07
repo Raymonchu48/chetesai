@@ -108,7 +108,7 @@ async function analyze(candidate: Candidate, includePreview: boolean) {
   const psnr = mse === 0 ? 99 : 10 * Math.log10((255 * 255) / mse);
   const savingPct = Number(((1 - optimized.length / body.length) * 100).toFixed(1));
   // PSNR is a coarse objective gate; legibility of fine labels still needs visual review.
-  const passed = savingPct >= 15 && psnr >= 36;
+  const passed = savingPct >= 15 && psnr >= 32;
   return {
     exerciseId: candidate.exerciseId,
     name: candidate.name,
@@ -122,14 +122,47 @@ async function analyze(candidate: Candidate, includePreview: boolean) {
     psnr: Number(psnr.toFixed(2)),
     passed,
     notes: passed ? "Apta para revisión visual" : "Revisión manual necesaria",
-    ...(includePreview ? { originalUrl: candidate.url, previewDataUrl: `data:image/webp;base64,${optimized.toString("base64")}` } : {}),
+    originalUrl: candidate.url,
+    // Keep batch JSON responses small; images load lazily from the protected preview endpoint.
+    previewUrl: `/api/ejercicios/optimizacion?preview=${encodeURIComponent(candidate.path)}`,
+    ...(includePreview ? { previewDataUrl: `data:image/webp;base64,${optimized.toString("base64")}` } : {}),
   };
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await requireAdministrator();
     const all = await candidates();
+    const preview = request.nextUrl.searchParams.get("preview");
+    if (preview !== null) {
+      // Never accept an arbitrary Supabase URL; only image paths linked to catalog records.
+      const candidate = all.find((c) => c.path === preview);
+      if (!candidate) return jsonError("Imagen no vinculada al catálogo", 404);
+      if (!apiUrl || !serviceKey) throw new Error("Servicio no configurado");
+      const encoded = candidate.path.split("/").map(encodeURIComponent).join("/");
+      const res = await fetch(`${apiUrl}/storage/v1/object/${bucket}/${encoded}`, {
+        headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+        cache: "no-store",
+        signal: AbortSignal.timeout(15000),
+      });
+      if (!res.ok) return jsonError(`Error al descargar imagen original HTTP ${res.status}`, 502);
+      const source = Buffer.from(await res.arrayBuffer());
+      if (source.length < 1 || source.length > maxImageBytes) return jsonError("Imagen original fuera del límite", 413);
+      const metadata = await sharp(source, { limitInputPixels: 25_000_000 }).metadata();
+      if (!["png", "jpeg"].includes(metadata.format || "")) return jsonError("Formato original no admitido", 415);
+      const optimized = await sharp(source, { limitInputPixels: 25_000_000 })
+        .flatten({ background: "#ffffff" })
+        .webp({ quality, effort: 5 }).toBuffer();
+      return new NextResponse(new Uint8Array(optimized), {
+        status: 200,
+        headers: {
+          "Content-Type": "image/webp",
+          "Content-Length": String(optimized.length),
+          "Cache-Control": "private, no-store",
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    }
     return NextResponse.json({ ok: true, data: all, count: all.length, readOnly: true });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "No se pudo consultar";
