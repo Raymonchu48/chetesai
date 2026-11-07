@@ -53,6 +53,15 @@ async function candidates(): Promise<Candidate[]> {
   const rows = (await response.json()) as Array<{
     id: string; nombre: string; imagen_url?: string | null; imagen_mujer_url?: string | null; miniatura_url?: string | null;
   }>;
+  // Exclude originals previously restored after visual review: they must not be
+  // offered for the next WebP batch or accidentally republished.
+  const revertedResponse = await fetch(
+    `${apiUrl}/rest/v1/media_optimization_audit?select=original_path&status=eq.reverted&limit=1000`,
+    { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }, cache: "no-store" }
+  );
+  if (!revertedResponse.ok) throw new Error("No se pudo consultar la lista de exclusiones");
+  const reverted = await revertedResponse.json() as Array<{ original_path: string }>;
+  const excludedPaths = new Set(reverted.map((item) => item.original_path));
   const results: Candidate[] = [];
   for (const item of rows) {
     for (const field of ["imagen_url", "imagen_mujer_url", "miniatura_url"] as const) {
@@ -63,6 +72,7 @@ async function candidates(): Promise<Candidate[]> {
       if (parsed.origin !== new URL(apiUrl).origin || !parsed.pathname.startsWith(prefix)) continue;
       const path = decodeURIComponent(parsed.pathname.slice(prefix.length));
       if (!/^[a-z0-9-]+\/[a-z0-9-]+\.(png|jpe?g)$/i.test(path)) continue;
+      if (excludedPaths.has(path)) continue;
       results.push({ path, exerciseId: item.id, name: item.nombre, field, url });
     }
   }
