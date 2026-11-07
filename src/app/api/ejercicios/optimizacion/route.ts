@@ -61,7 +61,13 @@ async function candidates(): Promise<Candidate[]> {
   );
   if (!revertedResponse.ok) throw new Error("No se pudo consultar la lista de exclusiones");
   const reverted = await revertedResponse.json() as Array<{ original_path: string }>;
-  const excludedPaths = new Set(reverted.map((item) => item.original_path));
+  const manualExclusionsResponse = await fetch(
+    `${apiUrl}/rest/v1/media_optimization_exclusions?select=original_path&limit=1000`,
+    { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }, cache: "no-store" }
+  );
+  if (!manualExclusionsResponse.ok) throw new Error("No se pudo consultar los bloqueos de conversión");
+  const manualExclusions = await manualExclusionsResponse.json() as Array<{ original_path: string }>;
+  const excludedPaths = new Set([...reverted.map((item) => item.original_path), ...manualExclusions.map((item) => item.original_path)]);
   const results: Candidate[] = [];
   for (const item of rows) {
     for (const field of ["imagen_url", "imagen_mujer_url", "miniatura_url"] as const) {
