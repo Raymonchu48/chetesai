@@ -16,7 +16,7 @@ type Result = {
   path: string; name?: string; field?: string; originalBytes?: number;
   optimizedBytes?: number; savingPct?: number; width?: number; height?: number;
   psnr?: number; passed: boolean; notes?: string; error?: string;
-  originalUrl?: string; previewDataUrl?: string;
+  originalUrl?: string; previewDataUrl?: string; previewUrl?: string;
 };
 
 function mb(bytes?: number) {
@@ -143,9 +143,9 @@ export default function OptimizationPage() {
               <p className="mt-1 break-all text-xs text-muted-foreground">{result.path}</p>
               {result.error ? <p className="mt-2 text-sm text-red-700">{result.error}</p> :
                 <p className="mt-2 text-sm">Original: {mb(result.originalBytes)} · WebP: {mb(result.optimizedBytes)} · Ahorro: {result.savingPct}% · {result.width} × {result.height} px · PSNR: {result.psnr} dB</p>}
-              {result.previewDataUrl && result.originalUrl ? <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <div><p className="mb-2 text-sm font-medium">Original en Supabase</p><img src={result.originalUrl} alt={`Original: ${result.name}`} className="w-full rounded-lg border bg-white object-contain" /></div>
-                <div><p className="mb-2 text-sm font-medium">WebP optimizado · calidad 92</p><img src={result.previewDataUrl} alt={`Optimizada: ${result.name}`} className="w-full rounded-lg border bg-white object-contain" /></div>
+              {(result.previewUrl || result.previewDataUrl) && result.originalUrl ? <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <div><p className="mb-2 text-sm font-medium">Original en Supabase</p><img src={result.originalUrl} alt={`Original: ${result.name}`} loading="lazy" decoding="async" className="w-full rounded-lg border bg-white object-contain" /></div>
+                <div><p className="mb-2 text-sm font-medium">WebP optimizado · calidad 92</p><img src={result.previewUrl || result.previewDataUrl} alt={`Optimizada: ${result.name}`} loading="lazy" decoding="async" className="w-full rounded-lg border bg-white object-contain" /></div>
               </div> : null}
             </div>)}
           </div>
