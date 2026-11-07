@@ -21,6 +21,27 @@ type Result = {
   originalUrl?: string; previewDataUrl?: string; previewUrl?: string;
 };
 
+function WebpPreview({ src, name }: { src: string; name?: string }) {
+  const [requested, setRequested] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  if (!requested) return (
+    <Button type="button" variant="outline" size="sm" onClick={() => setRequested(true)}>
+      Cargar WebP para comparar
+    </Button>
+  );
+  return <div className="space-y-2">
+    {failed && <p className="text-sm text-red-700">No se ha podido cargar la vista previa; la imagen original sigue intacta.</p>}
+    {failed && <Button type="button" variant="outline" size="sm" onClick={() => { setFailed(false); setAttempt((n) => n + 1); }}>Reintentar vista previa</Button>}
+    <img key={attempt} src={`${src}${src.includes("?") ? "&" : "?"}attempt=${attempt}`}
+      alt={`Optimizada: ${name || "ejercicio"}`}
+      decoding="async"
+      onError={() => setFailed(true)}
+      onLoad={() => setFailed(false)}
+      className={`w-full rounded-lg border bg-white object-contain ${failed ? "hidden" : ""}`} />
+  </div>;
+}
+
 function mb(bytes?: number) {
   return bytes === undefined ? "—" : `${(bytes / 1048576).toFixed(2)} MiB`;
 }
@@ -173,7 +194,7 @@ export default function OptimizationPage() {
                 <p className="mt-2 text-sm">Original: {mb(result.originalBytes)} · WebP: {mb(result.optimizedBytes)} · Ahorro: {result.savingPct}% · {result.width} × {result.height} px · PSNR: {result.psnr} dB</p>}
               {(result.previewUrl || result.previewDataUrl) && result.originalUrl ? <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <div><p className="mb-2 text-sm font-medium">Original en Supabase</p><img src={result.originalUrl} alt={`Original: ${result.name}`} loading="lazy" decoding="async" className="w-full rounded-lg border bg-white object-contain" /></div>
-                <div><p className="mb-2 text-sm font-medium">WebP optimizado · calidad 92</p><img src={result.previewUrl || result.previewDataUrl} alt={`Optimizada: ${result.name}`} loading="lazy" decoding="async" className="w-full rounded-lg border bg-white object-contain" /></div>
+                <div><p className="mb-2 text-sm font-medium">WebP optimizado · calidad 92</p><WebpPreview src={result.previewUrl || result.previewDataUrl || ""} name={result.name} /></div>
               </div> : null}
             </div>)}
           </div>

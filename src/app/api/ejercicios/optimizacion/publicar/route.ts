@@ -74,6 +74,13 @@ async function previous(path: string) {
 async function publish(path: string) {
   if (!safePath(path)) throw new Error("Ruta no admitida");
   if (await previous(path)) throw new Error("El original ya fue procesado; comprueba el historial");
+  const exclusion = await fetch(
+    `${base}/rest/v1/media_optimization_exclusions?original_path=eq.${encodeURIComponent(path)}&select=original_path&limit=1`,
+    { headers: authHeaders(), cache: "no-store" }
+  );
+  if (!exclusion.ok) throw new Error("No se pudieron comprobar las exclusiones");
+  const blocked = await exclusion.json() as Array<{ original_path: string }>;
+  if (blocked.length) throw new Error("Imagen excluida por incidencia visual; no se puede publicar");
   const originalUrl = objectUrl(path);
   const references: Ref[] = [];
   const catalog = await rows();
