@@ -10,6 +10,8 @@ import { ArrowLeft, ImageDown, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 type Candidate = { path: string; exerciseId: string; name: string; field: string; url: string };
+type ExportSummary = { published: number; parts: number; chunkSize: number; cleanupReviewCandidates: number; cleanupBlocked: number; possibleSavingsMiB: number; cleanupMode: string; warning: string };
+
 type Published = { path: string; optimizedPath?: string; savingPct?: number; psnr?: number; referencesUpdated?: number; originalPreserved?: boolean; error?: string };
 
 type Result = {
@@ -32,6 +34,7 @@ export default function OptimizationPage() {
   const [published, setPublished] = useState<Published[]>([]);
   const [publishProgress, setPublishProgress] = useState(0);
   const [alreadyPublished, setAlreadyPublished] = useState(0);
+  const [exportSummary, setExportSummary] = useState<ExportSummary | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -50,6 +53,17 @@ export default function OptimizationPage() {
       .then(async (r) => { if (!r.ok) return; const j = await r.json() as { data?: unknown[] }; setAlreadyPublished(j.data?.length || 0); })
       .catch(() => {});
   }, []);
+
+  async function refreshExportSummary() {
+    try {
+      const response = await fetch("/api/ejercicios/optimizacion/descargas?manifest=1", { cache: "no-store" });
+      if (!response.ok) return;
+      const result = await response.json() as ExportSummary & { ok: boolean };
+      if (result.ok) setExportSummary(result);
+    } catch { /* Manual retry via refresh control. */ }
+  }
+
+  useEffect(() => { void refreshExportSummary(); }, []);
 
   async function analyze(count: number) {
     if (processing) return;
@@ -99,6 +113,7 @@ export default function OptimizationPage() {
     }
     setItems((prev) => prev.filter((entry) => !results.some((r) => r.path === entry.path && !r.error)));
     setAlreadyPublished((prev) => prev + results.filter((r) => !r.error).length);
+    void refreshExportSummary();
     setPublishing(false);
     const good = results.filter((r) => !r.error).length;
     toast[good === results.length ? "success" : "warning"](`Lote terminado: ${good} imágenes publicadas, ${results.length - good} pendientes. Ningún original eliminado.`);
@@ -130,6 +145,19 @@ export default function OptimizationPage() {
               <Button variant="outline" disabled={processing || publishing || chosen.length === 0} onClick={publishBatch}>{publishing ? `Publicando ${publishProgress}/${Math.min(chosen.length, firstBatchRemaining)}...` : `Publicar ${Math.min(chosen.length, firstBatchRemaining)} imágenes · conservar originales`}</Button>
             </div>
           </>}
+        </CardContent></Card>
+        <Card><CardContent className="space-y-3 p-5">
+          <h2 className="text-xl font-semibold">Copia local y limpieza segura</h2>
+          <p className="text-sm text-muted-foreground">Exporta las WebP publicadas para guardarlas en tu ordenador, en archivos ZIP por partes de hasta 10 imágenes. Cada ZIP contiene las imágenes organizadas por ejercicio y un manifiesto. La descarga exige tu sesión de administrador.</p>
+          {exportSummary ? <>
+            <p className="text-sm"><strong>{exportSummary.published}</strong> WebP disponibles en <strong>{exportSummary.parts}</strong> partes · ahorro potencial después de retirar originales: <strong>{exportSummary.possibleSavingsMiB} MiB</strong>.</p>
+            <p className="text-sm">Originales candidatos a revisión de limpieza: <strong>{exportSummary.cleanupReviewCandidates}</strong> · Bloqueados por comprobaciones: <strong>{exportSummary.cleanupBlocked}</strong>.</p>
+            <div className="flex flex-wrap gap-2">
+              {Array.from({ length: exportSummary.parts }, (_, i) => <a key={i} href={`/api/ejercicios/optimizacion/descargas?part=${i + 1}`} className="inline-flex rounded-md border px-3 py-2 text-sm font-medium text-primary hover:bg-muted">Descargar ZIP {i + 1}/{exportSummary.parts}</a>)}
+            </div>
+          </> : <p className="text-sm text-muted-foreground">Inventario de descargas aún no cargado.</p>}
+          <Button variant="outline" size="sm" onClick={refreshExportSummary}>Actualizar inventario</Button>
+          <p className="text-sm text-amber-800">No se eliminarán originales desde esta herramienta. Antes de la limpieza comprobaré referencias, disponibilidad de WebP y una copia recuperable de los originales. Los ZIP contienen las versiones WebP.</p>
         </CardContent></Card>
         {published.length > 0 && <Card><CardContent className="space-y-3 p-5"><h2 className="text-xl font-semibold">Resultado de publicación</h2><p className="text-sm text-muted-foreground">Publicadas {published.filter((r) => !r.error).length} de {published.length}. Los originales se mantienen.</p>{published.map((r) => <div key={r.path} className="rounded-lg border p-3 text-sm"><p className="break-all font-medium">{r.path}</p>{r.error ? <p className="text-red-700">{r.error}</p> : <p className="text-emerald-700">WebP publicado · ahorro {r.savingPct}% · PSNR {r.psnr} dB · referencias actualizadas {r.referencesUpdated}</p>}</div>)}</CardContent></Card>}
         {results.length > 0 && <Card><CardContent className="space-y-4 p-5">
