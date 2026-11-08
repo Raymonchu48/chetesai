@@ -12,6 +12,12 @@ import { toast } from "sonner";
 type Candidate = { path: string; exerciseId: string; name: string; field: string; url: string };
 type ExportSummary = { published: number; parts: number; chunkSize: number; cleanupReviewCandidates: number; cleanupBlocked: number; possibleSavingsMiB: number; cleanupMode: string; warning: string };
 
+type CleanupInfo = {
+  remainingCandidates: number; estimatedRemainingMiB: number; cleaned: number;
+  freedMiB: number; batchSize: number; preview: Array<{ path: string; bytes: number }>;
+};
+type CleanupResult = { path: string; ok: boolean; freedBytes?: number; error?: string };
+
 type Published = { path: string; optimizedPath?: string; savingPct?: number; psnr?: number; referencesUpdated?: number; originalPreserved?: boolean; error?: string };
 
 type Result = {
@@ -57,6 +63,9 @@ export default function OptimizationPage() {
   const [alreadyPublished, setAlreadyPublished] = useState(0);
   const [exportSummary, setExportSummary] = useState<ExportSummary | null>(null);
   const [error, setError] = useState("");
+  const [cleanupInfo, setCleanupInfo] = useState<CleanupInfo | null>(null);
+  const [cleanupResults, setCleanupResults] = useState<CleanupResult[]>([]);
+  const [cleaning, setCleaning] = useState(false);
 
   useEffect(() => {
     fetch("/api/ejercicios/optimizacion", { cache: "no-store" })
@@ -85,6 +94,41 @@ export default function OptimizationPage() {
   }
 
   useEffect(() => { void refreshExportSummary(); }, []);
+
+  async function refreshCleanup() {
+    try {
+      const response = await fetch("/api/ejercicios/optimizacion/limpieza", { cache: "no-store" });
+      if (!response.ok) return;
+      const payload = await response.json() as { ok: boolean } & CleanupInfo;
+      if (payload.ok) setCleanupInfo(payload);
+    } catch { /* Do not expose credentials or cached inventory. */ }
+  }
+
+  useEffect(() => { void refreshCleanup(); }, []);
+
+  async function cleanupFirstBatch() {
+    if (cleaning || publishing || processing || !cleanupInfo?.preview?.length) return;
+    const paths = cleanupInfo.preview.map(x => x.path);
+    if (!window.confirm(`Confirmo que tengo copias recuperables en mi PC de los ${paths.length} PNG originales y las WebP correspondientes. ¿Eliminar DEFINITIVAMENTE estos PNG de Supabase? Las imágenes activas WebP seguirán publicadas.`)) return;
+    setCleaning(true);
+    setCleanupResults([]);
+    try {
+      const response = await fetch("/api/ejercicios/optimizacion/limpieza", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "cleanup", paths, backupsConfirmed: true }),
+      });
+      const payload = await response.json() as {
+        ok: boolean; error?: string; results?: CleanupResult[]; removed?: number; freedMiB?: number;
+      };
+      if (!response.ok || !payload.ok) throw new Error(payload.error || "Error de limpieza");
+      setCleanupResults(payload.results || []);
+      toast.success(`Limpieza: ${payload.removed || 0} PNG eliminados; ${payload.freedMiB || 0} MiB liberados nominalmente.`);
+      await refreshCleanup();
+      await refreshExportSummary();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo realizar la limpieza");
+    } finally { setCleaning(false); }
+  }
 
   async function analyze(count: number) {
     if (processing) return;
@@ -179,6 +223,29 @@ export default function OptimizationPage() {
           </> : <p className="text-sm text-muted-foreground">Inventario de descargas aún no cargado.</p>}
           <Button variant="outline" size="sm" onClick={refreshExportSummary}>Actualizar inventario</Button>
           <p className="text-sm text-amber-800">No se eliminarán originales desde esta herramienta. Antes de la limpieza comprobaré referencias, disponibilidad de WebP y una copia recuperable de los originales. Los ZIP contienen las versiones WebP.</p>
+        </CardContent></Card>
+        <Card><CardContent className="space-y-3 p-5">
+          <h2 className="text-xl font-semibold">Retirada controlada de PNG originales</h2>
+          <p className="text-sm text-muted-foreground">
+            Borra únicamente PNG originales sin referencias activas conocidas, con su WebP publicada y decodificada.
+            Los archivos restaurados y excluidos no son candidatos. Cada eliminación se registra en el histórico y usa la API oficial de Supabase Storage.
+          </p>
+          {cleanupInfo ? <>
+            <p className="text-sm"><strong>{cleanupInfo.remainingCandidates}</strong> originales candidatos · <strong>{cleanupInfo.estimatedRemainingMiB} MiB</strong> por liberar · <strong>{cleanupInfo.cleaned}</strong> retirados anteriormente ({cleanupInfo.freedMiB} MiB).</p>
+            <p className="text-sm">Próximo lote: <strong>{cleanupInfo.preview.length}</strong> originales · {mb(cleanupInfo.preview.reduce((sum, i) => sum + i.bytes, 0))}</p>
+            <Button type="button" disabled={cleaning || publishing || processing || cleanupInfo.preview.length === 0} onClick={cleanupFirstBatch}>
+              {cleaning ? "Comprobando y retirando originales..." : `Eliminar con copia local confirmada · ${cleanupInfo.preview.length} PNG`}
+            </Button>
+          </> : <p className="text-sm text-muted-foreground">Cargando inventario de limpieza...</p>}
+          <Button type="button" variant="outline" size="sm" onClick={refreshCleanup} disabled={cleaning}>Actualizar inventario de limpieza</Button>
+          <p className="text-sm text-amber-800">Esta acción es irreversible dentro de Supabase. Solo podrás recuperar esos PNG desde tus copias locales. No uses este botón hasta comprobar que también conservas los originales, no solo las WebP.</p>
+          {cleanupResults.length > 0 && <div className="space-y-2">
+            <h3 className="font-semibold">Resultado de la limpieza</h3>
+            {cleanupResults.map(result => <div key={result.path} className="rounded-md border p-2 text-sm">
+              <p className="break-all">{result.path}</p>
+              <p className={result.ok ? "text-emerald-700" : "text-red-700"}>{result.ok ? `PNG retirado; tamaño: ${mb(result.freedBytes)}` : result.error || "Error"}</p>
+            </div>)}
+          </div>}
         </CardContent></Card>
         {published.length > 0 && <Card><CardContent className="space-y-3 p-5"><h2 className="text-xl font-semibold">Resultado de publicación</h2><p className="text-sm text-muted-foreground">Publicadas {published.filter((r) => !r.error).length} de {published.length}. Los originales se mantienen.</p>{published.map((r) => <div key={r.path} className="rounded-lg border p-3 text-sm"><p className="break-all font-medium">{r.path}</p>{r.error ? <p className="text-red-700">{r.error}</p> : <p className="text-emerald-700">WebP publicado · ahorro {r.savingPct}% · PSNR {r.psnr} dB · referencias actualizadas {r.referencesUpdated}</p>}</div>)}</CardContent></Card>}
         {results.length > 0 && <Card><CardContent className="space-y-4 p-5">
