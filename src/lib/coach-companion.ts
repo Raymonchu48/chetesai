@@ -1,7 +1,8 @@
 export type CoachContext = {
   name: string;
   workout: { nombre: string; duracion_sesion_minutos?: number | null } | null;
-  exercises: Array<{ dia: number; orden: number; series: number; repeticiones: string; ejercicios?: { nombre: string } }>;
+  visualModel: "hombre" | "mujer";
+  exercises: Array<{ id: string; dia: number; orden: number; series: number; repeticiones: string; descanso_segundos?: number; ejercicios?: { nombre: string; video_url?: string | null; video_mujer_url?: string | null; gif_url?: string | null } }>;
   foodPlan: { nombre: string; comidas: Array<{ nombre: string; hora?: string; descripcion?: string; alimentos?: Array<{ nombre: string; cantidad_g: number; unidad_medida?: string }> }> } | null;
   workoutLoaded: boolean;
   nutritionLoaded: boolean;
@@ -31,6 +32,7 @@ export async function loadCoachContext(): Promise<CoachContext> {
   return {
     name: String(a?.cliente?.nombre || b?.cliente?.nombre || "").trim().split(/\s+/)[0] || "",
     workout: a?.rutina || null,
+    visualModel: a?.cliente?.modelo_visual === "mujer" ? "mujer" : "hombre",
     exercises: Array.isArray(a?.ejercicios) ? a.ejercicios : [],
     foodPlan: b?.plan || null,
     workoutLoaded: Boolean(a), nutritionLoaded: Boolean(b),
