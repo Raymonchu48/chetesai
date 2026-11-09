@@ -83,6 +83,26 @@ export async function POST(request: Request) {
         body: JSON.stringify({ cliente_id: id, fecha, ...parsed.data, updated_at: new Date().toISOString() }),
       },
     );
-    return NextResponse.json({ ok: true, data: data[0] || null });
+    let alertCreated = false;
+    if (parsed.data.molestias) {
+      try {
+        const already = await serviceFetch<Array<{ id: string }>>(
+          `coach_avisos_profesional?cliente_id=eq.${encodeURIComponent(id)}&tipo=eq.molestias&created_at=gte.${encodeURIComponent(fecha + "T00:00:00Z")}&select=id&limit=1`,
+        );
+        if (!already.length) {
+          await serviceFetch("coach_avisos_profesional", {
+            method: "POST", headers: { Prefer: "return=minimal" },
+            body: JSON.stringify({
+              cliente_id: id, tipo: "molestias",
+              mensaje: `El cliente ha indicado molestias en su valoración de bienestar del ${fecha}. Energía: ${parsed.data.energia}/5. Revisar antes de entrenar.`,
+            }),
+          });
+          alertCreated = true;
+        }
+      } catch {
+        // The daily assessment was saved; a communication failure must not undo it.
+      }
+    }
+    return NextResponse.json({ ok: true, data: data[0] || null, alertCreated });
   } catch (error) { return handleError(error); }
 }
