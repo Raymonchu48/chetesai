@@ -24,8 +24,10 @@ export async function loadCoachContext(): Promise<CoachContext> {
     fetch("/api/portal/rutina", { cache: "no-store" }).then(async (r) => { if (!r.ok) throw Error("No routine"); return r.json(); }),
     fetch("/api/portal/bienestar", { cache: "no-store" }).then(async (r) => { if (!r.ok) throw Error("No nutrition"); return r.json(); }),
   ]);
-  const a = responses[0].status === "fulfilled" && responses[0].value?.ok ? responses[0].value.data : null;
-  const b = responses[1].status === "fulfilled" && responses[1].value?.ok ? responses[1].value.data : null;
+  const a = responses[0].status === "fulfilled" && responses[0].value && typeof responses[0].value === "object" && "ok" in responses[0].value && responses[0].value.ok
+    ? (responses[0].value as { data?: any }).data : null;
+  const b = responses[1].status === "fulfilled" && responses[1].value && typeof responses[1].value === "object" && "ok" in responses[1].value && responses[1].value.ok
+    ? (responses[1].value as { data?: any }).data : null;
   return {
     name: String(a?.cliente?.nombre || b?.cliente?.nombre || "").trim().split(/\s+/)[0] || "",
     workout: a?.rutina || null,
