@@ -87,6 +87,8 @@ export function ChetesaiAiAssistant() {
   const [preEnergy, setPreEnergy] = useState(3);
   const [preDiscomfort, setPreDiscomfort] = useState(false);
   const [postEffort, setPostEffort] = useState(5);
+  const [actualReps, setActualReps] = useState("");
+  const [actualWeight, setActualWeight] = useState("");
   const [wellnessNotes, setWellnessNotes] = useState("");
   const [preWellness, setPreWellness] = useState<Wellness | null>(null);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
@@ -122,7 +124,12 @@ export function ChetesaiAiAssistant() {
 
   async function startGuidedWorkout() {
     if (!isPortal || workingOut) return;
-    if (preDiscomfort) {
+    if (!preWellness) {
+      setWellnessOpen(true);
+      respond("Antes de comenzar, indica cómo te encuentras. Es una comprobación rápida para adaptar el acompañamiento sin cambiar tu rutina.");
+      return;
+    }
+    if (preWellness.discomfort) {
       respond("Has indicado molestias antes de entrenar. No iniciaré una sesión guiada sin que lo revise tu profesional. Si tienes dolor agudo o síntomas preocupantes, no entrenes y busca atención sanitaria.");
       setWellnessOpen(true);
       return;
@@ -152,6 +159,10 @@ export function ChetesaiAiAssistant() {
 
   async function completeGuidedSet() {
     if (!pendingSet || workingOut || !guidedSession) return;
+    if ((actualReps && (!Number.isInteger(Number(actualReps)) || Number(actualReps) < 0 || Number(actualReps) > 1000)) || (actualWeight && (!Number.isFinite(Number(actualWeight)) || Number(actualWeight) < 0 || Number(actualWeight) > 1000))) {
+      respond("Introduce repeticiones y peso válidos, o déjalos vacíos si no deseas registrarlos.");
+      return;
+    }
     setWorkingOut(true);
     try {
       const response = await fetch("/api/portal/entrenamiento", {
@@ -159,7 +170,7 @@ export function ChetesaiAiAssistant() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "update_set", serie_id: pendingSet.id, completada: true,
-          repeticiones_realizadas: "", peso_real: "", rpe_real: "",
+          repeticiones_realizadas: actualReps, peso_real: actualWeight, rpe_real: "",
           comentario: "Serie completada desde Chetesaí Coach IA; repeticiones y carga reales sin registrar",
         }),
       });
@@ -167,6 +178,8 @@ export function ChetesaiAiAssistant() {
       if (!response.ok || !result.ok) throw Error(result.error || "No se pudo guardar la serie");
       const updated = { ...guidedSession, series: guidedSession.series.map((set) => set.id === pendingSet.id ? { ...set, completada: true } : set) };
       setGuidedSession(updated);
+      setActualReps("");
+      setActualWeight("");
       const remaining = updated.series.filter((set) => !set.completada).length;
       if (remaining) {
         setRestSeconds(Math.max(0, Math.min(600, Number((pendingExercise as { descanso_segundos?: number } | undefined)?.descanso_segundos || 60))));
@@ -498,6 +511,14 @@ export function ChetesaiAiAssistant() {
                 <>
                   <p className="font-semibold">{pendingExercise?.ejercicios?.nombre || "Siguiente ejercicio"} · Serie {pendingSet.numero_serie}</p>
                   <p>{pendingSet.repeticiones_objetivo || "Repeticiones según tu plan"} {restSeconds > 0 ? `· Descanso ${restSeconds}s` : ""}</p>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <label className="text-[11px]">Repeticiones reales
+                      <input inputMode="numeric" type="number" min="0" max="1000" value={actualReps} onChange={e=>setActualReps(e.target.value)} placeholder="Opcional" className="mt-1 w-full rounded-lg border bg-white p-2" />
+                    </label>
+                    <label className="text-[11px]">Peso real (kg)
+                      <input inputMode="decimal" type="number" min="0" max="1000" step="0.5" value={actualWeight} onChange={e=>setActualWeight(e.target.value)} placeholder="Opcional" className="mt-1 w-full rounded-lg border bg-white p-2" />
+                    </label>
+                  </div>
                   <div className="mt-2 flex gap-2">
                     <button type="button" disabled={workingOut || restSeconds > 0} onClick={() => void completeGuidedSet()} className="flex items-center gap-1 rounded-xl bg-[#2f9e24] px-3 py-2 font-bold text-white disabled:opacity-50"><CheckCircle2 className="h-4 w-4" /> Serie terminada</button>
                     <button type="button" onClick={() => { setRestSeconds(0); router.push("/portal"); setOpen(false); }} className="rounded-xl border border-[#bad0b5] px-3 py-2 font-bold">Ver ejercicios</button>
