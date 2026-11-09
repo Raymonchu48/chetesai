@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { coachAnswer, coachToday, loadCoachContext, type CoachContext } from "@/lib/coach-companion";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -36,8 +37,8 @@ const publicActions: QuickAction[] = [
 ];
 
 const portalActions: QuickAction[] = [
-  { label: "Entrenamiento", icon: Dumbbell, action: "/portal" },
-  { label: "Mi nutrición", icon: Apple, action: "/portal/bienestar" },
+  { label: "¿Qué me toca hoy?", icon: Dumbbell, action: "today-workout" },
+  { label: "¿Qué como hoy?", icon: Apple, action: "today-food" },
   { label: "Mi progreso", icon: TrendingUp, action: "/portal/progreso" },
   { label: "Mis citas", icon: CalendarDays, action: "/portal/citas" },
 ];
@@ -58,6 +59,8 @@ export function ChetesaiAiAssistant() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+  const [coachContext, setCoachContext] = useState<CoachContext | null>(null);
+  const [loadingCoach, setLoadingCoach] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
       id: "welcome",
@@ -67,6 +70,28 @@ export function ChetesaiAiAssistant() {
     },
   ]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const greetedRef = useRef(false);
+  useEffect(() => {
+    if (!isPortal) { setCoachContext(null); greetedRef.current = false; return; }
+    let active = true;
+    setLoadingCoach(true);
+    loadCoachContext().then((ctx) => {
+      if (!active) return;
+      setCoachContext(ctx);
+      if (!greetedRef.current) {
+        greetedRef.current = true;
+        const { greeting } = coachToday();
+        setMessages([createMessage("assistant", `${greeting}${ctx.name ? ", " + ctx.name : ""}! Soy tu Chetesaí Coach IA. Me alegra verte de nuevo. ¿Qué hacemos hoy? Pregúntame qué te toca entrenar, qué comes hoy o cómo consultar tu progreso.`)]);
+      }
+    }).catch(() => {
+      if (active && !greetedRef.current) {
+        greetedRef.current = true;
+        setMessages([createMessage("assistant", "¡Hola! Soy tu Chetesaí Coach IA. ¿Qué hacemos hoy? Puedes consultar tu entrenamiento, nutrición o progreso.")]);
+      }
+    }).finally(() => { if (active) setLoadingCoach(false); });
+    return () => { active = false; };
+  }, [isPortal]);
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -96,6 +121,12 @@ export function ChetesaiAiAssistant() {
     : "bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+5rem)] max-h-[min(74dvh,680px)]";
 
   function runQuickAction(action: string) {
+    if (action === "today-workout" || action === "today-food") {
+      const question = action === "today-workout" ? "¿Qué me toca entrenar hoy?" : "¿Qué como hoy?";
+      const reply = coachAnswer(question, coachContext) || "Consulta tu planificación en el portal.";
+      setMessages((current) => [...current, createMessage("user", question), createMessage("assistant", reply)]);
+      return;
+    }
     if (action.startsWith("/")) {
       router.push(action);
       setOpen(false);
@@ -128,6 +159,12 @@ export function ChetesaiAiAssistant() {
     const content = input.trim();
     if (!content || sending) return;
 
+    const personalAnswer = isPortal ? coachAnswer(content, coachContext) : null;
+    if (personalAnswer) {
+      setMessages((current) => [...current, createMessage("user", content), createMessage("assistant", personalAnswer)]);
+      setInput("");
+      return;
+    }
     const userMessage = createMessage("user", content);
     const conversation = [...messages, userMessage];
     setMessages(conversation);
@@ -195,13 +232,11 @@ export function ChetesaiAiAssistant() {
         className={`fixed inset-x-3 z-[74] flex flex-col overflow-hidden rounded-[28px] border border-[#b38d45]/35 bg-[#f9f7f2] shadow-[0_28px_80px_rgba(0,0,0,0.45)] animate-in fade-in slide-in-from-bottom-4 duration-300 sm:inset-x-auto sm:right-6 sm:w-[390px] ${panelPosition}`}
       >
         <header className="flex items-center gap-3 bg-gradient-to-r from-[#111713] to-[#1b2721] px-5 py-4 text-white">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-[#8cdb78]/25 bg-[#8cdb78]/10 text-[#9fe68f]">
-            <Sparkles className="h-5 w-5" />
-          </span>
+          <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl border border-[#8cdb78]/60 bg-[#15251b]"><Image src="/brand/chetesai-coach-avatar.webp" alt="Mini coach Chetesaí" fill sizes="44px" className="object-cover" /></span>
           <div className="min-w-0 flex-1">
             <p className="font-black">Chetesaí Coach IA</p>
             <p className="flex items-center gap-1.5 text-xs text-white/60">
-              <span className="h-2 w-2 rounded-full bg-[#62ce55]" /> Orientación inmediata
+              <span className="h-2 w-2 rounded-full bg-[#62ce55]" /> {isPortal ? "Tu acompañante personal" : "Orientación inmediata"}
             </p>
           </div>
           <button
@@ -216,7 +251,8 @@ export function ChetesaiAiAssistant() {
 
         <div ref={scrollRef} aria-live="polite" className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
           {messages.map((message) => (
-            <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div key={message.id} className={`flex items-end gap-2 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+              {message.role === "assistant" ? <span className="relative mb-1 h-8 w-8 shrink-0 overflow-hidden rounded-full border border-[#b6d8a9]"><Image src="/brand/chetesai-coach-avatar.webp" alt="" fill sizes="32px" className="object-cover" /></span> : null}
               <p
                 className={`max-w-[88%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-6 ${
                   message.role === "user"
@@ -264,7 +300,7 @@ export function ChetesaiAiAssistant() {
               value={input}
               onChange={(event) => setInput(event.target.value)}
               maxLength={800}
-              placeholder="Pregúntame sobre Chetesaí…"
+              placeholder={isPortal ? "Pregunta por tu entrenamiento o nutrición…" : "Pregúntame sobre Chetesaí…"}
               className="min-w-0 flex-1 rounded-2xl border border-[#d8d2c8] bg-white px-4 py-3 text-sm text-[#202724] outline-none transition placeholder:text-[#89918d] focus:border-[#2f9e24] focus:ring-2 focus:ring-[#2f9e24]/15"
             />
             <button
@@ -278,7 +314,7 @@ export function ChetesaiAiAssistant() {
           </form>
 
           <div className="mt-3 flex items-center justify-between gap-3 text-[10px] leading-4 text-[#737b77]">
-            <p>Orientación general · No sustituye atención médica</p>
+            <p>{isPortal ? (loadingCoach ? "Consultando tus planes…" : "Seguimiento personalizado · Supervisión profesional") : "Orientación general · No sustituye atención médica"}</p>
             <button type="button" onClick={() => runQuickAction("contact")} className="flex shrink-0 items-center gap-1 font-bold text-[#2f6f28] hover:underline">
               <Mail className="h-3 w-3" /> Ramón <ChevronRight className="h-3 w-3" />
             </button>
