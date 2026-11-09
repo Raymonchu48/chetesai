@@ -282,7 +282,23 @@ export function ChetesaiAiAssistant() {
 
   const greetedRef = useRef(false);
   useEffect(() => {
-    if (!isPortal) { setCoachContext(null); greetedRef.current = false; return; }
+    if (!isPortal) {
+      setCoachContext(null);
+      setGuidedSession(null);
+      setPreWellness(null);
+      setWellnessNotes("");
+      setRestSeconds(0);
+      setOpen(false);
+      setVoiceEnabled(false);
+      setMessages([{
+        id: "welcome-public",
+        role: "assistant",
+        content: "¡Hola! Soy Chetesaí Coach IA. Puedo orientarte sobre los servicios, tarifas y el funcionamiento de Chetesaí Fitness+.",
+      }]);
+      if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
+      greetedRef.current = false;
+      return;
+    }
     let active = true;
     setLoadingCoach(true);
     loadCoachContext().then((ctx) => {
