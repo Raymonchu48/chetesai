@@ -8,7 +8,7 @@ export default function CoachAlertsPage() {
  const [error,setError]=useState("");
  const refresh=useCallback(async()=>{
   setLoading(true);try{const res=await fetch("/api/portal/coach-consulta",{cache:"no-store"});
-  const data=await res.json();if(!res.ok||!data.ok)throw Error(data.error||"No autorizado");
+  const data=(await res.json()) as {ok?:boolean;error?:string;avisos?:Alert[]};if(!res.ok||!data.ok)throw Error(data.error||"No autorizado");
   setItems(data.avisos||[]);setError("");}catch(e){setError(e instanceof Error?e.message:"Error");}finally{setLoading(false);}
  },[]);
  useEffect(()=>{void refresh();},[refresh]);
