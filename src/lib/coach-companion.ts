@@ -1,7 +1,8 @@
 export type CoachContext = {
   name: string;
   workout: { nombre: string; duracion_sesion_minutos?: number | null } | null;
-  exercises: Array<{ dia: number; orden: number; series: number; repeticiones: string; ejercicios?: { nombre: string } }>;
+  visualModel: "hombre" | "mujer";
+  exercises: Array<{ id: string; dia: number; orden: number; series: number; repeticiones: string; descanso_segundos?: number; ejercicios?: { nombre: string; video_url?: string | null; video_mujer_url?: string | null; gif_url?: string | null } }>;
   foodPlan: { nombre: string; comidas: Array<{ nombre: string; hora?: string; descripcion?: string; alimentos?: Array<{ nombre: string; cantidad_g: number; unidad_medida?: string }> }> } | null;
   workoutLoaded: boolean;
   nutritionLoaded: boolean;
@@ -31,6 +32,7 @@ export async function loadCoachContext(): Promise<CoachContext> {
   return {
     name: String(a?.cliente?.nombre || b?.cliente?.nombre || "").trim().split(/\s+/)[0] || "",
     workout: a?.rutina || null,
+    visualModel: a?.cliente?.modelo_visual === "mujer" ? "mujer" : "hombre",
     exercises: Array.isArray(a?.ejercicios) ? a.ejercicios : [],
     foodPlan: b?.plan || null,
     workoutLoaded: Boolean(a), nutritionLoaded: Boolean(b),
@@ -63,4 +65,43 @@ export function coachAnswer(question: string, ctx: CoachContext | null): string 
   const exercises = ctx.exercises.filter(x => Number(x.dia) === index).sort((a,b)=>a.orden-b.orden);
   if (!exercises.length) return `Hoy es ${label} y tu rutina «${ctx.workout.nombre}» no tiene ejercicios previstos para este día. Si tu calendario de entrenamiento es distinto, consúltalo con tu profesional.`;
   return `¡Vamos con tu entrenamiento de ${label}! Tu rutina «${ctx.workout.nombre}» incluye:\n\n${exercises.slice(0, 12).map(x => `• ${x.ejercicios?.nombre || "Ejercicio"}: ${x.series} series × ${x.repeticiones || "repeticiones asignadas"}`).join("\n")}${ctx.workout.duracion_sesion_minutos ? `\n\nDuración orientativa: ${ctx.workout.duracion_sesion_minutos} minutos.` : ""}\n\nAbre «Entrenamiento» en tu portal para consultar la técnica y registrar tu sesión.`;
+}
+
+/** Consultas de comidas específicas sobre el plan aprobado, sin generar sustituciones. */
+export function specificMealAnswer(question: string, ctx: CoachContext | null): string | null {
+  const q = question.toLocaleLowerCase("es").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const keywords: Record<string, string[]> = {
+    desayuno: ["desayun"], almuerzo: ["almorz", "media manana"], comida: ["comer", "comida"],
+    merienda: ["meriend"], cena: ["cenar", "cena"], recena: ["recena"],
+  };
+  const type = Object.keys(keywords).find(key => keywords[key].some(word => q.includes(word)));
+  const quantity = /cuant[oa]s?|gramos|cantidad|porci[oó]n|raci[oó]n/.test(q);
+  const foodLookup = /(?:cuant|gramos|cantidad|porci|raci|que tengo|que hay|que me toca|que debo)/.test(q);
+  if (!foodLookup) return null;
+  if (!type && !quantity) return null;
+  if (!ctx?.nutritionLoaded) return "No puedo consultar ahora tu plan nutricional. Comprueba «Mi nutrición» desde el portal.";
+  if (!ctx.foodPlan) return "No hay un plan nutricional aprobado y activo para consultar.";
+  const { label } = coachToday();
+  const all = ctx.foodPlan.comidas || [];
+  const hasDays = all.some(meal => dayNames.slice(1).some(day => meal.nombre.toLocaleLowerCase("es").startsWith(day.toLocaleLowerCase("es") + " · ")));
+  const todayMeals = hasDays ? all.filter(meal => meal.nombre.toLocaleLowerCase("es").startsWith(label.toLocaleLowerCase("es") + " · ")) : all;
+  if (!type) {
+    const search = q.replace(/\b(cuantos|cuantas|cuanto|cuanta|gramos|cantidad|porcion|racion|de|del|la|el|los|las|tengo|que|hoy|mi|plan|comer|como|para|en|hay|debo|deberia|al|se|sirven|esta)\b/g, " ").replace(/[¿?.,]/g, " ").split(/\s+/).filter(word => word.length > 3);
+    if (!search.length) return "Dime qué alimento de tu plan quieres consultar, por ejemplo: «¿Cuántos gramos de arroz tengo hoy?»";
+    const found = todayMeals.flatMap(meal => (meal.alimentos || [])
+      .filter(food => search.some(word => food.nombre.toLocaleLowerCase("es").normalize("NFD").replace(/[\u0300-\u036f]/g,"").includes(word)))
+      .map(food => `${meal.nombre}: ${food.nombre}, ${food.cantidad_g} ${food.unidad_medida || "g"}`));
+    if (found.length) return `Según tu plan de hoy (${label}):\n${found.slice(0,8).map(x => "• " + x).join("\n")}\n\nEstas son las cantidades publicadas por tu profesional.`;
+    return "No he localizado ese alimento entre las comidas de hoy. Puedes ver todos los ingredientes en «Mi nutrición».";
+  }
+  const matching = todayMeals.filter(meal => {
+    const title = meal.nombre.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+    return keywords[type].some(word => title.includes(word)) || (type === "comida" && /almuerzo|comida/.test(title));
+  });
+  if (!matching.length) return `En tu plan «${ctx.foodPlan.nombre}» no hay una ${type} detallada para hoy (${label}). Puedes consultarlo con tu profesional.`;
+  return matching.slice(0,3).map(meal => {
+    const foods = (meal.alimentos || []).map(item => `• ${item.nombre}: ${item.cantidad_g} ${item.unidad_medida || "g"}`);
+    const details = foods.length ? foods.join("\n") : meal.descripcion || "Consulta el detalle en «Mi nutrición».";
+    return `${meal.nombre}${meal.hora ? " · " + meal.hora : ""}\n${details}${quantity && !foods.length ? "\nLas cantidades no están desglosadas en el plan." : ""}`;
+  }).join("\n\n") + "\n\nEstas cantidades son las indicadas en tu planificación profesional.";
 }

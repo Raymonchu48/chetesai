@@ -166,7 +166,14 @@ export async function PATCH(request: NextRequest) {
     if (action === "finish_session") {
       const sessionId = String(body.session_id || "");
       const payload = await getSessionPayload(sessionId);
-      if (!payload.sesion) return NextResponse.json({ ok: false, error: "Sesión no encontrada" }, { status: 404 });
+      if (!payload.sesion || String(payload.sesion.cliente_id) !== String(cliente.id) || String(payload.sesion.estado) !== "en_curso") {
+        return NextResponse.json({ ok: false, error: "Sesión no disponible para este cliente" }, { status: 404 });
+      }
+      const rawEffort = body.rpe_sesion;
+      const effort = rawEffort === "" || rawEffort == null ? null : Number(rawEffort);
+      if (effort !== null && (!Number.isInteger(effort) || effort < 1 || effort > 10)) {
+        return NextResponse.json({ ok: false, error: "Valor de esfuerzo no válido (1–10)" }, { status: 400 });
+      }
       const completed = payload.series.filter((row) => row.completada === true);
       const volume = completed.reduce((sum, row) => sum + Number(row.peso_real || 0) * Number(row.repeticiones_realizadas || 0), 0);
       const exerciseIds = new Set(completed.map((row) => String(row.rutina_ejercicio_id)));
@@ -182,7 +189,7 @@ export async function PATCH(request: NextRequest) {
           series_completadas: completed.length,
           ejercicios_completados: exerciseIds.size,
           volumen_total: volume,
-          rpe_sesion: body.rpe_sesion === "" ? null : Number(body.rpe_sesion),
+          rpe_sesion: effort,
           comentario_cliente: body.comentario_cliente ? String(body.comentario_cliente) : null,
           updated_at: new Date().toISOString(),
         }),
