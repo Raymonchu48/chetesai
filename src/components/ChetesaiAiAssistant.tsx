@@ -15,6 +15,8 @@ import {
   Send,
   Sparkles,
   TrendingUp,
+  Volume2,
+  VolumeX,
   X,
 } from "lucide-react";
 
@@ -61,6 +63,10 @@ export function ChetesaiAiAssistant() {
   const [sending, setSending] = useState(false);
   const [coachContext, setCoachContext] = useState<CoachContext | null>(null);
   const [loadingCoach, setLoadingCoach] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [voiceAvailable, setVoiceAvailable] = useState(false);
+  const spokenMessageRef = useRef<string | null>(null);
+  const coachAvatar = "/brand/chetesai-mini-coach.svg";
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
       id: "welcome",
@@ -70,6 +76,45 @@ export function ChetesaiAiAssistant() {
     },
   ]);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setVoiceAvailable(typeof window !== "undefined" && "speechSynthesis" in window && "SpeechSynthesisUtterance" in window);
+    return () => {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  function speakMessage(message: ChatMessage) {
+    if (!("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(message.content);
+    utterance.lang = "es-ES";
+    utterance.rate = 0.96;
+    const voices = window.speechSynthesis.getVoices();
+    const spanishVoice = voices.find((voice) => voice.lang.toLowerCase() === "es-es") || voices.find((voice) => voice.lang.toLowerCase().startsWith("es"));
+    if (spanishVoice) utterance.voice = spanishVoice;
+    window.speechSynthesis.speak(utterance);
+    spokenMessageRef.current = message.id;
+  }
+
+  function toggleVoice() {
+    if (!voiceAvailable) return;
+    if (voiceEnabled) {
+      window.speechSynthesis.cancel();
+      setVoiceEnabled(false);
+    } else {
+      setVoiceEnabled(true);
+      const latest = [...messages].reverse().find((message) => message.role === "assistant");
+      if (latest) speakMessage(latest);
+    }
+  }
+
+  useEffect(() => {
+    if (!voiceEnabled || !open || !isPortal) return;
+    const latest = messages[messages.length - 1];
+    if (latest?.role === "assistant" && latest.id !== spokenMessageRef.current) speakMessage(latest);
+  }, [messages, voiceEnabled, open, isPortal]);
+
   const greetedRef = useRef(false);
   useEffect(() => {
     if (!isPortal) { setCoachContext(null); greetedRef.current = false; return; }
@@ -82,6 +127,7 @@ export function ChetesaiAiAssistant() {
         greetedRef.current = true;
         const { greeting } = coachToday();
         setMessages([createMessage("assistant", `${greeting}${ctx.name ? ", " + ctx.name : ""}! Soy tu Chetesaí Coach IA. Me alegra verte de nuevo. ¿Qué hacemos hoy? Pregúntame qué te toca entrenar, qué comes hoy o cómo consultar tu progreso.`)]);
+        if (ctx.workoutLoaded || ctx.nutritionLoaded) setOpen(true);
       }
     }).catch(() => {
       if (active && !greetedRef.current) {
@@ -102,9 +148,9 @@ export function ChetesaiAiAssistant() {
     };
 
     window.addEventListener("keydown", handleEscape);
-    window.setTimeout(() => inputRef.current?.focus(), 150);
+    if (!isPortal) window.setTimeout(() => inputRef.current?.focus(), 150);
     return () => window.removeEventListener("keydown", handleEscape);
-  }, [open]);
+  }, [open, isPortal]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -117,7 +163,7 @@ export function ChetesaiAiAssistant() {
     ? "bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+5.5rem)] md:bottom-[max(1.25rem,env(safe-area-inset-bottom))]"
     : "bottom-[max(1.25rem,env(safe-area-inset-bottom))]";
   const panelPosition = isPortal
-    ? "bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+10.5rem)] max-h-[min(62dvh,580px)] md:bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+5rem)] md:max-h-[min(74dvh,680px)]"
+    ? "bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+10.5rem)] max-h-[min(62dvh,580px)] md:top-24 md:bottom-6 md:h-[min(680px,calc(100dvh-7rem))] md:max-h-none"
     : "bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+5rem)] max-h-[min(74dvh,680px)]";
 
   function runQuickAction(action: string) {
@@ -202,7 +248,7 @@ export function ChetesaiAiAssistant() {
     <>
       <button
         type="button"
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => { if (open && voiceAvailable) window.speechSynthesis.cancel(); setOpen((current) => !current); }}
         aria-label={open ? "Cerrar Chetesaí Coach IA" : "Abrir Chetesaí Coach IA"}
         aria-expanded={open}
         className={`group fixed right-4 z-[75] grid h-16 w-16 place-items-center rounded-full border border-[#d7b86b]/60 bg-gradient-to-br from-[#17201c] to-[#080b09] text-white shadow-[0_16px_45px_rgba(0,0,0,0.38)] transition duration-300 hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#8cdb78] focus:ring-offset-2 sm:right-6 ${launcherPosition}`}
@@ -210,7 +256,7 @@ export function ChetesaiAiAssistant() {
         {open ? <X className="h-6 w-6" /> : (
           <span className="absolute inset-[3px] overflow-hidden rounded-full border border-white/20 bg-[#111713] ring-1 ring-[#d7b86b]/35">
             <Image
-              src="/brand/chetesai-coach-avatar.webp"
+              src={coachAvatar}
               alt=""
               fill
               sizes="64px"
@@ -232,16 +278,28 @@ export function ChetesaiAiAssistant() {
         className={`fixed inset-x-3 z-[74] flex flex-col overflow-hidden rounded-[28px] border border-[#b38d45]/35 bg-[#f9f7f2] shadow-[0_28px_80px_rgba(0,0,0,0.45)] animate-in fade-in slide-in-from-bottom-4 duration-300 sm:inset-x-auto sm:right-6 sm:w-[390px] ${panelPosition}`}
       >
         <header className="flex items-center gap-3 bg-gradient-to-r from-[#111713] to-[#1b2721] px-5 py-4 text-white">
-          <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl border border-[#8cdb78]/60 bg-[#15251b]"><Image src="/brand/chetesai-coach-avatar.webp" alt="Mini coach Chetesaí" fill sizes="44px" className="object-cover" /></span>
+          <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl border border-[#8cdb78]/60 bg-[#15251b]"><Image src={coachAvatar} alt="Mini coach Chetesaí" fill sizes="44px" className="object-cover" /></span>
           <div className="min-w-0 flex-1">
             <p className="font-black">Chetesaí Coach IA</p>
             <p className="flex items-center gap-1.5 text-xs text-white/60">
               <span className="h-2 w-2 rounded-full bg-[#62ce55]" /> {isPortal ? "Tu acompañante personal" : "Orientación inmediata"}
             </p>
           </div>
+          {isPortal && voiceAvailable ? (
+            <button
+              type="button"
+              onClick={toggleVoice}
+              aria-label={voiceEnabled ? "Silenciar voz del coach" : "Activar voz del coach"}
+              aria-pressed={voiceEnabled}
+              title={voiceEnabled ? "Desactivar voz" : "Escuchar al coach"}
+              className="grid h-10 w-10 place-items-center rounded-xl text-[#c7e9bd] transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#8cdb78]"
+            >
+              {voiceEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+            </button>
+          ) : null}
           <button
             type="button"
-            onClick={() => setOpen(false)}
+            onClick={() => { setOpen(false); if (voiceAvailable) window.speechSynthesis.cancel(); }}
             className="grid h-10 w-10 place-items-center rounded-xl text-white/65 transition hover:bg-white/10 hover:text-white"
             aria-label="Cerrar asistente"
           >
@@ -252,7 +310,7 @@ export function ChetesaiAiAssistant() {
         <div ref={scrollRef} aria-live="polite" className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
           {messages.map((message) => (
             <div key={message.id} className={`flex items-end gap-2 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-              {message.role === "assistant" ? <span className="relative mb-1 h-8 w-8 shrink-0 overflow-hidden rounded-full border border-[#b6d8a9]"><Image src="/brand/chetesai-coach-avatar.webp" alt="" fill sizes="32px" className="object-cover" /></span> : null}
+              {message.role === "assistant" ? <span className="relative mb-1 h-8 w-8 shrink-0 overflow-hidden rounded-full border border-[#b6d8a9]"><Image src={coachAvatar} alt="" fill sizes="32px" className="object-cover" /></span> : null}
               <p
                 className={`max-w-[88%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-6 ${
                   message.role === "user"
