@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { CoachPushSettings } from "@/components/CoachPushSettings";
 import { coachAnswer, coachToday, loadCoachContext, specificMealAnswer, type CoachContext } from "@/lib/coach-companion";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -15,6 +16,11 @@ import {
   HeartPulse,
   LoaderCircle,
   Mail,
+  Mic,
+  MicOff,
+  BellRing,
+  History,
+  MessageSquare,
   MessageCircle,
   Send,
   Sparkles,
@@ -62,6 +68,9 @@ const portalActions: QuickAction[] = [
   { label: "Mi progreso", icon: TrendingUp, action: "/portal/progreso" },
   { label: "Mis citas", icon: CalendarDays, action: "/portal/citas" },
   { label: "Eventos especiales", icon: CalendarDays, action: "/portal/eventos" },
+  { label: "Notificaciones", icon: BellRing, action: "push-settings" },
+  { label: "Historial", icon: History, action: "history" },
+  { label: "Consultar profesional", icon: MessageSquare, action: "consult-professional" },
 ];
 
 function createMessage(role: ChatMessage["role"], content: string): ChatMessage {
@@ -94,6 +103,16 @@ export function ChetesaiAiAssistant() {
   const [wellnessNotes, setWellnessNotes] = useState("");
   const [preWellness, setPreWellness] = useState<Wellness | null>(null);
   const [savingWellness, setSavingWellness] = useState(false);
+  const [pushOpen, setPushOpen] = useState(false);
+  const [consultOpen, setConsultOpen] = useState(false);
+  const [consultText, setConsultText] = useState("");
+  const [consultSending, setConsultSending] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [voiceListening, setVoiceListening] = useState(false);
+  const recognitionRef = useRef<{stop:()=>void}|null>(null);
+  const savedIdsRef = useRef(new Set<string>());
+  const historyInitializedRef = useRef(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [voiceAvailable, setVoiceAvailable] = useState(false);
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -122,6 +141,70 @@ export function ChetesaiAiAssistant() {
     },
   ]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!isPortal) { historyInitializedRef.current=false; savedIdsRef.current.clear(); return; }
+    if (!historyInitializedRef.current) {
+      historyInitializedRef.current=true;
+      messages.forEach(m=>savedIdsRef.current.add(m.id));
+      return;
+    }
+    const newItems=messages.filter(m=>!savedIdsRef.current.has(m.id));
+    for(const m of newItems) {
+      savedIdsRef.current.add(m.id);
+      void fetch("/api/portal/coach-historial",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({rol:m.role,contenido:m.content.slice(0,3000)})
+      }).catch(()=>{});
+    }
+  },[isPortal,messages]);
+
+  async function openHistory() {
+    setHistoryOpen(true); setHistoryLoading(true);
+    try{
+      const r=await fetch("/api/portal/coach-historial",{cache:"no-store"});
+      const data=await r.json() as {ok?:boolean;mensajes?:Array<{id:string;rol:"user"|"assistant";contenido:string}>};
+      if(!r.ok||!data.ok)throw Error("No se pudo recuperar el historial");
+      const restored=(data.mensajes||[]).map(m=>({id:"saved-"+m.id,role:m.rol,content:m.contenido}));
+      restored.forEach(m=>savedIdsRef.current.add(m.id));
+      setMessages(current=>[...restored,...current]);
+    }catch{respond("No se ha podido recuperar tu historial privado.");}
+    finally{setHistoryLoading(false);}
+  }
+  async function eraseHistory() {
+    if(!window.confirm("¿Eliminar el historial guardado de tu Coach IA?"))return;
+    try{const r=await fetch("/api/portal/coach-historial",{method:"DELETE"});if(!r.ok)throw Error();
+      setMessages(current=>current.filter(m=>!m.id.startsWith("saved-")));
+      setHistoryOpen(false);
+      respond("Se ha eliminado el historial guardado de tu cuenta.");
+    }catch{respond("No se pudo borrar el historial. Inténtalo de nuevo.");}
+  }
+  async function sendConsultation() {
+    if(consultText.trim().length<5 || consultSending)return;
+    setConsultSending(true);
+    try{const res=await fetch("/api/portal/coach-consulta",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tipo:"consulta",mensaje:consultText.trim()})});
+      if(!res.ok)throw Error();
+      setConsultOpen(false);setConsultText("");
+      respond("He enviado tu consulta al panel profesional de Chetesaí. La respuesta no es automática.");
+    }catch{respond("No he podido enviar la consulta. Prueba de nuevo o contacta directamente con tu profesional.");}
+    finally{setConsultSending(false);}
+  }
+  function toggleMicrophone() {
+    if(voiceListening){recognitionRef.current?.stop();setVoiceListening(false);return;}
+    const w=window as unknown as {SpeechRecognition?:new()=>any;webkitSpeechRecognition?:new()=>any};
+    const SpeechRecognition=w.SpeechRecognition||w.webkitSpeechRecognition;
+    if(!SpeechRecognition){respond("Este navegador no admite dictado por voz. Puedes escribir tu pregunta.");return;}
+    const recog=new SpeechRecognition();
+    recog.lang="es-ES";recog.interimResults=false;recog.continuous=false;
+    recog.onresult=(event:any)=>{
+      const transcript=String(event.results?.[0]?.[0]?.transcript||"").trim();
+      if(transcript)setInput(current=>[current,transcript].filter(Boolean).join(" ").slice(0,800));
+    };
+    recog.onerror=()=>setVoiceListening(false);
+    recog.onend=()=>{setVoiceListening(false);recognitionRef.current=null;};
+    recognitionRef.current=recog;setVoiceListening(true);
+    try{recog.start();}catch{setVoiceListening(false);}
+  }
+
 
   useEffect(() => {
     if (!isPortal || restSeconds <= 0) return;
@@ -319,6 +402,11 @@ export function ChetesaiAiAssistant() {
   const greetedRef = useRef(false);
   useEffect(() => {
     if (!isPortal) {
+      recognitionRef.current?.stop();
+      setVoiceListening(false);
+      setPushOpen(false);
+      setConsultOpen(false);
+      setHistoryOpen(false);
       setCoachContext(null);
       setGuidedSession(null);
       setPreWellness(null);
@@ -417,6 +505,9 @@ export function ChetesaiAiAssistant() {
   function runQuickAction(action: string) {
     if (action === "start-workout") { void startGuidedWorkout(); return; }
     if (action === "wellness") { setWellnessOpen(true); return; }
+    if (action === "push-settings") {setPushOpen(p=>!p);return;}
+    if (action === "history") {if(!historyOpen)void openHistory();else setHistoryOpen(false);return;}
+    if (action === "consult-professional") {setConsultOpen(p=>!p);return;}
     if (action === "today-workout" || action === "today-food") {
       const question = action === "today-workout" ? "¿Qué me toca entrenar hoy?" : "¿Qué como hoy?";
       const reply = coachAnswer(question, coachContext) || "Consulta tu planificación en el portal.";
@@ -589,6 +680,18 @@ export function ChetesaiAiAssistant() {
         </div>
 
         <div className="border-t border-[#ded8cd] bg-white/80 px-4 py-3">
+          {isPortal && pushOpen ? <div className="mb-2"><CoachPushSettings /></div> : null}
+          {isPortal && historyOpen ? (
+            <div className="mb-2 flex items-center justify-between rounded-xl border bg-[#f3f8f1] p-2 text-xs">
+              <span>{historyLoading?"Recuperando historial…":"Historial privado de tus conversaciones"}</span>
+              <button type="button" onClick={()=>void eraseHistory()} className="rounded-lg border px-2 py-1 font-bold">Borrar historial</button>
+            </div>
+          ) : null}
+          {isPortal && consultOpen ? <div className="mb-2 rounded-xl border border-[#c6dbc1] bg-[#f0f8ed] p-3 text-xs text-[#244528]">
+            <p className="mb-2 font-bold">Enviar consulta al profesional</p>
+            <textarea rows={3} maxLength={1000} value={consultText} onChange={e=>setConsultText(e.target.value)} placeholder="Escribe tu consulta…" className="w-full rounded-lg border bg-white p-2" />
+            <button type="button" disabled={consultSending||consultText.trim().length<5} onClick={()=>void sendConsultation()} className="mt-2 rounded-lg bg-[#2f9e24] px-3 py-2 font-bold text-white disabled:opacity-50">{consultSending?"Enviando…":"Enviar al profesional"}</button>
+          </div> : null}
           {isPortal && guidedSession ? (
             <div className="mb-3 rounded-2xl border border-[#c6dbc1] bg-[#f0f8ed] p-3 text-xs text-[#244528]">
               <p className="mb-1 flex items-center gap-2 font-black"><Dumbbell className="h-4 w-4" /> Entrenamiento guiado {workingOut ? "· Guardando…" : ""}</p>
@@ -678,6 +781,9 @@ export function ChetesaiAiAssistant() {
               placeholder={isPortal ? "Pregunta por tu entrenamiento o nutrición…" : "Pregúntame sobre Chetesaí…"}
               className="min-w-0 flex-1 rounded-2xl border border-[#d8d2c8] bg-white px-4 py-3 text-sm text-[#202724] outline-none transition placeholder:text-[#89918d] focus:border-[#2f9e24] focus:ring-2 focus:ring-[#2f9e24]/15"
             />
+            {isPortal ? <button type="button" onClick={toggleMicrophone} aria-label={voiceListening?"Detener micrófono":"Dictar mensaje"} title={voiceListening?"Detener dictado":"Hablar con el coach"} className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-[#bfd7ba] bg-[#f3f8f1] text-[#2f6f28]">
+              {voiceListening?<MicOff className="h-5 w-5"/>:<Mic className="h-5 w-5"/>}
+            </button> : null}
             <button
               type="submit"
               disabled={!input.trim() || sending}

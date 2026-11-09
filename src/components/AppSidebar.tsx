@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Activity,
+  MessageSquare,
   Apple,
   BarChart3,
   CalendarDays,
@@ -35,6 +36,7 @@ const navItems = [
   { href: "/nutricion", label: "Nutrición", icon: Apple },
   { href: "/sesiones", label: "Sesiones", icon: CalendarDays },
   { href: "/eventos", label: "Eventos", icon: PartyPopper },
+  { href: "/coach-avisos", label: "Coach IA · Avisos", icon: MessageSquare },
   { href: "/pagos", label: "Pagos", icon: CreditCard },
   { href: "/informes", label: "Informes", icon: BarChart3 },
   { href: "/proteccion-datos", label: "Protección de datos", icon: ShieldCheck },

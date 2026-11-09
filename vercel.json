@@ -4,6 +4,10 @@
     {
       "path": "/api/cron/eventos-recordatorios",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/coach-push",
+      "schedule": "15 7 * * *"
     }
   ]
 }
