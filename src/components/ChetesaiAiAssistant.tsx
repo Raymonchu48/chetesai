@@ -91,6 +91,7 @@ export function ChetesaiAiAssistant() {
   const [actualWeight, setActualWeight] = useState("");
   const [wellnessNotes, setWellnessNotes] = useState("");
   const [preWellness, setPreWellness] = useState<Wellness | null>(null);
+  const [savingWellness, setSavingWellness] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [voiceAvailable, setVoiceAvailable] = useState(false);
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -212,6 +213,8 @@ export function ChetesaiAiAssistant() {
       if (!response.ok || !result.ok) throw Error(result.error || "No se pudo finalizar");
       setGuidedSession(null);
       setPreWellness(null);
+      setWellnessOpen(false);
+      setSavingWellness(false);
       setWellnessNotes("");
       setRestSeconds(0);
       respond("¡Entrenamiento completado! He guardado tu valoración del esfuerzo en la sesión para que tu profesional pueda revisarla. ¡Buen trabajo!");
@@ -219,10 +222,27 @@ export function ChetesaiAiAssistant() {
     finally { setWorkingOut(false); }
   }
 
-  function savePreWellness() {
-    setPreWellness({ energy: preEnergy, discomfort: preDiscomfort, effort: 0, notes: "" });
-    setWellnessOpen(false);
-    respond(preDiscomfort ? "He anotado que tienes molestias. No iniciaré la sesión guiada hasta que tu profesional las revise." : `Valoración previa registrada para esta sesión: energía ${preEnergy}/5. Puedes comenzar cuando estés preparado. Al finalizar guardaremos tu esfuerzo para el seguimiento profesional.`);
+  async function savePreWellness() {
+    if (savingWellness) return;
+    setSavingWellness(true);
+    try {
+      const response = await fetch("/api/portal/coach-bienestar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ energia: preEnergy, molestias: preDiscomfort }),
+      });
+      const result = await response.json() as { ok?: boolean; error?: string };
+      if (!response.ok || !result.ok) throw Error(result.error || "No se pudo guardar la valoración");
+      setPreWellness({ energy: preEnergy, discomfort: preDiscomfort, effort: 0, notes: "" });
+      setWellnessOpen(false);
+      respond(preDiscomfort
+        ? "He registrado tu valoración de hoy y las molestias indicadas. No comenzaré el entrenamiento guiado hasta que lo revises con tu profesional."
+        : `Tu valoración de bienestar de hoy está guardada: energía ${preEnergy}/5 y sin molestias declaradas. ¿Empezamos con tu entrenamiento o quieres consultar tu alimentación?`);
+    } catch (error) {
+      respond(error instanceof Error ? `No he podido guardar tu bienestar: ${error.message}. Inténtalo de nuevo; todavía no está registrado.` : "No he podido registrar tu bienestar. Inténtalo de nuevo.");
+    } finally {
+      setSavingWellness(false);
+    }
   }
 
 
@@ -301,19 +321,41 @@ export function ChetesaiAiAssistant() {
     }
     let active = true;
     setLoadingCoach(true);
-    loadCoachContext().then((ctx) => {
+    Promise.all([
+      loadCoachContext(),
+      fetch("/api/portal/coach-bienestar", { cache: "no-store" })
+        .then(async (response) => {
+          const result = await response.json() as { ok?: boolean; data?: { energia: number; molestias: boolean } | null; error?: string };
+          if (!response.ok || !result.ok) throw Error(result.error || "No se pudo consultar el bienestar");
+          return result.data || null;
+        }),
+    ]).then(([ctx, dailyWellness]) => {
       if (!active) return;
       setCoachContext(ctx);
       if (!greetedRef.current) {
         greetedRef.current = true;
         const { greeting } = coachToday();
-        setMessages([createMessage("assistant", `${greeting}${ctx.name ? ", " + ctx.name : ""}! Soy tu Chetesaí Coach IA. Me alegra verte de nuevo. ¿Qué hacemos hoy? Pregúntame qué te toca entrenar, qué comes hoy o cómo consultar tu progreso.`)]);
-        if (ctx.workoutLoaded || ctx.nutritionLoaded) setOpen(true);
+        const welcome = createMessage("assistant", `${greeting}${ctx.name ? ", " + ctx.name : ""}! Soy tu Chetesaí Coach IA. Me alegra verte de nuevo.`);
+        if (dailyWellness) {
+          setPreEnergy(dailyWellness.energia);
+          setPreDiscomfort(dailyWellness.molestias);
+          setPreWellness({ energy: dailyWellness.energia, discomfort: dailyWellness.molestias, effort: 0, notes: "" });
+          setWellnessOpen(false);
+          setMessages([welcome, createMessage("assistant", dailyWellness.molestias
+            ? "Tu valoración de bienestar de hoy ya está registrada. Como has indicado molestias, consulta a tu profesional antes de entrenar."
+            : "Tu valoración de bienestar de hoy ya está registrada. ¿Qué hacemos ahora: entrenamiento o nutrición?")]);
+        } else {
+          setWellnessOpen(true);
+          setMessages([welcome, createMessage("assistant", "Antes de comenzar, ¿cómo te encuentras hoy? Indícame tu nivel de energía y si tienes molestias. Guardaré tu valoración para el seguimiento profesional.")]);
+        }
+        setOpen(true);
       }
     }).catch(() => {
       if (active && !greetedRef.current) {
         greetedRef.current = true;
-        setMessages([createMessage("assistant", "¡Hola! Soy tu Chetesaí Coach IA. ¿Qué hacemos hoy? Puedes consultar tu entrenamiento, nutrición o progreso.")]);
+        setMessages([createMessage("assistant", "¡Hola! Soy tu Chetesaí Coach IA. No he podido consultar tu bienestar de hoy. Abre «Mi bienestar» para intentarlo de nuevo.")]);
+        setWellnessOpen(true);
+        setOpen(true);
       }
     }).finally(() => { if (active) setLoadingCoach(false); });
     return () => { active = false; };
@@ -569,7 +611,7 @@ export function ChetesaiAiAssistant() {
               </label>
               <label className="mt-2 flex items-center gap-2"><input type="checkbox" checked={preDiscomfort} onChange={(e)=>setPreDiscomfort(e.target.checked)} /> Tengo molestias o dolor</label>
               <div className="mt-3 flex gap-2">
-                <button type="button" onClick={savePreWellness} className="rounded-xl bg-[#2f9e24] px-3 py-2 font-bold text-white">Guardar valoración</button>
+                <button type="button" onClick={() => void savePreWellness()} disabled={savingWellness} className="rounded-xl bg-[#2f9e24] px-3 py-2 font-bold text-white disabled:opacity-50">{savingWellness ? "Guardando…" : "Guardar valoración"}</button>
                 <button type="button" onClick={()=>setWellnessOpen(false)} className="rounded-xl border px-3 py-2 font-bold">Cerrar</button>
               </div>
             </div>
