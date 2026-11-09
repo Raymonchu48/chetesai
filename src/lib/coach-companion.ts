@@ -64,3 +64,32 @@ export function coachAnswer(question: string, ctx: CoachContext | null): string 
   if (!exercises.length) return `Hoy es ${label} y tu rutina «${ctx.workout.nombre}» no tiene ejercicios previstos para este día. Si tu calendario de entrenamiento es distinto, consúltalo con tu profesional.`;
   return `¡Vamos con tu entrenamiento de ${label}! Tu rutina «${ctx.workout.nombre}» incluye:\n\n${exercises.slice(0, 12).map(x => `• ${x.ejercicios?.nombre || "Ejercicio"}: ${x.series} series × ${x.repeticiones || "repeticiones asignadas"}`).join("\n")}${ctx.workout.duracion_sesion_minutos ? `\n\nDuración orientativa: ${ctx.workout.duracion_sesion_minutos} minutos.` : ""}\n\nAbre «Entrenamiento» en tu portal para consultar la técnica y registrar tu sesión.`;
 }
+
+/** Consultas de comidas específicas sobre el plan aprobado, sin generar sustituciones. */
+export function specificMealAnswer(question: string, ctx: CoachContext | null): string | null {
+  const q = question.toLocaleLowerCase("es").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const keywords: Record<string, string[]> = {
+    desayuno: ["desayun"], almuerzo: ["almorz", "media manana"], comida: ["comer", "comida"],
+    merienda: ["meriend"], cena: ["cenar", "cena"], recena: ["recena"],
+  };
+  const type = Object.keys(keywords).find(key => keywords[key].some(word => q.includes(word)));
+  const quantity = /cuant[oa]s?|gramos|cantidad|porci[oó]n|raci[oó]n/.test(q);
+  const foodLookup = /(?:cuant|gramos|cantidad|porci|raci|que tengo|que hay|que me toca|que debo)/.test(q);
+  if (!type || !foodLookup) return null;
+  if (!ctx?.nutritionLoaded) return "No puedo consultar ahora tu plan nutricional. Comprueba «Mi nutrición» desde el portal.";
+  if (!ctx.foodPlan) return "No hay un plan nutricional aprobado y activo para consultar.";
+  const { label } = coachToday();
+  const all = ctx.foodPlan.comidas || [];
+  const hasDays = all.some(meal => dayNames.slice(1).some(day => meal.nombre.toLocaleLowerCase("es").startsWith(day.toLocaleLowerCase("es") + " · ")));
+  const todayMeals = hasDays ? all.filter(meal => meal.nombre.toLocaleLowerCase("es").startsWith(label.toLocaleLowerCase("es") + " · ")) : all;
+  const matching = todayMeals.filter(meal => {
+    const title = meal.nombre.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+    return keywords[type].some(word => title.includes(word)) || (type === "comida" && /almuerzo|comida/.test(title));
+  });
+  if (!matching.length) return `En tu plan «${ctx.foodPlan.nombre}» no hay una ${type} detallada para hoy (${label}). Puedes consultarlo con tu profesional.`;
+  return matching.slice(0,3).map(meal => {
+    const foods = (meal.alimentos || []).map(item => `• ${item.nombre}: ${item.cantidad_g} ${item.unidad_medida || "g"}`);
+    const details = foods.length ? foods.join("\n") : meal.descripcion || "Consulta el detalle en «Mi nutrición».";
+    return `${meal.nombre}${meal.hora ? " · " + meal.hora : ""}\n${details}${quantity && !foods.length ? "\nLas cantidades no están desglosadas en el plan." : ""}`;
+  }).join("\n\n") + "\n\nEstas cantidades son las indicadas en tu planificación profesional.";
+}
