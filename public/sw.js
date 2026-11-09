@@ -18,3 +18,24 @@ self.addEventListener("fetch", event => {
     (await caches.match(OFFLINE_PAGE)) || Response.error()
   ));
 });
+
+self.addEventListener("push", event => {
+  // A push with no payload does not transmit private client data to notification services.
+  const title = "Chetesaí Fitness+";
+  event.waitUntil(self.registration.showNotification(title, {
+    body: "Tienes un recordatorio en tu portal. Abre Chetesaí para consultar los detalles.",
+    icon: "/brand/app-icon-192.png",
+    badge: "/brand/app-icon-192.png",
+    tag: "chetesai-recordatorio",
+    data: { url: "/portal" }
+  }));
+});
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+  const url = new URL("/portal", self.location.origin).href;
+  event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async clients => {
+    const existing = clients.find(client => client.url.startsWith(self.location.origin) && "focus" in client);
+    if (existing) { await existing.focus(); if ("navigate" in existing) return existing.navigate(url); }
+    return self.clients.openWindow(url);
+  }));
+});
