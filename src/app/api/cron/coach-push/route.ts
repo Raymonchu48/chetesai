@@ -30,7 +30,7 @@ export async function GET(req:Request){
    if(sub.eventos&&regs.some(r=>r.cliente_id===sub.cliente_id&&["confirmada","lista_espera"].includes(r.estado)&&upcoming.has(r.evento_id)))categories.push("eventos");
    if(sub.sesiones&&agenda.some(s=>s.cliente_id===sub.cliente_id&&daySpan(s.inicio_at,day)===1))categories.push("sesiones");
    if(!categories.length){skipped++;continue;}
-   const key=day+":"+categories.sort().join(",");
+   const key=day; // At most one push per device per day, regardless of categories.
    const rows=await serviceRequest<Array<{id:string}>>(`coach_push_envios?suscripcion_id=eq.${sub.id}&clave=eq.${encodeURIComponent(key)}&select=id&limit=1`);
    if(rows.length){skipped++;continue;}
    try {
