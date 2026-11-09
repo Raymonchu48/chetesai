@@ -75,13 +75,23 @@ export function specificMealAnswer(question: string, ctx: CoachContext | null): 
   const type = Object.keys(keywords).find(key => keywords[key].some(word => q.includes(word)));
   const quantity = /cuant[oa]s?|gramos|cantidad|porci[oó]n|raci[oó]n/.test(q);
   const foodLookup = /(?:cuant|gramos|cantidad|porci|raci|que tengo|que hay|que me toca|que debo)/.test(q);
-  if (!type || !foodLookup) return null;
+  if (!foodLookup) return null;
+  if (!type && !quantity) return null;
   if (!ctx?.nutritionLoaded) return "No puedo consultar ahora tu plan nutricional. Comprueba «Mi nutrición» desde el portal.";
   if (!ctx.foodPlan) return "No hay un plan nutricional aprobado y activo para consultar.";
   const { label } = coachToday();
   const all = ctx.foodPlan.comidas || [];
   const hasDays = all.some(meal => dayNames.slice(1).some(day => meal.nombre.toLocaleLowerCase("es").startsWith(day.toLocaleLowerCase("es") + " · ")));
   const todayMeals = hasDays ? all.filter(meal => meal.nombre.toLocaleLowerCase("es").startsWith(label.toLocaleLowerCase("es") + " · ")) : all;
+  if (!type) {
+    const search = q.replace(/cuant[oa]s?|gramos|cantidad|porcion|racion|de|del|la|el|los|las|tengo|que|hoy|mi|plan|comer|como|para|en|hay|deb(o|eria)|al|se|sirven|esta/g, " ").split(/\\s+/).filter(word => word.length > 3);
+    if (!search.length) return "Dime qué alimento de tu plan quieres consultar, por ejemplo: «¿Cuántos gramos de arroz tengo hoy?»";
+    const found = todayMeals.flatMap(meal => (meal.alimentos || [])
+      .filter(food => search.some(word => food.nombre.toLocaleLowerCase("es").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").includes(word)))
+      .map(food => `${meal.nombre}: ${food.nombre}, ${food.cantidad_g} ${food.unidad_medida || "g"}`));
+    if (found.length) return `Según tu plan de hoy (${label}):\\n${found.slice(0,8).map(x => "• " + x).join("\\n")}\\n\\nEstas son las cantidades publicadas por tu profesional.`;
+    return "No he localizado ese alimento entre las comidas de hoy. Puedes ver todos los ingredientes en «Mi nutrición».";
+  }
   const matching = todayMeals.filter(meal => {
     const title = meal.nombre.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
     return keywords[type].some(word => title.includes(word)) || (type === "comida" && /almuerzo|comida/.test(title));
