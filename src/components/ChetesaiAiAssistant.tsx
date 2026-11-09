@@ -120,7 +120,9 @@ export function ChetesaiAiAssistant() {
   const todayIndex = coachToday().index;
   const todayExercises = (coachContext?.exercises || []).filter((exercise) => Number(exercise.dia) === todayIndex).sort((a,b) => a.orden-b.orden);
   const pendingSet = guidedSession?.series.find((serie) => !serie.completada) || null;
-  const pendingExercise = pendingSet ? todayExercises.find((exercise) => String((exercise as { id?: string }).id || "") === String(pendingSet.rutina_ejercicio_id)) : null;
+  const pendingExercise = pendingSet ? todayExercises.find((exercise) => String(exercise.id) === String(pendingSet.rutina_ejercicio_id)) : null;
+  const exerciseVideo = pendingExercise?.ejercicios ? (coachContext?.visualModel === "mujer" ? pendingExercise.ejercicios.video_mujer_url || pendingExercise.ejercicios.video_url : pendingExercise.ejercicios.video_url) : null;
+  const safeExerciseVideo = exerciseVideo && (/^https:\/\//i.test(exerciseVideo) || /^\/(?!\/)/.test(exerciseVideo)) ? exerciseVideo : null;
 
   async function startGuidedWorkout() {
     if (!isPortal || workingOut) return;
@@ -511,6 +513,13 @@ export function ChetesaiAiAssistant() {
                 <>
                   <p className="font-semibold">{pendingExercise?.ejercicios?.nombre || "Siguiente ejercicio"} · Serie {pendingSet.numero_serie}</p>
                   <p>{pendingSet.repeticiones_objetivo || "Repeticiones según tu plan"} {restSeconds > 0 ? `· Descanso ${restSeconds}s` : ""}</p>
+                  {safeExerciseVideo ? (
+                    <video key={safeExerciseVideo} controls playsInline preload="none" src={safeExerciseVideo} className="mt-2 max-h-36 w-full rounded-xl bg-black" aria-label={`Vídeo: ${pendingExercise?.ejercicios?.nombre || "Ejercicio"}`}>
+                      Tu navegador no puede reproducir este vídeo. Consulta el ejercicio en el portal.
+                    </video>
+                  ) : (
+                    <p className="mt-2 text-[11px] text-[#536c52]">La demostración técnica está disponible en el portal si tu profesional la ha publicado.</p>
+                  )}
                   <div className="mt-2 grid grid-cols-2 gap-2">
                     <label className="text-[11px]">Repeticiones reales
                       <input inputMode="numeric" type="number" min="0" max="1000" value={actualReps} onChange={e=>setActualReps(e.target.value)} placeholder="Opcional" className="mt-1 w-full rounded-lg border bg-white p-2" />
