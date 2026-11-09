@@ -109,7 +109,7 @@ export function ChetesaiAiAssistant() {
     remindersAnnouncedRef.current = true;
     setMessages(prev => [
       ...prev,
-      createMessage("assistant", "Antes de seguir, tengo estos recordatorios para ti:\\n\\n" + list.map(a => "• " + a.texto).join("\\n\\n") + "\\n\\nPuedes consultarlos en tu portal. No se renovará ningún bono ni se realizará ninguna inscripción automáticamente."),
+      createMessage("assistant", "Antes de seguir, tengo estos recordatorios para ti:\n\n" + list.map(a => "• " + a.texto).join("\n\n") + "\n\nPuedes consultarlos en tu portal. No se renovará ningún bono ni se realizará ninguna inscripción automáticamente."),
     ]);
   }
   const coachAvatar = "/brand/chetesai-mini-coach.svg";
