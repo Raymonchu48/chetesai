@@ -21,7 +21,7 @@ export function CoachPushSettings() {
   const available = typeof window !== "undefined" && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
   setSupported(available);
   if (!available) return;
-  void fetch("/api/portal/coach-push", { cache: "no-store" }).then(r=>r.json()).then(async data=>{
+  void fetch("/api/portal/coach-push", { cache: "no-store" }).then(async r=>(await r.json()) as {vapidPublicKey?:string;items?:Array<{endpoint:string;activa:boolean;bonos:boolean;eventos:boolean;sesiones:boolean}>}).then(async data=>{
    if (!alive) return;
    setKey(data.vapidPublicKey || "");
    const registration = await navigator.serviceWorker.ready;
