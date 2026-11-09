@@ -91,6 +91,8 @@ export function ChetesaiAiAssistant() {
   const [preWellness, setPreWellness] = useState<Wellness | null>(null);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [voiceAvailable, setVoiceAvailable] = useState(false);
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoice, setSelectedVoice] = useState("");
   const spokenMessageRef = useRef<string | null>(null);
   const coachAvatar = "/brand/chetesai-mini-coach.svg";
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
@@ -157,7 +159,7 @@ export function ChetesaiAiAssistant() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "update_set", serie_id: pendingSet.id, completada: true,
-          repeticiones_realizadas: null, peso_real: null, rpe_real: null,
+          repeticiones_realizadas: "", peso_real: "", rpe_real: "",
           comentario: "Serie completada desde Chetesaí Coach IA; repeticiones y carga reales sin registrar",
         }),
       });
@@ -210,7 +212,21 @@ export function ChetesaiAiAssistant() {
 
 
   useEffect(() => {
-    setVoiceAvailable(typeof window !== "undefined" && "speechSynthesis" in window && "SpeechSynthesisUtterance" in window);
+    const supported = typeof window !== "undefined" && "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+    setVoiceAvailable(supported);
+    if (supported) {
+      const refresh = () => {
+        const spanish = window.speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith("es"));
+        setAvailableVoices(spanish);
+        setSelectedVoice(previous => previous || spanish.find(v => /alvaro|álvaro|pablo|jorge|diego|antonio|enrique|raul|raúl|carlos|male|hombre/i.test(v.name))?.voiceURI || spanish[0]?.voiceURI || "");
+      };
+      refresh();
+      window.speechSynthesis.addEventListener("voiceschanged", refresh);
+      return () => {
+        window.speechSynthesis.removeEventListener("voiceschanged", refresh);
+        window.speechSynthesis.cancel();
+      };
+    }
     return () => {
       if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
     };
@@ -223,7 +239,9 @@ export function ChetesaiAiAssistant() {
     utterance.lang = "es-ES";
     utterance.rate = 0.96;
     const voices = window.speechSynthesis.getVoices();
-    const spanishVoice = voices.find((voice) => voice.lang.toLowerCase() === "es-es") || voices.find((voice) => voice.lang.toLowerCase().startsWith("es"));
+    const spanishVoice = voices.find(v => v.voiceURI === selectedVoice) ||
+      voices.find(v => v.lang.toLowerCase().startsWith("es") && /alvaro|álvaro|pablo|jorge|diego|antonio|enrique|raul|raúl|carlos|male|hombre/i.test(v.name)) ||
+      voices.find(v => v.lang.toLowerCase() === "es-es") || voices.find(v => v.lang.toLowerCase().startsWith("es"));
     if (spanishVoice) utterance.voice = spanishVoice;
     window.speechSynthesis.speak(utterance);
     spokenMessageRef.current = message.id;
@@ -509,6 +527,14 @@ export function ChetesaiAiAssistant() {
                 <button type="button" onClick={()=>setWellnessOpen(false)} className="rounded-xl border px-3 py-2 font-bold">Cerrar</button>
               </div>
             </div>
+          ) : null}
+          {isPortal && voiceAvailable && voiceEnabled && availableVoices.length ? (
+            <label className="mb-2 flex items-center gap-2 text-xs text-[#46624f]">
+              <span className="shrink-0">Voz del coach</span>
+              <select aria-label="Seleccionar voz española" value={selectedVoice} onChange={e => { setSelectedVoice(e.target.value); window.speechSynthesis.cancel(); }} className="min-w-0 max-w-[240px] flex-1 rounded-lg border border-[#cfd9cb] bg-white px-2 py-1">
+                {availableVoices.map(v => <option key={v.voiceURI} value={v.voiceURI}>{v.name}</option>)}
+              </select>
+            </label>
           ) : null}
           <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
             {quickActions.map((item) => {
