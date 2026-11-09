@@ -40,6 +40,7 @@ type GuidedSet = {
 };
 type GuidedSession = { sesion: { id: string; estado?: string }; series: GuidedSet[] };
 type Wellness = { energy: number; effort: number; notes: string; discomfort: boolean };
+type CoachReminder = { id: string; tipo: "bono" | "evento"; texto: string; href: string };
 
 type QuickAction = {
   label: string;
@@ -60,6 +61,7 @@ const portalActions: QuickAction[] = [
   { label: "Mi bienestar", icon: HeartPulse, action: "wellness" },
   { label: "Mi progreso", icon: TrendingUp, action: "/portal/progreso" },
   { label: "Mis citas", icon: CalendarDays, action: "/portal/citas" },
+  { label: "Eventos especiales", icon: CalendarDays, action: "/portal/eventos" },
 ];
 
 function createMessage(role: ChatMessage["role"], content: string): ChatMessage {
@@ -97,6 +99,19 @@ export function ChetesaiAiAssistant() {
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoice, setSelectedVoice] = useState("");
   const spokenMessageRef = useRef<string | null>(null);
+  const pendingRemindersRef = useRef<CoachReminder[]>([]);
+  const remindersAnnouncedRef = useRef(false);
+
+  function announceReminders(items?: CoachReminder[]) {
+    if (remindersAnnouncedRef.current) return;
+    const list = items || pendingRemindersRef.current;
+    if (!list.length) return;
+    remindersAnnouncedRef.current = true;
+    setMessages(prev => [
+      ...prev,
+      createMessage("assistant", "Antes de seguir, tengo estos recordatorios para ti:\n\n" + list.map(a => "• " + a.texto).join("\n\n") + "\n\nPuedes consultarlos en tu portal. No se renovará ningún bono ni se realizará ninguna inscripción automáticamente."),
+    ]);
+  }
   const coachAvatar = "/brand/chetesai-mini-coach.svg";
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
@@ -238,6 +253,7 @@ export function ChetesaiAiAssistant() {
       respond(preDiscomfort
         ? "He registrado tu valoración de hoy y las molestias indicadas. No comenzaré el entrenamiento guiado hasta que lo revises con tu profesional."
         : `Tu valoración de bienestar de hoy está guardada: energía ${preEnergy}/5 y sin molestias declaradas. ¿Empezamos con tu entrenamiento o quieres consultar tu alimentación?`);
+      announceReminders();
     } catch (error) {
       respond(error instanceof Error ? `No he podido guardar tu bienestar: ${error.message}. Inténtalo de nuevo; todavía no está registrado.` : "No he podido registrar tu bienestar. Inténtalo de nuevo.");
     } finally {
@@ -306,6 +322,8 @@ export function ChetesaiAiAssistant() {
       setCoachContext(null);
       setGuidedSession(null);
       setPreWellness(null);
+      pendingRemindersRef.current = [];
+      remindersAnnouncedRef.current = false;
       setWellnessNotes("");
       setRestSeconds(0);
       setOpen(false);
@@ -329,7 +347,13 @@ export function ChetesaiAiAssistant() {
           if (!response.ok || !result.ok) throw Error(result.error || "No se pudo consultar el bienestar");
           return result.data || null;
         }),
-    ]).then(([ctx, dailyWellness]) => {
+      fetch("/api/portal/coach-recordatorios", { cache: "no-store" })
+        .then(async response => {
+          const result = await response.json() as { ok?: boolean; avisos?: CoachReminder[] };
+          return response.ok && result.ok && Array.isArray(result.avisos) ? result.avisos : [];
+        }).catch(() => [] as CoachReminder[]),
+    ]).then(([ctx, dailyWellness, reminders]) => {
+      pendingRemindersRef.current = reminders;
       if (!active) return;
       setCoachContext(ctx);
       if (!greetedRef.current) {
@@ -344,6 +368,7 @@ export function ChetesaiAiAssistant() {
           setMessages([welcome, createMessage("assistant", dailyWellness.molestias
             ? "Tu valoración de bienestar de hoy ya está registrada. Como has indicado molestias, consulta a tu profesional antes de entrenar."
             : "Tu valoración de bienestar de hoy ya está registrada. ¿Qué hacemos ahora: entrenamiento o nutrición?")]);
+          if (reminders.length) announceReminders(reminders);
         } else {
           setWellnessOpen(true);
           setMessages([welcome, createMessage("assistant", "Antes de comenzar, ¿cómo te encuentras hoy? Indícame tu nivel de energía y si tienes molestias. Guardaré tu valoración para el seguimiento profesional.")]);
