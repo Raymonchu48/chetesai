@@ -81,8 +81,20 @@ export default function LoginPage() {
     }
   }, []);
 
+  function navigateToDedicatedPortal(role: AccessRole) {
+    const host = window.location.hostname;
+    if (host === "www.chetesaifitness.com" || host === "chetesaifitness.com") {
+      window.location.assign(role === "cliente"
+        ? "https://app.chetesaifitness.com/login"
+        : "https://pro.chetesaifitness.com/login");
+      return true;
+    }
+    return false;
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (navigateToDedicatedPortal(accessRole)) return;
     setError("");
     setNotice("");
     setLoading(true);
@@ -113,6 +125,7 @@ export default function LoginPage() {
   }
 
   function handleGoogleLogin() {
+    if (navigateToDedicatedPortal(accessRole)) return;
     setError("");
     setNotice("");
     setGoogleLoading(true);
@@ -196,10 +209,10 @@ export default function LoginPage() {
           </div>
 
           <div className={`mb-6 grid ${dedicatedRole ? "grid-cols-1" : "grid-cols-2"} rounded-2xl border border-[#3F5043] bg-[#101713] p-1.5 shadow-inner`} role="tablist" aria-label="Tipo de acceso">
-            {!dedicatedRole || dedicatedRole === "profesional" ? <button type="button" role="tab" aria-selected={accessRole === "profesional"} onClick={() => { setAccessRole("profesional"); setError(""); }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "profesional" ? "bg-gradient-to-r from-[#89B94D] to-[#89B94D] text-[#101713] shadow-[0_9px_22px_rgba(69,96,42,0.22)]" : "text-[#A9B4AC] hover:text-[#D1D4D2]")}>
+            {!dedicatedRole || dedicatedRole === "profesional" ? <button type="button" role="tab" aria-selected={accessRole === "profesional"} onClick={() => { if (!navigateToDedicatedPortal("profesional")) { setAccessRole("profesional"); setError(""); } }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "profesional" ? "bg-gradient-to-r from-[#89B94D] to-[#89B94D] text-[#101713] shadow-[0_9px_22px_rgba(69,96,42,0.22)]" : "text-[#A9B4AC] hover:text-[#D1D4D2]")}>
               <ProfessionalIcon active={accessRole === "profesional"} /> <span>Profesional</span>
             </button> : null}
-            {!dedicatedRole || dedicatedRole === "cliente" ? <button type="button" role="tab" aria-selected={accessRole === "cliente"} onClick={() => { setAccessRole("cliente"); setError(""); }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "cliente" ? "bg-gradient-to-r from-[#89B94D] to-[#89B94D] text-[#101713] shadow-[0_9px_22px_rgba(69,96,42,0.22)]" : "text-[#A9B4AC] hover:text-[#D1D4D2]")}>
+            {!dedicatedRole || dedicatedRole === "cliente" ? <button type="button" role="tab" aria-selected={accessRole === "cliente"} onClick={() => { if (!navigateToDedicatedPortal("cliente")) { setAccessRole("cliente"); setError(""); } }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "cliente" ? "bg-gradient-to-r from-[#89B94D] to-[#89B94D] text-[#101713] shadow-[0_9px_22px_rgba(69,96,42,0.22)]" : "text-[#A9B4AC] hover:text-[#D1D4D2]")}>
               <ClientIcon /> <span>Cliente</span>
             </button> : null}
           </div>
