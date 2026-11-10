@@ -53,6 +53,7 @@ function GoogleIcon() {
 export default function LoginPage() {
   const router = useRouter();
   const [accessRole, setAccessRole] = useState<AccessRole>("profesional");
+  const [dedicatedRole, setDedicatedRole] = useState<AccessRole | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -63,6 +64,9 @@ export default function LoginPage() {
   const [notice, setNotice] = useState("");
 
   useEffect(() => {
+    const hostname = window.location.hostname;
+    if (hostname === "app.chetesaifitness.com") { setAccessRole("cliente"); setDedicatedRole("cliente"); }
+    if (hostname === "pro.chetesaifitness.com") { setAccessRole("profesional"); setDedicatedRole("profesional"); }
     const savedEmail = window.localStorage.getItem("chetesai_login_email");
     if (savedEmail) {
       setEmail(savedEmail);
@@ -191,13 +195,13 @@ export default function LoginPage() {
             <p className="mt-3 min-h-10 font-meta text-sm leading-relaxed text-[#A9B4AC]" aria-live="polite">{roleDescription}</p>
           </div>
 
-          <div className="mb-6 grid grid-cols-2 rounded-2xl border border-[#3F5043] bg-[#101713] p-1.5 shadow-inner" role="tablist" aria-label="Tipo de acceso">
-            <button type="button" role="tab" aria-selected={accessRole === "profesional"} onClick={() => { setAccessRole("profesional"); setError(""); }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "profesional" ? "bg-gradient-to-r from-[#89B94D] to-[#89B94D] text-[#101713] shadow-[0_9px_22px_rgba(69,96,42,0.22)]" : "text-[#A9B4AC] hover:text-[#D1D4D2]")}>
+          <div className={`mb-6 grid ${dedicatedRole ? "grid-cols-1" : "grid-cols-2"} rounded-2xl border border-[#3F5043] bg-[#101713] p-1.5 shadow-inner`} role="tablist" aria-label="Tipo de acceso">
+            {!dedicatedRole || dedicatedRole === "profesional" ? <button type="button" role="tab" aria-selected={accessRole === "profesional"} onClick={() => { setAccessRole("profesional"); setError(""); }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "profesional" ? "bg-gradient-to-r from-[#89B94D] to-[#89B94D] text-[#101713] shadow-[0_9px_22px_rgba(69,96,42,0.22)]" : "text-[#A9B4AC] hover:text-[#D1D4D2]")}>
               <ProfessionalIcon active={accessRole === "profesional"} /> <span>Profesional</span>
-            </button>
-            <button type="button" role="tab" aria-selected={accessRole === "cliente"} onClick={() => { setAccessRole("cliente"); setError(""); }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "cliente" ? "bg-gradient-to-r from-[#89B94D] to-[#89B94D] text-[#101713] shadow-[0_9px_22px_rgba(69,96,42,0.22)]" : "text-[#A9B4AC] hover:text-[#D1D4D2]")}>
+            </button> : null}
+            {!dedicatedRole || dedicatedRole === "cliente" ? <button type="button" role="tab" aria-selected={accessRole === "cliente"} onClick={() => { setAccessRole("cliente"); setError(""); }} className={"flex min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3.5 text-sm font-black transition-all sm:px-3 sm:text-base " + (accessRole === "cliente" ? "bg-gradient-to-r from-[#89B94D] to-[#89B94D] text-[#101713] shadow-[0_9px_22px_rgba(69,96,42,0.22)]" : "text-[#A9B4AC] hover:text-[#D1D4D2]")}>
               <ClientIcon /> <span>Cliente</span>
-            </button>
+            </button> : null}
           </div>
 
           <PwaInstall />
