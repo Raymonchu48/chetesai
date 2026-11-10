@@ -19,7 +19,7 @@ type TokenResponse = {
 function publicAppUrl(request: NextRequest) {
   // Return to the same subdomain that initiated Google authentication.
   if (["app.chetesaifitness.com", "pro.chetesaifitness.com"].includes(request.nextUrl.hostname)) {
-    return request.nextUrl.origin.replace(/\\/$/, "");
+    return request.nextUrl.origin;
   }
   const configured = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
   if (configured && !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configured)) {
