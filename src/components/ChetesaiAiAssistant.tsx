@@ -98,6 +98,7 @@ export function ChetesaiAiAssistant() {
   const [wellnessOpen, setWellnessOpen] = useState(false);
   const [preEnergy, setPreEnergy] = useState(3);
   const [preDiscomfort, setPreDiscomfort] = useState(false);
+  const [discomfortDetail, setDiscomfortDetail] = useState("");
   const [postEffort, setPostEffort] = useState(5);
   const [actualReps, setActualReps] = useState("");
   const [actualWeight, setActualWeight] = useState("");
@@ -328,14 +329,16 @@ export function ChetesaiAiAssistant() {
       const response = await fetch("/api/portal/coach-bienestar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ energia: preEnergy, molestias: preDiscomfort }),
+        body: JSON.stringify({ energia: preEnergy, molestias: preDiscomfort, detalle_molestias: preDiscomfort ? discomfortDetail.trim() : "" }),
       });
-      const result = await response.json() as { ok?: boolean; error?: string };
+      const result = await response.json() as { ok?: boolean; error?: string; alertError?: boolean };
       if (!response.ok || !result.ok) throw Error(result.error || "No se pudo guardar la valoración");
       setPreWellness({ energy: preEnergy, discomfort: preDiscomfort, effort: 0, notes: "" });
       setWellnessOpen(false);
       respond(preDiscomfort
-        ? "He registrado tu valoración de hoy y las molestias indicadas. No comenzaré el entrenamiento guiado hasta que lo revises con tu profesional."
+        ? result.alertError
+          ? "He guardado tu descripción de la molestia, pero no he podido notificar al profesional. Contacta directamente con él antes de entrenar; no inicies la sesión guiada."
+          : "He registrado tu descripción de la molestia y enviado un aviso al profesional. No comenzaré el entrenamiento guiado hasta que lo revise."
         : `Tu valoración de bienestar de hoy está guardada: energía ${preEnergy}/5 y sin molestias declaradas. ¿Empezamos con tu entrenamiento o quieres consultar tu alimentación?`);
       announceReminders();
     } catch (error) {
@@ -432,7 +435,7 @@ export function ChetesaiAiAssistant() {
       loadCoachContext(),
       fetch("/api/portal/coach-bienestar", { cache: "no-store" })
         .then(async (response) => {
-          const result = await response.json() as { ok?: boolean; data?: { energia: number; molestias: boolean } | null; error?: string };
+          const result = await response.json() as { ok?: boolean; data?: { energia: number; molestias: boolean; detalle_molestias?: string | null } | null; error?: string };
           if (!response.ok || !result.ok) throw Error(result.error || "No se pudo consultar el bienestar");
           return result.data || null;
         }),
@@ -452,6 +455,7 @@ export function ChetesaiAiAssistant() {
         if (dailyWellness) {
           setPreEnergy(dailyWellness.energia);
           setPreDiscomfort(dailyWellness.molestias);
+          setDiscomfortDetail(dailyWellness.detalle_molestias || "");
           setPreWellness({ energy: dailyWellness.energia, discomfort: dailyWellness.molestias, effort: 0, notes: "" });
           setWellnessOpen(false);
           setMessages([welcome, createMessage("assistant", dailyWellness.molestias
@@ -740,8 +744,18 @@ export function ChetesaiAiAssistant() {
                 <input type="range" min="1" max="5" value={preEnergy} onChange={e=>setPreEnergy(Number(e.target.value))} className="mt-1 w-full accent-[#2f9e24]" />
               </label>
               <label className="mt-2 flex items-center gap-2"><input type="checkbox" checked={preDiscomfort} onChange={(e)=>setPreDiscomfort(e.target.checked)} /> Tengo molestias o dolor</label>
+              {preDiscomfort ? <div className="mt-3 space-y-1.5">
+                <label htmlFor="coach-discomfort-detail" className="block font-bold">Describe tus molestias para el profesional</label>
+                <textarea id="coach-discomfort-detail" rows={3} maxLength={500} required minLength={8}
+                  value={discomfortDetail} onChange={event=>setDiscomfortDetail(event.target.value)}
+                  placeholder="¿Dónde las notas? ¿Qué sientes (dolor, pinchazo, tensión)? ¿Desde cuándo y con qué movimientos?"
+                  aria-describedby="coach-discomfort-help"
+                  className="w-full rounded-xl border border-[#aac9a6] bg-white p-3 text-sm text-[#244528]" />
+                <p id="coach-discomfort-help" className="text-[11px] text-[#557057]">Escribe al menos 8 caracteres. Tu descripción se enviará al profesional autorizado. No se utilizará para emitir un diagnóstico automático.</p>
+                <p className="text-[11px] text-[#557057]">{discomfortDetail.trim().length}/500 caracteres</p>
+              </div> : null}
               <div className="mt-3 flex gap-2">
-                <button type="button" onClick={() => void savePreWellness()} disabled={savingWellness} className="rounded-xl bg-[#2f9e24] px-3 py-2 font-bold text-white disabled:opacity-50">{savingWellness ? "Guardando…" : "Guardar valoración"}</button>
+                <button type="button" onClick={() => void savePreWellness()} disabled={savingWellness || (preDiscomfort && discomfortDetail.trim().length < 8)} className="min-h-11 rounded-xl bg-[#2f9e24] px-3 py-2 font-bold text-white disabled:opacity-50">{savingWellness ? "Guardando…" : "Guardar valoración"}</button>
                 <button type="button" onClick={()=>setWellnessOpen(false)} className="rounded-xl border px-3 py-2 font-bold">Cerrar</button>
               </div>
             </div>
