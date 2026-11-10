@@ -12,6 +12,11 @@ function base64Url(input: Buffer) {
 }
 
 function publicAppUrl(request: NextRequest) {
+  // For the two separate portals, OAuth must return to the same hostname
+  // so the PKCE verifier and session remain host-only.
+  if (["app.chetesaifitness.com", "pro.chetesaifitness.com"].includes(request.nextUrl.hostname)) {
+    return request.nextUrl.origin;
+  }
   const configured = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
   if (configured && !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configured)) {
     return configured.replace(/\/$/, "");
@@ -32,6 +37,12 @@ export async function GET(request: NextRequest) {
 
   if (!supabaseUrl) {
     return loginError(request, "Google no está configurado en Chetesaí");
+  }
+
+  const hostname = request.nextUrl.hostname;
+  if ((hostname === "app.chetesaifitness.com" && accessRole !== "cliente") ||
+      (hostname === "pro.chetesaifitness.com" && accessRole !== "profesional")) {
+    return loginError(request, "Utiliza el acceso correspondiente a este portal");
   }
 
   if (accessRole !== "profesional" && accessRole !== "cliente") {

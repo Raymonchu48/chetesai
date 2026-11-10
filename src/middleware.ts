@@ -94,7 +94,39 @@ function persistRefreshedSession(response: NextResponse, session: SessionResult)
 }
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, hostname } = request.nextUrl;
+  // Host-only auth cookies isolate client and professional sessions.
+  const clientHost = hostname === "app.chetesaifitness.com";
+  const professionalHost = hostname === "pro.chetesaifitness.com";
+  const isClientArea = pathname === "/portal" || pathname.startsWith("/portal/") || pathname.startsWith("/api/portal/");
+  const isProfessionalArea = [
+    "/dashboard", "/clientes", "/ejercicios", "/rutinas", "/progreso",
+    "/nutricion", "/sesiones", "/eventos", "/pagos", "/informes", "/coach-avisos",
+  ].some(prefix => pathname === prefix || pathname.startsWith(prefix + "/")) ||
+    [
+      "/api/dashboard", "/api/clientes", "/api/ejercicios", "/api/rutinas",
+      "/api/rutina-ejercicios", "/api/progreso", "/api/nutricion", "/api/sesiones",
+      "/api/eventos", "/api/pagos", "/api/bonos", "/api/informes", "/api/coach-avisos",
+    ].some(prefix => pathname === prefix || pathname.startsWith(prefix + "/"));
+
+  if (pathname === "/manifest.webmanifest" && (clientHost || professionalHost)) {
+    return NextResponse.rewrite(new URL(
+      clientHost ? "/manifest-cliente.webmanifest" : "/manifest-profesional.webmanifest",
+      request.url
+    ));
+  }
+
+  if (pathname === "/" && (clientHost || professionalHost)) {
+    return NextResponse.redirect(new URL(clientHost ? "/portal" : "/dashboard", request.url));
+  }
+  // Enforce portal boundaries server-side while keeping existing www URLs intact.
+  if ((clientHost && isProfessionalArea) || (professionalHost && isClientArea)) {
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ ok: false, error: "Área no disponible en este acceso" }, { status: 403 });
+    }
+    return NextResponse.redirect(new URL(clientHost ? "/portal" : "/dashboard", request.url));
+  }
+
   // Dedicated maintenance endpoint authenticates itself with a short-lived admin secret.
   // Keep it outside the generic cookie middleware so server-side maintenance can run.
   if (pathname === "/api/ejercicios/optimizacion/publicar") {
@@ -175,6 +207,8 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/",
+    "/manifest.webmanifest",
     "/login",
     "/dashboard/:path*",
     "/portal/:path*",
