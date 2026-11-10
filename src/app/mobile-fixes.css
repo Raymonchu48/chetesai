@@ -91,3 +91,22 @@
     font-size: inherit !important;
   }
 }
+
+/* Mobile touch responsiveness: native scrolling and reliable tap targets. */
+@media (pointer: coarse) {
+  :where(button, a[href], summary, [role="button"]) {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(47, 158, 36, 0.14);
+  }
+
+  /* Shared UI button variants previously exposed 32-40px high touch targets. */
+  button[data-slot="button"]:not([data-slot="dialog-close"]):not([data-slot="select-trigger"]) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Keep keyboard interaction discoverable without forcing hover effects on touch. */
+  :where(button, a[href], summary, [role="button"]):focus-visible {
+    outline-offset: 3px;
+  }
+}
