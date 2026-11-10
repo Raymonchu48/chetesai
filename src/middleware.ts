@@ -116,6 +116,12 @@ export async function middleware(request: NextRequest) {
     ));
   }
 
+  // The corporate landing page is public. Never require login at "/" on www/apex.
+  // Client/professional root URLs continue to route to their protected dashboards.
+  if (pathname === "/" && !clientHost && !professionalHost) {
+    return NextResponse.next();
+  }
+
   if (pathname === "/" && (clientHost || professionalHost)) {
     return NextResponse.redirect(new URL(clientHost ? "/portal" : "/dashboard", request.url));
   }
