@@ -27,6 +27,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const hostname = request.nextUrl.hostname;
+    if ((hostname === "app.chetesaifitness.com" && accessRole !== "cliente") ||
+        (hostname === "pro.chetesaifitness.com" && accessRole !== "profesional")) {
+      return NextResponse.json({ ok: false, error: "Selecciona el acceso correspondiente a este portal" }, { status: 403 });
+    }
+
     if (accessRole && accessRole !== "profesional" && accessRole !== "cliente") {
       return NextResponse.json(
         { ok: false, error: "Tipo de acceso no válido" },
