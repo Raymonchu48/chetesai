@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { CoachPushSettings } from "@/components/CoachPushSettings";
+import { CoachProfessionalReplies } from "@/components/CoachProfessionalReplies";
 import { coachAnswer, coachToday, loadCoachContext, specificMealAnswer, type CoachContext } from "@/lib/coach-companion";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -687,6 +688,7 @@ export function ChetesaiAiAssistant() {
               <button type="button" onClick={()=>void eraseHistory()} className="rounded-lg border px-2 py-1 font-bold">Borrar historial</button>
             </div>
           ) : null}
+          {isPortal && consultOpen ? <CoachProfessionalReplies active={consultOpen} /> : null}
           {isPortal && consultOpen ? <div className="mb-2 rounded-xl border border-[#c6dbc1] bg-[#f0f8ed] p-3 text-xs text-[#244528]">
             <p className="mb-2 font-bold">Enviar consulta al profesional</p>
             <textarea rows={3} maxLength={1000} value={consultText} onChange={e=>setConsultText(e.target.value)} placeholder="Escribe tu consulta…" className="w-full rounded-lg border bg-white p-2" />
