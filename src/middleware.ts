@@ -121,7 +121,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/api/eventos") ||
     pathname.startsWith("/api/pagos") ||
     pathname.startsWith("/api/bonos") ||
-    pathname.startsWith("/api/informes");
+    pathname.startsWith("/api/informes") ||
+    pathname.startsWith("/api/coach-avisos");
 
   if (!session.valid || !session.role) {
     if (isProfessionalApi || isPortalApi) {
@@ -147,6 +148,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/eventos") ||
     pathname.startsWith("/pagos") ||
     pathname.startsWith("/informes") ||
+    pathname.startsWith("/coach-avisos") ||
     isProfessionalApi;
 
   if (professionalRoute && session.role === "cliente") {
@@ -185,6 +187,7 @@ export const config = {
     "/eventos/:path*",
     "/pagos/:path*",
     "/informes/:path*",
+    "/coach-avisos/:path*",
     "/api/dashboard/:path*",
     "/api/portal/:path*",
     "/api/clientes/:path*",
@@ -198,5 +201,6 @@ export const config = {
     "/api/pagos/:path*",
     "/api/bonos/:path*",
     "/api/informes/:path*",
+    "/api/coach-avisos/:path*",
   ],
 };
