@@ -160,7 +160,7 @@ export function MobileLandingNav() {
             })}
 
             <Link
-              href="/login"
+              href="https://app.chetesaifitness.com/login"
               onClick={() => setOpen(false)}
               className="flex w-full items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.035] px-4 py-4 transition hover:border-[#8cdb78]/35 hover:bg-[#8cdb78]/10"
             >
