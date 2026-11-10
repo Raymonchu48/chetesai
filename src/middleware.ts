@@ -133,6 +133,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // On the public website, route old /login bookmarks to a choice screen
+  // before collecting credentials. Dedicated subdomains retain their login form.
+  if (pathname === "/login" && (hostname === "www.chetesaifitness.com" || hostname === "chetesaifitness.com")) {
+    return NextResponse.redirect(new URL("/acceso", request.url), 307);
+  }
+
   if (pathname === "/login") {
     const response = NextResponse.next();
     clearSessionCookies(response);
