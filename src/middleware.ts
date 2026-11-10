@@ -109,6 +109,13 @@ export async function middleware(request: NextRequest) {
       "/api/eventos", "/api/pagos", "/api/bonos", "/api/informes", "/api/coach-avisos",
     ].some(prefix => pathname === prefix || pathname.startsWith(prefix + "/"));
 
+  if (pathname === "/manifest.webmanifest" && (clientHost || professionalHost)) {
+    return NextResponse.rewrite(new URL(
+      clientHost ? "/manifest-cliente.webmanifest" : "/manifest-profesional.webmanifest",
+      request.url
+    ));
+  }
+
   if (pathname === "/" && (clientHost || professionalHost)) {
     return NextResponse.redirect(new URL(clientHost ? "/portal" : "/dashboard", request.url));
   }
@@ -201,6 +208,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/",
+    "/manifest.webmanifest",
     "/login",
     "/dashboard/:path*",
     "/portal/:path*",
