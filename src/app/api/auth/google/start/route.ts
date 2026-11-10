@@ -15,7 +15,7 @@ function publicAppUrl(request: NextRequest) {
   // For the two separate portals, OAuth must return to the same hostname
   // so the PKCE verifier and session remain host-only.
   if (["app.chetesaifitness.com", "pro.chetesaifitness.com"].includes(request.nextUrl.hostname)) {
-    return request.nextUrl.origin.replace(/\\/$/, "");
+    return request.nextUrl.origin;
   }
   const configured = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
   if (configured && !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configured)) {
