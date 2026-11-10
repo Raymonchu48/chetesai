@@ -198,7 +198,7 @@ export default function Main() {
             <button type="button" onClick={() => goTo("proceso")} className="transition hover:text-white">Cómo funciona</button>
             <button type="button" onClick={() => goTo("sobre-mi")} className="transition hover:text-white">Sobre mí</button>
             <button type="button" onClick={() => goTo("faq")} className="transition hover:text-white">FAQ</button>
-            <Link href="/login" className="transition hover:text-white">Acceso clientes</Link>
+            <a href="https://app.chetesaifitness.com/login" className="transition hover:text-white">Acceso clientes</a>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <Button className="rounded-xl bg-[#2f9e24] px-3 hover:bg-[#27891e] sm:px-4 lg:px-5" onClick={openValuation}>
@@ -573,7 +573,7 @@ export default function Main() {
               <div><p className="font-bold text-white">Chetesaí Fitness+</p><p>Entrena con cabeza. Mejora con método.</p></div>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-5">
-              <Link href="/login" className="transition hover:text-white">Acceso privado</Link>
+              <a href="https://pro.chetesaifitness.com/login" className="transition hover:text-white">Acceso profesional</a>
               <span>© {new Date().getFullYear()} Chetesaí Fitness+ · Derechos reservados sobre contenidos propios</span>
             </div>
           </div>
