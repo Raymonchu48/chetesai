@@ -107,6 +107,7 @@ export function ChetesaiAiAssistant() {
   const [savingWellness, setSavingWellness] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
   const [consultOpen, setConsultOpen] = useState(false);
+  const [unreadProfessionalReplies, setUnreadProfessionalReplies] = useState(0);
   const [consultText, setConsultText] = useState("");
   const [consultSending, setConsultSending] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -122,6 +123,33 @@ export function ChetesaiAiAssistant() {
   const spokenMessageRef = useRef<string | null>(null);
   const pendingRemindersRef = useRef<CoachReminder[]>([]);
   const remindersAnnouncedRef = useRef(false);
+
+  // Keep reply notifications available even when the client has not opened "Consultar profesional".
+  useEffect(() => {
+    if (!isPortal) { setUnreadProfessionalReplies(0); return; }
+    let active = true;
+    async function refreshReplies() {
+      try {
+        const response = await fetch("/api/portal/coach-respuestas", { cache: "no-store" });
+        if (!response.ok) return;
+        const result = await response.json() as { ok?: boolean; unread?: number };
+        if (active && result.ok) setUnreadProfessionalReplies(Math.max(0, Number(result.unread) || 0));
+      } catch { /* Keep the last value if the client is temporarily offline. */ }
+    }
+    const refreshVisible = () => { if (document.visibilityState === "visible") void refreshReplies(); };
+    void refreshReplies();
+    const interval = window.setInterval(refreshVisible, 30000);
+    window.addEventListener("focus", refreshVisible);
+    window.addEventListener("chetesai:replies-read", refreshVisible);
+    document.addEventListener("visibilitychange", refreshVisible);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refreshVisible);
+      window.removeEventListener("chetesai:replies-read", refreshVisible);
+      document.removeEventListener("visibilitychange", refreshVisible);
+    };
+  }, [isPortal]);
 
   function announceReminders(items?: CoachReminder[]) {
     if (remindersAnnouncedRef.current) return;
@@ -602,7 +630,7 @@ export function ChetesaiAiAssistant() {
       <button
         type="button"
         onClick={() => { if (open && voiceAvailable) window.speechSynthesis.cancel(); setOpen((current) => !current); }}
-        aria-label={open ? "Cerrar Chetesaí Coach IA" : "Abrir Chetesaí Coach IA"}
+        aria-label={open ? "Cerrar Chetesaí Coach IA" : unreadProfessionalReplies > 0 ? `Abrir Coach IA: ${unreadProfessionalReplies} respuestas nuevas de tu profesional` : "Abrir Chetesaí Coach IA"}
         aria-expanded={open}
         className={`group fixed right-4 z-[75] grid h-16 w-16 place-items-center rounded-full border border-[#d7b86b]/60 bg-gradient-to-br from-[#17201c] to-[#080b09] text-white shadow-[0_16px_45px_rgba(0,0,0,0.38)] transition duration-300 hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#8cdb78] focus:ring-offset-2 sm:right-6 ${launcherPosition}`}
       >
@@ -619,7 +647,7 @@ export function ChetesaiAiAssistant() {
         )}
         {!open ? (
           <span className="absolute -right-1 -top-1 grid h-6 min-w-6 place-items-center rounded-full border-2 border-[#101713] bg-[#2f9e24] px-1 text-[10px] font-black">
-            IA
+            {isPortal && unreadProfessionalReplies > 0 ? unreadProfessionalReplies : "IA"}
           </span>
         ) : null}
       </button>
@@ -660,6 +688,13 @@ export function ChetesaiAiAssistant() {
           </button>
         </header>
 
+        {isPortal && unreadProfessionalReplies > 0 ? (
+          <button type="button" onClick={() => setConsultOpen(true)}
+            className="mx-4 mt-3 flex min-h-11 items-center justify-between gap-3 rounded-xl border border-[#96c595] bg-[#eaf7e7] px-3 py-2 text-left text-xs font-bold text-[#225b30]">
+            <span>{unreadProfessionalReplies === 1 ? "Tienes una respuesta nueva de tu profesional" : `Tienes ${unreadProfessionalReplies} respuestas nuevas de tu profesional`}</span>
+            <span className="shrink-0 underline">Ver respuestas</span>
+          </button>
+        ) : null}
         <div ref={scrollRef} aria-live="polite" className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
           {messages.map((message) => (
             <div key={message.id} className={`flex items-end gap-2 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
