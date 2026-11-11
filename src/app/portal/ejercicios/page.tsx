@@ -186,9 +186,10 @@ export default function ClientExerciseGuidesPage() {
                 <Link
                   key={exercise.id}
                   href={`/portal/ejercicios/${exercise.id}`}
-                  className="group overflow-hidden rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
+                  prefetch
+                  className="group block touch-manipulation select-none overflow-hidden rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] shadow-sm transition-colors duration-150 md:hover:border-[#8cdb78] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2f9e24]"
                 >
-                  <div className="relative h-52 overflow-hidden bg-white p-2">
+                  <div className="pointer-events-none relative h-52 overflow-hidden bg-white p-2">
                     <ExerciseMediaVisual item={exercise} visualModel={visualModel} />
                     <span className="absolute left-4 top-4 rounded-full bg-[#18211d]/90 px-3 py-1 text-xs font-bold text-white backdrop-blur">
                       {labels[exercise.grupo_muscular] || exercise.grupo_muscular}
@@ -202,7 +203,7 @@ export default function ClientExerciseGuidesPage() {
                       <span className="rounded-full bg-[#f0ede7] px-3 py-1 font-semibold">{totalSets} series planificadas</span>
                       <span className="rounded-full bg-[#fff1e9] px-3 py-1 font-semibold text-[#b65a35]">{variantCount} {variantCount === 1 ? "vista" : "variantes"}</span>
                     </div>
-                    <div className="mt-5 flex items-center justify-between border-t border-[#ece6dc] pt-4 text-sm font-black text-[#46624f]">
+                    <div className="mt-5 flex min-h-11 items-center justify-between border-t border-[#ece6dc] pt-4 text-sm font-black text-[#46624f]">
                       Ver guía de ejecución <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                     </div>
                   </div>
