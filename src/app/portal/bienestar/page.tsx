@@ -81,6 +81,8 @@ export default function ClientWellbeingPage() {
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [quantities, setQuantities] = useState<Record<string, string>>({});
+  const [openDays, setOpenDays] = useState<Record<string, boolean>>({});
+  const [openMeals, setOpenMeals] = useState<Record<string, boolean>>({});
   const today = new Date().toISOString().slice(0, 10);
 
   const load = useCallback(async () => {
@@ -239,8 +241,8 @@ export default function ClientWellbeingPage() {
                           const dayMeals = data.plan!.comidas.filter(meal => meal.nombre.startsWith(`${day} · `));
                           if (!dayMeals.length) return null;
                           const kcal = nutritionTotals(dayMeals.flatMap(meal => meal.alimentos || [])).kcal;
-                          return <details key={day} className="group overflow-hidden rounded-[24px] border border-[#dce4d9] bg-[#fffdf9] shadow-sm" open={false}>
-                            <summary className="relative flex cursor-pointer list-none items-center justify-between gap-3 overflow-hidden px-4 py-5 marker:hidden sm:px-6 [&::-webkit-details-marker]:hidden">
+                          return <details key={day} className="group overflow-hidden rounded-[24px] border border-[#dce4d9] bg-[#fffdf9] shadow-sm" open={Boolean(openDays[day])}>
+                            <summary onClick={(event) => { event.preventDefault(); setOpenDays(current => ({ ...current, [day]: !current[day] })); }} aria-label={`${openDays[day] ? "Cerrar" : "Ver"} comidas del ${day}`} aria-expanded={Boolean(openDays[day])} className="relative flex min-h-20 touch-manipulation cursor-pointer select-none list-none items-center justify-between gap-3 overflow-hidden px-4 py-5 marker:hidden sm:px-6 [&::-webkit-details-marker]:hidden">
                               <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-[31%] right-[110px] hidden items-center justify-center gap-1 overflow-hidden opacity-55 sm:flex lg:left-[28%] lg:right-[145px]">
                                 <span className="text-3xl opacity-80 lg:text-4xl">🥕</span><span className="translate-y-2 text-3xl lg:text-4xl">🥦</span><span className="-translate-y-1 text-3xl lg:text-4xl">🍅</span><span className="translate-y-2 text-3xl lg:text-4xl">🌽</span><span className="text-3xl lg:text-4xl">🍆</span><span className="-translate-y-2 text-3xl lg:text-4xl">🍋</span><span className="translate-y-1 text-3xl lg:text-4xl">🍇</span>
                               </div>
@@ -257,8 +259,8 @@ export default function ClientWellbeingPage() {
                                 <div className="absolute bottom-2 right-1 flex gap-2 text-3xl opacity-20"><span>🥬</span><span>🍄</span><span>🫑</span></div>
                               </div>
                               <div className="relative z-10 space-y-3">
-                                {dayMeals.map((meal,index) => <details key={`${day}-${meal.nombre}-${index}`} className="group/meal overflow-hidden rounded-xl border border-[#d7e1d5] bg-white/95">
-                                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-4 marker:hidden [&::-webkit-details-marker]:hidden">
+                                {dayMeals.map((meal,index) => <details key={`${day}-${meal.nombre}-${index}`} className="group/meal overflow-hidden rounded-xl border border-[#d7e1d5] bg-white/95" open={Boolean(openMeals[`${day}-${meal.nombre}-${index}`])}>
+                                  <summary onClick={(event) => { event.preventDefault(); const key = `${day}-${meal.nombre}-${index}`; setOpenMeals(current => ({ ...current, [key]: !current[key] })); }} aria-expanded={Boolean(openMeals[`${day}-${meal.nombre}-${index}`])} className="flex min-h-14 touch-manipulation cursor-pointer select-none list-none items-center justify-between gap-3 px-4 py-4 marker:hidden [&::-webkit-details-marker]:hidden">
                                     <div className="min-w-0"><p className="font-semibold !text-[#263f31]">{meal.nombre.split(" · ").slice(1).join(" · ") || meal.nombre}</p><p className="text-xs text-[#59695e]">{meal.hora} · {Math.round(nutritionTotals(meal.alimentos || []).kcal)} kcal{meal.alimentos?.some(food => food.macros_no_declarados) ? " · parcial" : ""}</p></div>
                                     <span className="shrink-0 text-sm font-semibold text-[#46624f]"><span className="group-open/meal:hidden">Mostrar +</span><span className="hidden group-open/meal:inline">Ocultar −</span></span>
                                   </summary>
