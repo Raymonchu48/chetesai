@@ -91,3 +91,36 @@
     font-size: inherit !important;
   }
 }
+
+/*
+ * Phone-only touch response.
+ * On narrow coarse-pointer screens, do not require hover animations before taps.
+ * Tablets and desktop are intentionally unaffected.
+ */
+@media (max-width: 639px) and (hover: none) and (pointer: coarse) {
+  :where(button, a[href], summary, [role="button"], [role="tab"], [role="menuitem"]) {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(137, 185, 77, 0.18);
+  }
+
+  /* Radix/shared buttons were rendered as small as 32px high. */
+  button[data-slot="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Avoid expensive animated movement and sticky hover state on phone cards. */
+  :where(button, a[href], summary, [role="button"], [role="tab"], [role="menuitem"]):hover {
+    transform: none !important;
+  }
+
+  :where(button, a[href], summary, [role="button"], [role="tab"], [role="menuitem"]) {
+    transition-property: color, background-color, border-color, opacity !important;
+    transition-duration: 100ms !important;
+  }
+
+  /* Tap the whole interactive surface; do not let decorative icons intercept it. */
+  :where(button, a[href], summary, [role="button"], [role="tab"], [role="menuitem"]) > svg {
+    pointer-events: none;
+  }
+}
