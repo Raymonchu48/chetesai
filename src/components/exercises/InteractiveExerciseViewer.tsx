@@ -38,7 +38,7 @@ export default function InteractiveExerciseViewer({ item, visualModel = "hombre"
   const [activeId, setActiveId] = useState(variants[0]?.id || "");
 
   const active = variants.find((variant) => variant.id === activeId) || variants[0];
-  if (!active) return <ExerciseMediaVisual item={item} visualModel={visualModel} />;
+  if (!active) return <ExerciseMediaVisual item={item} visualModel={visualModel} eager />;
 
   const directVideo = isDirectVideoUrl(active.video_url);
   const fallbackItem = active.imagen_url
@@ -62,7 +62,7 @@ export default function InteractiveExerciseViewer({ item, visualModel = "hombre"
           />
         ) : (
           <div className="absolute inset-0 bg-white p-2 sm:p-4">
-            <ExerciseMediaVisual item={fallbackItem} visualModel={visualModel} />
+            <ExerciseMediaVisual item={fallbackItem} visualModel={visualModel} eager />
           </div>
         )}
 
@@ -99,7 +99,7 @@ export default function InteractiveExerciseViewer({ item, visualModel = "hombre"
                 role="tab"
                 aria-selected={variant.id === active.id}
                 onClick={() => setActiveId(variant.id)}
-                className={`shrink-0 rounded-full border px-4 py-2 text-xs font-black transition ${variant.id === active.id ? "border-[#46624f] bg-[#46624f] text-white shadow-sm" : "border-[#dfe8dc] bg-white text-[#56605a] hover:border-[#8cdb78]"}`}
+                className={`min-h-11 shrink-0 touch-manipulation rounded-full border px-4 py-2 text-xs font-black transition-colors ${variant.id === active.id ? "border-[#46624f] bg-[#46624f] text-white shadow-sm" : "border-[#dfe8dc] bg-white text-[#56605a] hover:border-[#8cdb78]"}`}
               >
                 {variant.nombre}
               </button>

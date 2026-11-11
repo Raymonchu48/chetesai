@@ -15,9 +15,10 @@ type ExerciseMediaItem = {
 type Props = {
   item: ExerciseMediaItem;
   visualModel?: ExerciseVisualModel;
+  eager?: boolean;
 };
 
-export default function ExerciseMediaVisual({ item, visualModel = "hombre" }: Props) {
+export default function ExerciseMediaVisual({ item, visualModel = "hombre", eager = false }: Props) {
   const uploaded = visualModel === "mujer"
     ? item.imagen_mujer_url
     : item.imagen_url || item.gif_url || item.miniatura_url;
@@ -27,7 +28,7 @@ export default function ExerciseMediaVisual({ item, visualModel = "hombre" }: Pr
 
   // Each model uses its own uploaded image; existing male media stays intact.
   if (uploaded) {
-    return <img src={uploaded} alt={item.nombre} className="h-full w-full object-contain bg-white" />;
+    return <img src={uploaded} alt={item.nombre} loading={eager ? "eager" : "lazy"} decoding="async" className="h-full w-full object-contain bg-white" />;
   }
 
   // Los ejercicios de Piernas conservan el banco visual final como alternativa.
