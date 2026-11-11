@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, BookOpen, Dumbbell, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -73,9 +72,12 @@ export default function ClientExerciseGuidesPage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [group, setGroup] = useState("todos");
+  const [assignmentId, setAssignmentId] = useState("");
 
   useEffect(() => {
-    fetch("/api/portal/rutina")
+    const requestedAssignmentId = new URLSearchParams(window.location.search).get("asignacion_id") || "";
+    setAssignmentId(requestedAssignmentId);
+    fetch(`/api/portal/rutina${requestedAssignmentId ? `?asignacion_id=${encodeURIComponent(requestedAssignmentId)}` : ""}`, { cache: "no-store" })
       .then(async (response) => {
         const result = (await response.json()) as { ok: boolean; data?: PortalData | null; error?: string };
         if (!response.ok || !result.ok) throw new Error(result.error || "No se pudieron cargar las guías");
@@ -183,10 +185,9 @@ export default function ClientExerciseGuidesPage() {
               const totalSets = assignments.reduce((sum, item) => sum + Number(item.series || 0), 0);
               const variantCount = getExerciseVisualVariants(exercise).length;
               return (
-                <Link
+                <a
                   key={exercise.id}
-                  href={`/portal/ejercicios/${exercise.id}`}
-                  prefetch
+                  href={`/portal/ejercicios/${exercise.id}${assignmentId ? `?asignacion_id=${encodeURIComponent(assignmentId)}` : ""}`}
                   className="group block touch-manipulation select-none overflow-hidden rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] shadow-sm transition-colors duration-150 md:hover:border-[#8cdb78] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2f9e24]"
                 >
                   <div className="pointer-events-none relative h-52 overflow-hidden bg-white p-2">
@@ -207,7 +208,7 @@ export default function ClientExerciseGuidesPage() {
                       Ver guía de ejecución <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                     </div>
                   </div>
-                </Link>
+                </a>
               );
             })}
           </div>

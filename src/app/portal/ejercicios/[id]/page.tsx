@@ -93,9 +93,12 @@ export default function ExerciseGuideDetailPage() {
   const [data, setData] = useState<PortalData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [assignmentId, setAssignmentId] = useState("");
 
   useEffect(() => {
-    fetch("/api/portal/rutina")
+    const requestedAssignmentId = new URLSearchParams(window.location.search).get("asignacion_id") || "";
+    setAssignmentId(requestedAssignmentId);
+    fetch(`/api/portal/rutina${requestedAssignmentId ? `?asignacion_id=${encodeURIComponent(requestedAssignmentId)}` : ""}`, { cache: "no-store" })
       .then(async (response) => {
         const result = (await response.json()) as { ok: boolean; data?: PortalData | null; error?: string };
         if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo cargar la guía");
@@ -123,7 +126,7 @@ export default function ExerciseGuideDetailPage() {
           <Dumbbell className="mx-auto h-10 w-10 text-[#8b938e]" />
           <h1 className="mt-4 text-2xl font-black">Guía no disponible</h1>
           <p className="mt-2 text-sm text-[#707872]">{error || "Este ejercicio no forma parte de tu planificación activa."}</p>
-          <Link href="/portal/ejercicios" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#46624f] px-5 py-3 text-sm font-bold text-white">
+          <Link href={`/portal/ejercicios${assignmentId ? `?asignacion_id=${encodeURIComponent(assignmentId)}` : ""}`} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#46624f] px-5 py-3 text-sm font-bold text-white">
             <ArrowLeft className="h-4 w-4" /> Volver a mis guías
           </Link>
         </div>
@@ -134,7 +137,7 @@ export default function ExerciseGuideDetailPage() {
   return (
     <main className="min-h-screen bg-[#f7f4ee] px-5 py-8 text-[#29312e] md:py-10">
       <div className="mx-auto max-w-6xl">
-        <Link href="/portal/ejercicios" className="mb-5 inline-flex items-center gap-2 text-sm font-bold text-[#46624f] hover:underline">
+        <Link href={`/portal/ejercicios${assignmentId ? `?asignacion_id=${encodeURIComponent(assignmentId)}` : ""}`} className="mb-5 inline-flex items-center gap-2 text-sm font-bold text-[#46624f] hover:underline">
           <ArrowLeft className="h-4 w-4" /> Volver a la guía de ejercicios
         </Link>
 
