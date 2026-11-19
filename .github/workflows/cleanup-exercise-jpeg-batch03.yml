@@ -1,0 +1,70 @@
+name: "Chetesaí: controlled JPEG cleanup batch 03"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/cleanup-exercise-jpeg-batch03.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/cleanup-exercise-jpeg-batch03.yml"
+      - "scripts/cleanup-jpeg-batch03.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: chetesai-jpeg-cleanup-production
+  cancel-in-progress: false
+
+jobs:
+  lint:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout script for syntax verification
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Python syntax validation
+        run: python3 -m py_compile scripts/cleanup-jpeg-batch03.py
+  cleanup:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout reviewed maintenance script
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Prepare PostgreSQL 17 client
+        run: docker pull postgres:17
+      - name: Audit next 25 JPG/JPEG and their active WebP replacements
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-jpeg-batch03.py audit
+      - name: Download and encrypt rollback copies before deletion
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_ENCRYPTION_PASSWORD: ${{ secrets.BACKUP_ENCRYPTION_PASSWORD }}
+        run: python3 scripts/cleanup-jpeg-batch03.py archive
+      - name: Preserve encrypted rollback archive as GitHub artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: chetesai-jpeg-batch03-rollback-encrypted
+          path: chetesai-jpeg-batch03-rollback.tar.gz.enc
+          retention-days: 30
+          if-no-files-found: error
+      - name: Delete ONLY the audited 25 JPG/JPEG with Storage API
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AUTHORIZED_BATCH_ID: CHETESAI-20261119-JPEG-03
+        run: python3 scripts/cleanup-jpeg-batch03.py remove
+      - name: Confirm JPEG deletion and preservation of all 25 WebP images
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-jpeg-batch03.py verify
