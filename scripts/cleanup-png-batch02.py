@@ -77,7 +77,8 @@ def validate(before=True):
         "  IF NOT EXISTS(SELECT 1 FROM storage.objects o WHERE o.bucket_id='exercise-media' AND o.name='zancada-atras-con-press-encima-hombre/imagen-1795090727025-88122d8b.png') THEN RAISE EXCEPTION 'New male PNG missing'; END IF;",
         "  IF NOT EXISTS(SELECT 1 FROM storage.objects o WHERE o.bucket_id='exercise-media' AND o.name='zancada-atras-con-press-encima-mujer/imagen-1795091043795-747211e5.png') THEN RAISE EXCEPTION 'New female PNG missing'; END IF;",
         "  IF NOT EXISTS(SELECT 1 FROM public.ejercicios e WHERE e.imagen_url like '%/zancada-atras-con-press-encima-hombre/imagen-1795090727025-88122d8b.png' AND e.imagen_mujer_url like '%/zancada-atras-con-press-encima-mujer/imagen-1795091043795-747211e5.png') THEN RAISE EXCEPTION 'New zancada PNG references changed'; END IF;",
-        "  IF EXISTS(SELECT 1 FROM public.ejercicios e CROSS JOIN LATERAL (VALUES (e.imagen_url), (e.imagen_mujer_url), (e.miniatura_url), (e.gif_url)) urls(path) WHERE urls.path ~* '\\.png        " FOR item IN SELECT * FROM (VALUES " + rows + ") AS pairs(original_path,replacement_path) LOOP",
+        "  IF EXISTS(SELECT 1 FROM public.ejercicios e CROSS JOIN LATERAL (VALUES (e.imagen_url), (e.imagen_mujer_url), (e.miniatura_url), (e.gif_url)) urls(path) WHERE lower(right(urls.path,4))='.png' AND NOT EXISTS(SELECT 1 FROM storage.objects o WHERE o.bucket_id='exercise-media' AND urls.path like '%'||o.name)) THEN RAISE EXCEPTION 'An active exercise PNG is missing'; END IF;",
+        " FOR item IN SELECT * FROM (VALUES " + rows + ") AS pairs(original_path,replacement_path) LOOP",
     ]
     if before:
         checks += [
@@ -106,7 +107,7 @@ def validate(before=True):
             "    WHERE table_schema='public' AND table_type='BASE TABLE' LOOP",
             "    EXECUTE format('SELECT EXISTS(SELECT 1 FROM public.%I t WHERE strpos(row_to_json(t)::text,$1)>0)',tab.table_name)",
             "      INTO referenced USING item.original_path;",
-            "    IF referenced THEN RAISE EXCEPTION 'JPEG is referenced in table %: %',tab.table_name,item.original_path; END IF;",
+            "    IF referenced THEN RAISE EXCEPTION 'PNG is referenced in table %: %',tab.table_name,item.original_path; END IF;",
             "  END LOOP;",
         ]
     checks += [" END LOOP;", "END $safe$;"]
@@ -134,7 +135,7 @@ def archive():
             content = api_request("GET", url)
             if not content or len(content) > 30_000_000:
                 raise RuntimeError("Unexpected backup object size: " + original)
-            destination = temp / "jpeg" / original
+            destination = temp / "png" / original
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_bytes(content)
             manifest.append({"original": original, "replacement": replacement,
@@ -143,7 +144,7 @@ def archive():
         tarpath = temp / "archive.tar.gz"
         with tarfile.open(tarpath, "w:gz") as tar:
             tar.add(temp / "manifest.json", arcname="manifest.json")
-            tar.add(temp / "jpeg", arcname="jpeg")
+            tar.add(temp / "png", arcname="png")
         subprocess.run(["openssl", "enc", "-aes-256-cbc", "-salt", "-pbkdf2",
                         "-in", str(tarpath), "-out", ENCRYPTED_ARCHIVE,
                         "-pass", "env:BACKUP_ENCRYPTION_PASSWORD"], check=True)
@@ -236,7 +237,7 @@ def archive():
             content = api_request("GET", url)
             if not content or len(content) > 30_000_000:
                 raise RuntimeError("Unexpected backup object size: " + original)
-            destination = temp / "jpeg" / original
+            destination = temp / "png" / original
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_bytes(content)
             manifest.append({"original": original, "replacement": replacement,
@@ -245,7 +246,7 @@ def archive():
         tarpath = temp / "archive.tar.gz"
         with tarfile.open(tarpath, "w:gz") as tar:
             tar.add(temp / "manifest.json", arcname="manifest.json")
-            tar.add(temp / "jpeg", arcname="jpeg")
+            tar.add(temp / "png", arcname="jpeg")
         subprocess.run(["openssl", "enc", "-aes-256-cbc", "-salt", "-pbkdf2",
                         "-in", str(tarpath), "-out", ENCRYPTED_ARCHIVE,
                         "-pass", "env:BACKUP_ENCRYPTION_PASSWORD"], check=True)
