@@ -5,6 +5,11 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/cleanup-exercise-jpeg-batch01.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/cleanup-exercise-jpeg-batch01.yml"
+      - "scripts/cleanup-jpeg-batch01.py"
   workflow_dispatch:
 
 permissions:
@@ -15,8 +20,18 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  lint:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout script for syntax verification
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Python syntax validation
+        run: python3 -m py_compile scripts/cleanup-jpeg-batch01.py
   cleanup:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
