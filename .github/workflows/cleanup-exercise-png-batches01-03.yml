@@ -1,0 +1,126 @@
+name: 'Chetesai: controlled PNG cleanup batches 01-03'
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/cleanup-exercise-png-batches01-03.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/cleanup-exercise-png-batches01-03.yml'
+      - 'scripts/cleanup-png-batch01.py'
+      - 'scripts/cleanup-png-batch02.py'
+      - 'scripts/cleanup-png-batch03.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: chetesai-storage-cleanup-png-production
+  cancel-in-progress: false
+
+jobs:
+  lint:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout manifests
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Validate Python scripts
+        run: python3 -m py_compile scripts/cleanup-png-batch01.py scripts/cleanup-png-batch02.py scripts/cleanup-png-batch03.py
+  cleanup:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout immutable PNG manifests
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Prepare Postgres 17 client
+        run: docker pull postgres:17
+      - name: "Batch 01: verify 20 inactive PNGs and their current WebPs"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-png-batch01.py audit
+      - name: "Batch 01: make encrypted rollback archive"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_ENCRYPTION_PASSWORD: ${{ secrets.BACKUP_ENCRYPTION_PASSWORD }}
+        run: python3 scripts/cleanup-png-batch01.py archive
+      - name: "Batch 01: save encrypted rollback artifact"
+        uses: actions/upload-artifact@v6
+        with:
+          name: chetesai-png-batch01-rollback-encrypted
+          path: chetesai-png-batch01-rollback.tar.gz.enc
+          retention-days: 30
+          if-no-files-found: error
+      - name: "Batch 01: remove audited PNGs through Storage API"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AUTHORIZED_BATCH_ID: CHETESAI-20261119-PNG-01
+        run: python3 scripts/cleanup-png-batch01.py remove
+      - name: "Batch 01: verify originals gone and active media preserved"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-png-batch01.py verify
+      - name: "Batch 02: verify 20 inactive PNGs and their current WebPs"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-png-batch02.py audit
+      - name: "Batch 02: make encrypted rollback archive"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_ENCRYPTION_PASSWORD: ${{ secrets.BACKUP_ENCRYPTION_PASSWORD }}
+        run: python3 scripts/cleanup-png-batch02.py archive
+      - name: "Batch 02: save encrypted rollback artifact"
+        uses: actions/upload-artifact@v6
+        with:
+          name: chetesai-png-batch02-rollback-encrypted
+          path: chetesai-png-batch02-rollback.tar.gz.enc
+          retention-days: 30
+          if-no-files-found: error
+      - name: "Batch 02: remove audited PNGs through Storage API"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AUTHORIZED_BATCH_ID: CHETESAI-20261119-PNG-02
+        run: python3 scripts/cleanup-png-batch02.py remove
+      - name: "Batch 02: verify originals gone and active media preserved"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-png-batch02.py verify
+      - name: "Batch 03: verify 19 inactive PNGs and their current WebPs"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-png-batch03.py audit
+      - name: "Batch 03: make encrypted rollback archive"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_ENCRYPTION_PASSWORD: ${{ secrets.BACKUP_ENCRYPTION_PASSWORD }}
+        run: python3 scripts/cleanup-png-batch03.py archive
+      - name: "Batch 03: save encrypted rollback artifact"
+        uses: actions/upload-artifact@v6
+        with:
+          name: chetesai-png-batch03-rollback-encrypted
+          path: chetesai-png-batch03-rollback.tar.gz.enc
+          retention-days: 30
+          if-no-files-found: error
+      - name: "Batch 03: remove audited PNGs through Storage API"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AUTHORIZED_BATCH_ID: CHETESAI-20261119-PNG-03
+        run: python3 scripts/cleanup-png-batch03.py remove
+      - name: "Batch 03: verify originals gone and active media preserved"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-png-batch03.py verify
