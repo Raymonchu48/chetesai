@@ -1,0 +1,182 @@
+name: "Chetesaí: sequential controlled JPEG cleanup batches 04–08"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/cleanup-exercise-jpeg-batches04-08.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/cleanup-exercise-jpeg-batches04-08.yml"
+      - "scripts/cleanup-jpeg-batch04.py"
+      - "scripts/cleanup-jpeg-batch05.py"
+      - "scripts/cleanup-jpeg-batch06.py"
+      - "scripts/cleanup-jpeg-batch07.py"
+      - "scripts/cleanup-jpeg-batch08.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: chetesai-jpeg-cleanup-production
+  cancel-in-progress: false
+
+jobs:
+  lint:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout manifest scripts
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Check every manifest syntax
+        run: python3 -m py_compile scripts/cleanup-jpeg-batch04.py scripts/cleanup-jpeg-batch05.py scripts/cleanup-jpeg-batch06.py scripts/cleanup-jpeg-batch07.py scripts/cleanup-jpeg-batch08.py
+  cleanup:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - name: Checkout manifests
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Prepare PostgreSQL 17 client
+        run: docker pull postgres:17
+      - name: "Batch 04: audit 25 originals and active WebP"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-jpeg-batch04.py audit
+      - name: "Batch 04: encrypted restore copy"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_ENCRYPTION_PASSWORD: ${{ secrets.BACKUP_ENCRYPTION_PASSWORD }}
+        run: python3 scripts/cleanup-jpeg-batch04.py archive
+      - name: "Batch 04: preserve encrypted recovery artifact"
+        uses: actions/upload-artifact@v6
+        with:
+          name: chetesai-jpeg-batch04-rollback-encrypted
+          path: chetesai-jpeg-batch04-rollback.tar.gz.enc
+          retention-days: 30
+          if-no-files-found: error
+      - name: "Batch 04: remove exact audited JPEG objects"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AUTHORIZED_BATCH_ID: CHETESAI-20261119-JPEG-04
+        run: python3 scripts/cleanup-jpeg-batch04.py remove
+      - name: "Batch 04: verify WebP preserved and originals absent"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-jpeg-batch04.py verify
+      - name: "Batch 05: audit 25 originals and active WebP"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-jpeg-batch05.py audit
+      - name: "Batch 05: encrypted restore copy"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_ENCRYPTION_PASSWORD: ${{ secrets.BACKUP_ENCRYPTION_PASSWORD }}
+        run: python3 scripts/cleanup-jpeg-batch05.py archive
+      - name: "Batch 05: preserve encrypted recovery artifact"
+        uses: actions/upload-artifact@v6
+        with:
+          name: chetesai-jpeg-batch05-rollback-encrypted
+          path: chetesai-jpeg-batch05-rollback.tar.gz.enc
+          retention-days: 30
+          if-no-files-found: error
+      - name: "Batch 05: remove exact audited JPEG objects"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AUTHORIZED_BATCH_ID: CHETESAI-20261119-JPEG-05
+        run: python3 scripts/cleanup-jpeg-batch05.py remove
+      - name: "Batch 05: verify WebP preserved and originals absent"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-jpeg-batch05.py verify
+      - name: "Batch 06: audit 25 originals and active WebP"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-jpeg-batch06.py audit
+      - name: "Batch 06: encrypted restore copy"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_ENCRYPTION_PASSWORD: ${{ secrets.BACKUP_ENCRYPTION_PASSWORD }}
+        run: python3 scripts/cleanup-jpeg-batch06.py archive
+      - name: "Batch 06: preserve encrypted recovery artifact"
+        uses: actions/upload-artifact@v6
+        with:
+          name: chetesai-jpeg-batch06-rollback-encrypted
+          path: chetesai-jpeg-batch06-rollback.tar.gz.enc
+          retention-days: 30
+          if-no-files-found: error
+      - name: "Batch 06: remove exact audited JPEG objects"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AUTHORIZED_BATCH_ID: CHETESAI-20261119-JPEG-06
+        run: python3 scripts/cleanup-jpeg-batch06.py remove
+      - name: "Batch 06: verify WebP preserved and originals absent"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-jpeg-batch06.py verify
+      - name: "Batch 07: audit 25 originals and active WebP"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-jpeg-batch07.py audit
+      - name: "Batch 07: encrypted restore copy"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_ENCRYPTION_PASSWORD: ${{ secrets.BACKUP_ENCRYPTION_PASSWORD }}
+        run: python3 scripts/cleanup-jpeg-batch07.py archive
+      - name: "Batch 07: preserve encrypted recovery artifact"
+        uses: actions/upload-artifact@v6
+        with:
+          name: chetesai-jpeg-batch07-rollback-encrypted
+          path: chetesai-jpeg-batch07-rollback.tar.gz.enc
+          retention-days: 30
+          if-no-files-found: error
+      - name: "Batch 07: remove exact audited JPEG objects"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AUTHORIZED_BATCH_ID: CHETESAI-20261119-JPEG-07
+        run: python3 scripts/cleanup-jpeg-batch07.py remove
+      - name: "Batch 07: verify WebP preserved and originals absent"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-jpeg-batch07.py verify
+      - name: "Batch 08: audit 3 originals and active WebP"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-jpeg-batch08.py audit
+      - name: "Batch 08: encrypted restore copy"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_ENCRYPTION_PASSWORD: ${{ secrets.BACKUP_ENCRYPTION_PASSWORD }}
+        run: python3 scripts/cleanup-jpeg-batch08.py archive
+      - name: "Batch 08: preserve encrypted recovery artifact"
+        uses: actions/upload-artifact@v6
+        with:
+          name: chetesai-jpeg-batch08-rollback-encrypted
+          path: chetesai-jpeg-batch08-rollback.tar.gz.enc
+          retention-days: 30
+          if-no-files-found: error
+      - name: "Batch 08: remove exact audited JPEG objects"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AUTHORIZED_BATCH_ID: CHETESAI-20261119-JPEG-08
+        run: python3 scripts/cleanup-jpeg-batch08.py remove
+      - name: "Batch 08: verify WebP preserved and originals absent"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 scripts/cleanup-jpeg-batch08.py verify
