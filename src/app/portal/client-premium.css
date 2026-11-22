@@ -574,3 +574,123 @@
 .client-privacy-legacy main header > p:first-child {
   color: #d8bb7a;
 }
+
+
+/* --------------------------------------------------------------
+   Events client page — premium depth and contrast, 2026-11-22.
+   Scoped to .client-page-events only. Existing registration,
+   cancellations, availability and notification controls unchanged.
+   -------------------------------------------------------------- */
+.client-experience .client-page-events {
+  color: #203629 !important;
+}
+.client-experience .client-page-events .client-page-hero > div > p:first-child {
+  color: #e0ff9d !important;
+}
+.client-experience .client-page-events .client-page-hero h1,
+.client-experience .client-page-events .client-page-hero h1 svg {
+  color: #f7fcec !important;
+}
+.client-experience .client-page-events .client-page-hero > div > p:last-child {
+  color: #dcebd8 !important;
+}
+/* The logout button retains its own dark surface and white label. */
+.client-experience .client-page-events .client-page-hero > div:last-child {
+  box-shadow: 0 9px 18px rgba(8,19,11,.24), inset 0 1px rgba(255,255,255,.75);
+}
+.client-experience .client-page-events .client-event-metric {
+  min-width: 0;
+}
+.client-experience .client-page-events .client-event-metric [data-slot="card-content"] > p {
+  color: #e9f5e3 !important;
+}
+.client-experience .client-page-events .client-event-metric [data-slot="card-content"] > p:last-child {
+  color: #e4ffad !important;
+}
+/* Light communications panel, with high-contrast labels and raised controls. */
+.client-experience .client-page-events .client-event-preferences {
+  color: #203629 !important;
+  background:
+    radial-gradient(ellipse at 97% 0%,rgba(203,246,147,.34),transparent 57%),
+    linear-gradient(150deg,#fcfef9,#eaf3e7) !important;
+}
+.client-experience .client-page-events .client-event-preferences :is(h2,p) {
+  color: #203629 !important;
+}
+.client-experience .client-page-events .client-event-preferences .client-event-preference {
+  color: #203629 !important;
+  background: linear-gradient(160deg,#ffffff,#edf5e9) !important;
+  border: 1px solid #bed3b4 !important;
+  border-radius: 22px;
+  box-shadow: 0 12px 22px rgba(25,49,29,.15),
+              0 3px 0 rgba(48,78,42,.1),
+              inset 0 2px rgba(255,255,255,.97),
+              inset 0 -3px 6px rgba(46,80,40,.06);
+  touch-action: manipulation;
+}
+.client-experience .client-page-events .client-event-preference p:first-child {
+  color: #203629 !important;
+}
+.client-experience .client-page-events .client-event-preference p:nth-child(2) {
+  color: #48604e !important;
+}
+.client-experience .client-page-events .client-event-preference input[type="checkbox"] {
+  accent-color: #466b36;
+  min-width: 20px;
+  min-height: 20px;
+}
+/* Event tiles: photo remains untouched; lower panel gains olive depth. */
+.client-experience .client-page-events .client-event-card {
+  overflow: hidden;
+  color: #f7fbee !important;
+  border: 1px solid rgba(211,255,153,.46) !important;
+  border-radius: 29px !important;
+  background:
+    radial-gradient(ellipse at 95% 0%,rgba(172,231,102,.24),transparent 60%),
+    linear-gradient(145deg,#354b38,#192a20) !important;
+  box-shadow: 0 24px 36px -10px rgba(20,39,23,.34),
+              0 7px 0 -2px rgba(27,50,30,.22),
+              inset 0 2px 1px rgba(249,255,217,.36),
+              inset 0 -5px 9px rgba(0,0,0,.23) !important;
+}
+.client-experience .client-page-events .client-event-card .client-event-image {
+  background-color: #16251a !important;
+  box-shadow: inset 0 -5px 13px rgba(0,0,0,.19);
+}
+.client-experience .client-page-events .client-event-card .client-event-image p {
+  color: #fff !important;
+}
+.client-experience .client-page-events .client-event-card .client-event-image p:last-child {
+  color: #edf7e3 !important;
+}
+.client-experience .client-page-events .client-event-card [data-slot="card-content"] {
+  color: #f7faee !important;
+  background:
+    radial-gradient(ellipse at 100% 2%,rgba(174,233,106,.15),transparent 67%),
+    linear-gradient(165deg,#314635 0%,#1b2b21 100%) !important;
+}
+.client-experience .client-page-events .client-event-card [data-slot="card-content"] > p,
+.client-experience .client-page-events .client-event-card [data-slot="card-content"] > div.mt-4.space-y-2 p {
+  color: #e5efdd !important;
+}
+.client-experience .client-page-events .client-event-card [data-slot="card-content"] > div.mt-4.space-y-2 svg {
+  color: #d5ff91 !important;
+}
+/* Registration badges remain in their original emerald/amber/slate colors. */
+.client-experience .client-page-events .client-event-card [data-slot="card-content"] > div.mt-5:not(:last-child) {
+  box-shadow: inset 0 1px rgba(255,255,255,.22);
+}
+.client-experience .client-page-events .client-event-card [data-slot="button"] {
+  min-height: 44px;
+  touch-action: manipulation;
+  box-shadow: 0 7px 12px rgba(0,0,0,.23), inset 0 1px rgba(255,255,255,.14);
+}
+/* Neutral empty states should be readable against their light backgrounds. */
+.client-experience .client-page-events [data-slot="card"]:not(.client-metric-card):not(.client-event-card) {
+  color: #203629 !important;
+}
+@media (max-width:640px) {
+  .client-experience .client-page-events .client-event-card {
+    border-radius: 25px !important;
+  }
+}
