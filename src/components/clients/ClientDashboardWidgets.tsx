@@ -26,6 +26,17 @@ export default function ClientDashboardWidgets({ routineName, routineMinutes, we
   const percentage = Math.min(100, Math.round(weeklySessions * 100 / safeGoal));
   const ringStyle = { "--client-ring-progress": percentage + "%" } as CSSProperties;
   const openCoach = () => window.dispatchEvent(new Event("chetesai:open-coach"));
+  const openHistory = () => {
+    if (window.innerWidth < 768) {
+      const details = document.getElementById("client-history-anchor") as HTMLDetailsElement | null;
+      if (details) { details.open = true; details.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    } else {
+      const section = document.getElementById("client-history-desktop");
+      const trigger = section?.querySelector("button[aria-expanded]") as HTMLButtonElement | null;
+      if (trigger?.getAttribute("aria-expanded") === "false") trigger.click();
+      section?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
   return (
     <section aria-label="Tu panel de bienestar" className="client-widgets" id="client-dashboard-widgets">
       <div className="client-widget-grid">
@@ -73,7 +84,7 @@ export default function ClientDashboardWidgets({ routineName, routineMinutes, we
           <div className="client-widget-history-rows">
             {history.length ? history.slice(0, 2).map((entry) => <div key={entry.id} className="client-widget-history-item"><span className="client-widget-history-icon"><CheckCircle2 size={21} aria-hidden="true" /></span><div><strong>Entrenamiento completado</strong><span>{WEEKDAYS[entry.day - 1] || "Sesión"} · {new Date(entry.date).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })} · {entry.series} series</span></div><CheckCircle2 className="client-widget-history-check" size={20} aria-hidden="true" /></div>) : <p className="client-widget-empty">Tus sesiones completadas aparecerán aquí.</p>}
           </div>
-          <a className="client-widget-action" href="#client-history-anchor">Consultar historial<ArrowRight size={18} aria-hidden="true" /></a>
+          {history.length > 0 && <button type="button" className="client-widget-action" onClick={openHistory}>Consultar historial<ArrowRight size={18} aria-hidden="true" /></button>}
         </article>
       </div>
     </section>
