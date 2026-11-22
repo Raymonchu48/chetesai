@@ -112,9 +112,9 @@ export default function ClientAppointmentsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f4ee] px-5 py-10 text-[#29312e]">
+    <main className="client-premium-page client-page-appointments min-h-screen bg-[#f7f4ee] px-5 py-10 text-[#29312e]">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-8 flex flex-col gap-5 rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <header className="client-page-hero mb-8 flex flex-col gap-5 rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs font-bold tracking-[0.22em] text-[#c9653b]">CHETESAÍ FITNESS+</p>
             <h1 className="mt-2 flex items-center gap-3 text-3xl font-bold tracking-tight"><CalendarDays className="h-8 w-8 text-[#46624f]" />Mis citas</h1>
@@ -157,4 +157,4 @@ function AppointmentCard({ session, updating = false, history = false, onConfirm
   const date = new Date(session.inicio_at);
   return <Card><CardContent className="p-5"><div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between"><div className="flex gap-4"><div className="min-w-20 rounded-2xl bg-[#eef5ef] px-3 py-3 text-center text-[#46624f]"><p className="text-2xl font-bold">{date.toLocaleDateString("es-ES", { day: "2-digit" })}</p><p className="text-xs uppercase">{date.toLocaleDateString("es-ES", { month: "short" })}</p></div><div><div className="flex flex-wrap items-center gap-2"><h3 className="text-lg font-bold">{session.titulo}</h3><Badge className={stateClasses[session.estado]}>{stateLabels[session.estado] || session.estado}</Badge></div><p className="mt-2 flex items-center gap-2 text-sm text-[#707872]"><Clock3 className="h-4 w-4" />{date.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })} · {session.duracion_minutos} minutos · {typeLabels[session.tipo_sesion] || session.tipo_sesion}</p>{session.ubicacion ? <p className="mt-1 flex items-center gap-2 text-sm text-[#707872]"><MapPin className="h-4 w-4" />{session.ubicacion}</p> : null}{session.mensaje_cliente ? <p className="mt-2 text-sm text-[#707872]">{session.mensaje_cliente}</p> : null}{session.motivo_cancelacion ? <p className="mt-2 text-sm text-red-600">{session.motivo_cancelacion}</p> : null}</div></div>{!history && !["cancelada", "realizada", "no_asistio"].includes(session.estado) ? <div className="flex gap-2"><Button className="bg-[#46624f] hover:bg-[#3b5543]" disabled={updating || session.estado === "confirmada"} onClick={onConfirm}><CheckCircle2 className="mr-2 h-4 w-4" />{session.estado === "confirmada" ? "Confirmada" : "Confirmar"}</Button><Button variant="outline" disabled={updating} onClick={onCancel}><XCircle className="mr-2 h-4 w-4" />Cancelar</Button></div> : null}</div></CardContent></Card>;
 }
-function Metric({ label, value }: { label: string; value: string }) { return <Card><CardContent className="p-5"><p className="text-sm text-[#707872]">{label}</p><p className="mt-2 text-3xl font-bold text-[#46624f]">{value}</p></CardContent></Card>; }
+function Metric({ label, value }: { label: string; value: string }) { return <Card className="client-metric-card"><CardContent className="p-5"><p className="text-sm text-[#707872]">{label}</p><p className="mt-2 text-3xl font-bold text-[#46624f]">{value}</p></CardContent></Card>; }
