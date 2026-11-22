@@ -29,9 +29,11 @@ const primaryItems = [
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  // Privacy retains its original presentation and is excluded from the new client theme.
+  const keepPrivacyUnchanged = pathname === "/portal/privacidad" || pathname.startsWith("/portal/privacidad/");
 
   return (
-    <div className="client-experience min-h-screen bg-[#f3f0e8] pb-24 sm:pb-28">
+    <div className={`${keepPrivacyUnchanged ? "" : "client-experience"} min-h-screen bg-[#f3f0e8] pb-24 sm:pb-28`}>
       <PrivacyConsentPrompt />
       <header className="flex items-center justify-between gap-4 bg-[#101713] px-4 py-3 text-[#D1D4D2]">
         <Link href="/portal" aria-label="Chetesaí Fitness+, inicio"><img src="/brand/logo-horizontal.svg" alt="Chetesaí Fitness+" width={186} height={50} /></Link>
