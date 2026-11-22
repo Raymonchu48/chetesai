@@ -149,9 +149,9 @@ export default function ClientWellbeingPage() {
   const mealCount = data?.plan?.comidas?.filter((meal) => meal.nombre || meal.descripcion).length || 0;
 
   return (
-    <main className="min-h-screen bg-[#f7f4ee] px-4 py-7 text-[#29312e] sm:px-5 sm:py-10">
+    <main className="client-premium-page client-page-nutrition min-h-screen bg-[#f7f4ee] px-4 py-7 text-[#29312e] sm:px-5 sm:py-10">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-7 rounded-[28px] border border-[#e7dfd3] bg-[#fffdf9] p-5 shadow-sm sm:p-6">
+        <header className="client-page-hero mb-7 rounded-[28px] border border-[#e7dfd3] bg-[#fffdf9] p-5 shadow-sm sm:p-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-xs font-bold tracking-[0.22em] text-[#c9653b]">CHETESAÍ FITNESS+</p>
@@ -188,7 +188,7 @@ export default function ClientWellbeingPage() {
                 <Card className="border-[#e7dfd3]"><CardContent className="py-16 text-center"><Apple className="mx-auto h-11 w-11 text-[#707872]" /><h3 className="mt-4 text-xl font-bold">Todavía no tienes un plan nutricional activo</h3><p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#707872]">Cuando tu profesional publique tu planificación, aparecerá aquí con tus comidas, objetivos y recomendaciones.</p></CardContent></Card>
               ) : (
                 <>
-                  <Card className="overflow-hidden border-0 bg-[#294435] text-white shadow-[0_18px_50px_rgba(41,68,53,0.18)]">
+                  <Card className="client-nutrition-feature overflow-hidden border-0 bg-[#294435] text-white shadow-[0_18px_50px_rgba(41,68,53,0.18)]">
                     <CardContent className="p-0">
                       <div className="grid gap-0 lg:grid-cols-[1.35fr_0.65fr]">
                         <div className="p-6 sm:p-8">
@@ -220,7 +220,7 @@ export default function ClientWellbeingPage() {
                   </div>
 
                   {data.plan.recomendaciones ? (
-                    <div className="mt-5 rounded-[24px] border border-[#dfe7df] bg-[#eef5ef] p-5 sm:p-6">
+                    <div className="client-neo-panel mt-5 rounded-[24px] border border-[#dfe7df] bg-[#eef5ef] p-5 sm:p-6">
                       <div className="flex items-center gap-2 text-[#46624f]"><Sparkles className="h-5 w-5" /><h3 className="font-bold">Indicaciones de tu profesional</h3></div>
                       <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[#4f5c55]">{data.plan.recomendaciones}</p>
                     </div>
@@ -281,7 +281,7 @@ export default function ClientWellbeingPage() {
               )}
             </section>
 
-            <section id="habitos" className="rounded-[28px] border border-[#e3ddd3] bg-[#f1eee8] p-4 sm:p-6">
+            <section id="habitos" className="client-neo-panel client-nutrition-habits rounded-[28px] border border-[#e3ddd3] bg-[#f1eee8] p-4 sm:p-6">
               <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#c9653b]">Seguimiento diario</p>
@@ -346,7 +346,7 @@ export default function ClientWellbeingPage() {
 }
 
 function PlanMetric({ label, value }: { label: string; value: string }) {
-  return <div className="rounded-2xl border border-[#e3ddd3] bg-[#fffdf9] p-4"><p className="text-xs font-semibold text-[#707872]">{label}</p><p className="mt-1 text-lg font-bold sm:text-xl">{value}</p></div>;
+  return <div className="client-metric-card rounded-2xl border border-[#e3ddd3] bg-[#fffdf9] p-4"><p className="text-xs font-semibold text-[#707872]">{label}</p><p className="mt-1 text-lg font-bold sm:text-xl">{value}</p></div>;
 }
 
 function DarkMetric({ label, value }: { label: string; value: string }) {
@@ -355,7 +355,7 @@ function DarkMetric({ label, value }: { label: string; value: string }) {
 
 function HabitMetric({ label, value, progress }: { label: string; value: string; progress?: number }) {
   const safe = Math.max(0, Math.min(100, progress || 0));
-  return <div className="rounded-2xl bg-white p-4 shadow-sm"><p className="text-xs font-semibold text-[#707872]">{label}</p><p className="mt-1 text-xl font-bold">{value}</p>{progress !== undefined ? <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#e7ebe7]"><div className="h-full rounded-full bg-[#46624f]" style={{ width: `${safe}%` }} /></div> : null}</div>;
+  return <div className="client-metric-card rounded-2xl bg-white p-4 shadow-sm"><p className="text-xs font-semibold text-[#707872]">{label}</p><p className="mt-1 text-xl font-bold">{value}</p>{progress !== undefined ? <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#e7ebe7]"><div className="h-full rounded-full bg-[#46624f]" style={{ width: `${safe}%` }} /></div> : null}</div>;
 }
 
 function formatNumber(value: number | null | undefined, suffix: string) {

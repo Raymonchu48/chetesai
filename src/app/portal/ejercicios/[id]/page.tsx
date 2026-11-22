@@ -116,12 +116,12 @@ export default function ExerciseGuideDetailPage() {
   const visualModel: ExerciseVisualModel = data?.cliente?.modelo_visual === "mujer" ? "mujer" : "hombre";
 
   if (loading) {
-    return <main className="min-h-screen bg-[#f7f4ee] px-5 py-16 text-center text-[#707872]">Cargando guía...</main>;
+    return <main className="client-premium-page client-page-guide-detail min-h-screen bg-[#f7f4ee] px-5 py-16 text-center text-[#707872]">Cargando guía...</main>;
   }
 
   if (error || !exercise) {
     return (
-      <main className="min-h-screen bg-[#f7f4ee] px-5 py-12 text-[#29312e]">
+      <main className="client-premium-page client-page-guide-detail min-h-screen bg-[#f7f4ee] px-5 py-12 text-[#29312e]">
         <div className="mx-auto max-w-3xl rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-10 text-center shadow-sm">
           <Dumbbell className="mx-auto h-10 w-10 text-[#8b938e]" />
           <h1 className="mt-4 text-2xl font-black">Guía no disponible</h1>
@@ -135,19 +135,19 @@ export default function ExerciseGuideDetailPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f4ee] px-5 py-8 text-[#29312e] md:py-10">
+    <main className="client-premium-page client-page-guide-detail min-h-screen bg-[#f7f4ee] px-5 py-8 text-[#29312e] md:py-10">
       <div className="mx-auto max-w-6xl">
         <Link href={`/portal/ejercicios${assignmentId ? `?asignacion_id=${encodeURIComponent(assignmentId)}` : ""}`} className="mb-5 inline-flex items-center gap-2 text-sm font-bold text-[#46624f] hover:underline">
           <ArrowLeft className="h-4 w-4" /> Volver a la guía de ejercicios
         </Link>
 
-        <section className="overflow-hidden rounded-[32px] border border-[#e7dfd3] bg-[#fffdf9] shadow-sm">
+        <section className="client-guide-feature overflow-hidden rounded-[32px] border border-[#e7dfd3] bg-[#fffdf9] shadow-sm">
           <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
             <div className="bg-white p-3 md:p-6">
               <InteractiveExerciseViewer item={exercise} visualModel={visualModel} />
             </div>
 
-            <div className="p-6 md:p-9">
+            <div className="client-guide-side p-6 md:p-9">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-[#c9653b]">GUÍA CHETESAÍ</p>
               <h1 className="mt-3 text-3xl font-black leading-tight md:text-5xl">{exercise.nombre}</h1>
               <p className="mt-4 leading-7 text-[#65706a]">
@@ -166,7 +166,7 @@ export default function ExerciseGuideDetailPage() {
           </div>
         </section>
 
-        <section className="mt-6 rounded-[32px] border border-[#d8e4da] bg-[#eef5ef] p-6 shadow-sm md:p-8">
+        <section className="client-neo-panel client-guide-prescription mt-6 rounded-[32px] border border-[#d8e4da] bg-[#eef5ef] p-6 shadow-sm md:p-8">
           <div className="flex items-center gap-3">
             <BadgeCheck className="h-7 w-7 text-[#46624f]" />
             <div>
@@ -233,7 +233,7 @@ export default function ExerciseGuideDetailPage() {
 
 function Info({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Dumbbell }) {
   return (
-    <div className="rounded-2xl bg-[#f7f4ee] p-4">
+    <div className="client-guide-info rounded-2xl bg-[#f7f4ee] p-4">
       <Icon className="h-5 w-5 text-[#46624f]" />
       <p className="mt-3 text-[10px] font-bold uppercase tracking-wide text-[#8b938e]">{label}</p>
       <p className="mt-1 font-black">{value}</p>
@@ -252,7 +252,7 @@ function Metric({ label, value, icon: Icon }: { label: string; value: string; ic
 
 function GuideSection({ icon: Icon, eyebrow, title, text }: { icon: typeof Dumbbell; eyebrow: string; title: string; text: string }) {
   return (
-    <section className="rounded-[30px] border border-[#e7dfd3] bg-[#fffdf9] p-7 shadow-sm">
+    <section className="client-neo-panel rounded-[30px] border border-[#e7dfd3] bg-[#fffdf9] p-7 shadow-sm">
       <Icon className="h-7 w-7 text-[#c9653b]" />
       <p className="mt-5 text-xs font-black uppercase tracking-[0.16em] text-[#c9653b]">{eyebrow}</p>
       <h2 className="mt-2 text-2xl font-black">{title}</h2>
