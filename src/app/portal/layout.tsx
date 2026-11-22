@@ -33,7 +33,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   const keepPrivacyUnchanged = pathname === "/portal/privacidad" || pathname.startsWith("/portal/privacidad/");
 
   return (
-    <div className={`${keepPrivacyUnchanged ? "" : "client-experience"} min-h-screen bg-[#f3f0e8] pb-24 sm:pb-28`}>
+    <div className={`${keepPrivacyUnchanged ? "client-privacy-legacy" : "client-experience"} min-h-screen bg-[#f3f0e8] pb-24 sm:pb-28`}>
       <PrivacyConsentPrompt />
       <header className="flex items-center justify-between gap-4 bg-[#101713] px-4 py-3 text-[#D1D4D2]">
         <Link href="/portal" aria-label="Chetesaí Fitness+, inicio"><img src="/brand/logo-horizontal.svg" alt="Chetesaí Fitness+" width={186} height={50} /></Link>
