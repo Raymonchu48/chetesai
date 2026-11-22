@@ -117,9 +117,9 @@ export default function ClientExerciseGuidesPage() {
   const visualModel: ExerciseVisualModel = data?.cliente?.modelo_visual === "mujer" ? "mujer" : "hombre";
 
   return (
-    <main className="min-h-screen bg-[#f7f4ee] px-5 py-10 text-[#29312e]">
+    <main className="client-premium-page client-page-guides min-h-screen bg-[#f7f4ee] px-5 py-10 text-[#29312e]">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-7 rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-6 shadow-sm md:p-8">
+        <header className="client-page-hero mb-7 rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-6 shadow-sm md:p-8">
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.22em] text-[#c9653b]">CHETESAÍ FITNESS+ · TÉCNICA</p>
@@ -130,14 +130,14 @@ export default function ClientExerciseGuidesPage() {
                 Consulta la ejecución de los ejercicios de tu planificación activa antes o durante el entrenamiento.
               </p>
             </div>
-            <div className="rounded-2xl bg-[#eef5ef] px-4 py-3 text-sm text-[#46624f]">
+            <div className="client-hero-stat rounded-2xl bg-[#eef5ef] px-4 py-3 text-sm text-[#46624f]">
               <p className="text-xs font-bold uppercase tracking-wide">Tu biblioteca</p>
               <p className="mt-1 text-lg font-black">{gallery.length} ejercicios asignados</p>
             </div>
           </div>
         </header>
 
-        <section className="mb-7 rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-5 shadow-sm">
+        <section className="client-neo-search mb-7 rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-5 shadow-sm">
           <div className="relative">
             <Search className="absolute left-4 top-3.5 h-5 w-5 text-[#8b938e]" />
             <Input
@@ -188,7 +188,7 @@ export default function ClientExerciseGuidesPage() {
                 <a
                   key={exercise.id}
                   href={`/portal/ejercicios/${exercise.id}${assignmentId ? `?asignacion_id=${encodeURIComponent(assignmentId)}` : ""}`}
-                  className="group block touch-manipulation select-none overflow-hidden rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] shadow-sm transition-colors duration-150 md:hover:border-[#8cdb78] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2f9e24]"
+                  className="client-gallery-tile group block touch-manipulation select-none overflow-hidden rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] shadow-sm transition-colors duration-150 md:hover:border-[#8cdb78] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2f9e24]"
                 >
                   <div className="pointer-events-none relative h-52 overflow-hidden bg-white p-2">
                     <ExerciseMediaVisual item={exercise} visualModel={visualModel} />
