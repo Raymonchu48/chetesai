@@ -507,6 +507,14 @@ export function ChetesaiAiAssistant() {
     return () => { active = false; };
   }, [isPortal]);
 
+  // Open the existing assistant from the client dashboard without changing
+  // its greeting, wellbeing registration, chat, voice or reminders.
+  useEffect(() => {
+    const openFromDashboard = () => setOpen(true);
+    window.addEventListener("chetesai:open-coach", openFromDashboard);
+    return () => window.removeEventListener("chetesai:open-coach", openFromDashboard);
+  }, []);
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
