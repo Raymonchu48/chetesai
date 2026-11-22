@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShieldCheck, UserRound, ArrowRight } from "lucide-react";
+import { ShieldCheck, UserRound, ArrowRight, Globe2 } from "lucide-react";
 
 export const metadata = { title: "Acceder a Chetesaí Fitness+" };
 
@@ -8,7 +8,7 @@ export default function AccessSelector() {
     <main className="flex min-h-screen items-center justify-center bg-[#101713] px-4 py-10 text-[#f2f5ec]">
       <section className="w-full max-w-xl rounded-3xl border border-[#425448] bg-[#18251c] p-6 shadow-2xl sm:p-10">
         <p className="text-xs font-bold uppercase tracking-[.22em] text-[#b7d777]">Chetesaí Fitness+</p>
-        <h1 className="mt-3 font-brand text-3xl font-bold">Elige tu acceso</h1>
+        <h1 className="mt-3 font-brand text-3xl font-bold !text-[#f2f5ec]">Elige tu acceso</h1>
         <p className="mt-3 text-sm leading-6 text-[#c5d1c4]">
           Para proteger tus datos, el portal de clientes y el panel profesional tienen sesiones independientes.
           Selecciona tu área antes de introducir tu contraseña.
@@ -25,8 +25,15 @@ export default function AccessSelector() {
             <ArrowRight className="h-5 w-5" />
           </a>
         </div>
-        <p className="mt-6 text-xs text-[#b6c8b7]">Cada cuenta conserva sus permisos. No se transfieren contraseñas entre portales.</p>
-        <Link href="/" className="mt-5 inline-block text-sm font-semibold text-[#c1df91] underline underline-offset-4">Volver a la web de Chetesaí</Link>
+        <div className="mt-6 border-t border-[#4a624d] pt-5">
+          <p className="mb-3 text-sm font-semibold text-[#dcebd8]">¿Quieres visitar nuestra web sin iniciar sesión?</p>
+          <a href="https://www.chetesaifitness.com/" className="flex min-h-16 items-center gap-4 rounded-2xl border-2 border-[#b7d777] bg-[#334a32] p-4 text-[#f6ffe9] transition hover:bg-[#435f3e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c6ef91]">
+            <Globe2 className="h-6 w-6 shrink-0" />
+            <span className="flex-1"><strong className="block text-base">Ir a la web de Chetesaí</strong><span className="text-xs text-[#e0eeda]">Servicios, información y contacto · Acceso público</span></span>
+            <ArrowRight className="h-5 w-5 shrink-0" />
+          </a>
+        </div>
+        <p className="mt-5 text-xs text-[#b6c8b7]">Cada cuenta conserva sus permisos. No se transfieren contraseñas entre portales.</p>
       </section>
     </main>
   );
