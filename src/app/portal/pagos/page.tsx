@@ -104,9 +104,9 @@ export default function ClientPaymentsPage() {
     .reduce((sum, item) => sum + Number(item.importe_eur || 0), 0);
 
   return (
-    <main className="min-h-screen bg-[#f7f4ee] px-5 py-10 text-[#29312e]">
+    <main className="client-premium-page client-page-payments min-h-screen bg-[#f7f4ee] px-5 py-10 text-[#29312e]">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-8 flex flex-col gap-5 rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <header className="client-page-hero mb-8 flex flex-col gap-5 rounded-3xl border border-[#e7dfd3] bg-[#fffdf9] p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs font-bold tracking-[0.22em] text-[#c9653b]">CHETESAÍ FITNESS+</p>
             <h1 className="mt-2 flex items-center gap-3 text-3xl font-bold tracking-tight">
@@ -147,7 +147,7 @@ export default function ClientPaymentsPage() {
 }
 
 function Metric({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
-  return <Card><CardContent className="flex items-center gap-4 p-5"><div className="grid h-11 w-11 place-items-center rounded-xl bg-[#edf3ed] text-[#46624f]">{icon}</div><div><p className="text-sm text-[#707872]">{label}</p><p className="mt-1 text-2xl font-bold text-[#46624f]">{value}</p></div></CardContent></Card>;
+  return <Card className="client-metric-card"><CardContent className="flex items-center gap-4 p-5"><div className="grid h-11 w-11 place-items-center rounded-xl bg-[#edf3ed] text-[#46624f]">{icon}</div><div><p className="text-sm text-[#707872]">{label}</p><p className="mt-1 text-2xl font-bold text-[#46624f]">{value}</p></div></CardContent></Card>;
 }
 function Empty({ text }: { text: string }) { return <Card><CardContent className="py-12 text-center text-[#707872]">{text}</CardContent></Card>; }
 function formatMoney(value: number) { return new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(Number(value || 0)); }
