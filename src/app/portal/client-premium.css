@@ -173,3 +173,274 @@
   .client-widget,.client-widget-action {transition:none;}
   .client-widget:hover {transform:none;}
 }
+
+
+/* --------------------------------------------------------------
+   Chetesaí client, phase 2 — visual continuity for inner sections.
+   Intentional boundary: these rules require .client-experience AND a
+   .client-premium-page, and never target /portal/privacidad or admin.
+   Data, actions, links, forms and media elements are untouched.
+   -------------------------------------------------------------- */
+.client-experience .client-premium-page {
+  min-height: 100vh;
+  color: #1d2d23;
+  background:
+    radial-gradient(ellipse 48% 28% at 96% 0%, rgba(167,224,115,.26), transparent 85%),
+    radial-gradient(ellipse 55% 33% at -12% 100%, rgba(181,226,133,.22), transparent 80%),
+    linear-gradient(162deg,#f5f8f2 0%,#eaf0e8 54%,#f7f9f5 100%) !important;
+}
+.client-experience .client-premium-page > div > .client-page-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(218,255,165,.47) !important;
+  border-radius: 32px !important;
+  color: #f5fbea !important;
+  background:
+    radial-gradient(ellipse 43% 75% at 100% 4%,rgba(188,247,104,.34),transparent 80%),
+    radial-gradient(ellipse 47% 50% at 0% 112%,rgba(126,188,84,.19),transparent 77%),
+    linear-gradient(136deg,#354a37 0%,#17271c 58%,#243c2b 100%) !important;
+  box-shadow:
+    0 31px 49px -17px rgba(19,39,24,.39),
+    0 7px 0 -2px rgba(25,46,29,.18),
+    inset 0 2px rgba(251,255,229,.33),
+    inset 0 -5px 12px rgba(0,0,0,.24) !important;
+}
+.client-experience .client-premium-page .client-page-hero h1 {
+  color: #f8ffed !important;
+  letter-spacing: -.038em;
+}
+.client-experience .client-premium-page .client-page-hero h1 svg { color: #d7ff90 !important; }
+.client-experience .client-premium-page .client-page-hero p {
+  color: #dfedda !important;
+}
+.client-experience .client-premium-page .client-page-hero > div > div:first-child > p:first-child,
+.client-experience .client-premium-page .client-page-hero > div:first-child > p:first-child {
+  color: #e2ff9f !important;
+}
+.client-experience .client-premium-page .client-page-hero .client-hero-stat {
+  color:#f5ffde !important;
+  border: 1px solid rgba(221,255,182,.3);
+  background: linear-gradient(145deg,rgba(206,250,137,.23),rgba(36,65,35,.7)) !important;
+  box-shadow: 0 13px 24px rgba(0,0,0,.22),inset 0 2px rgba(245,255,219,.25),inset 0 -3px 7px rgba(0,0,0,.14);
+}
+.client-experience .client-premium-page .client-page-hero .client-hero-stat p {color: #f5ffde !important;}
+
+/* Existing Card components keep their original text, inputs and state colors:
+   only a translucent luminous surface and tangible raised shadow are added. */
+.client-experience .client-premium-page [data-slot="card"] {
+  border: 1px solid rgba(141,182,135,.42);
+  border-radius: 27px;
+  background-image:
+    radial-gradient(ellipse at 95% 0%,rgba(197,247,143,.23),transparent 61%),
+    linear-gradient(165deg,rgba(255,255,255,.48),rgba(193,224,182,.1));
+  box-shadow: 0 20px 29px -10px rgba(20,44,27,.21),
+              0 5px 0 -2px rgba(25,46,29,.12),
+              inset 0 2px 1px rgba(255,255,255,.84),
+              inset 0 -3px 7px rgba(38,70,39,.07);
+}
+.client-experience .client-premium-page .client-metric-card {
+  color: #f5fbe9 !important;
+  border: 1px solid rgba(226,255,176,.43) !important;
+  border-radius: 23px !important;
+  background:
+    radial-gradient(ellipse 94% 80% at 105% -12%,rgba(186,245,100,.38),transparent 74%),
+    linear-gradient(145deg,#394f3d 0%,#19291f 78%) !important;
+  box-shadow: 0 17px 23px rgba(22,39,26,.24),0 4px 0 -2px rgba(26,47,30,.2),
+              inset 0 2px 1px rgba(249,255,218,.38),
+              inset 0 -4px 8px rgba(0,0,0,.21) !important;
+}
+.client-experience .client-premium-page .client-metric-card p,
+.client-experience .client-premium-page .client-metric-card strong {
+  color:#f6fbea !important;
+}
+.client-experience .client-premium-page .client-metric-card p:first-child {color:#dfedd6 !important;}
+.client-experience .client-premium-page .client-metric-card p:nth-of-type(2) {color:#e5ffb3 !important;}
+.client-experience .client-premium-page .client-metric-card svg {color:#d6ff92 !important;}
+.client-experience .client-premium-page .client-metric-card > [data-slot="card-content"] {
+  border-color:rgba(204,255,137,.48) !important;
+}
+.client-experience .client-premium-page .client-neo-panel,
+.client-experience .client-premium-page .client-neo-search {
+  border:1px solid rgba(152,190,139,.48) !important;
+  border-radius: 27px;
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(207,246,157,.38),transparent 55%),
+    linear-gradient(145deg,#fbfdf8 0%,#edf6eb 100%) !important;
+  box-shadow:0 19px 30px -12px rgba(29,54,33,.23),0 5px 0 -2px rgba(26,49,29,.13),
+             inset 0 2px 2px rgba(255,255,255,.94),inset 0 -4px 8px rgba(59,94,55,.07) !important;
+}
+.client-experience .client-premium-page button,
+.client-experience .client-premium-page a {
+  touch-action: manipulation;
+}
+.client-experience .client-premium-page :is(button,a):focus-visible {
+  outline:3px solid #9ad349;
+  outline-offset:3px;
+}
+.client-experience .client-premium-page :is(input,textarea,select) {
+  color-scheme:light;
+  scroll-margin-block:8rem;
+}
+
+/* Library: text-safe dark gallery tiles; existing image component is retained. */
+.client-experience .client-page-guides .client-gallery-tile {
+  color:#f4f9ed !important;
+  border:1px solid rgba(210,255,158,.43) !important;
+  border-radius:27px !important;
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(187,242,100,.31),transparent 61%),
+    linear-gradient(145deg,#3b503f,#18271d 75%) !important;
+  box-shadow:0 21px 28px -9px rgba(18,38,23,.34),0 6px 0 -2px rgba(28,50,30,.2),
+             inset 0 2px rgba(243,255,215,.41),inset 0 -4px 9px rgba(0,0,0,.21) !important;
+}
+.client-experience .client-page-guides .client-gallery-tile > div:first-child {
+  background:#f4f8f1 !important;
+  border-bottom:1px solid rgba(195,255,119,.4);
+  box-shadow:inset 0 -4px 11px rgba(31,61,29,.09);
+}
+.client-experience .client-page-guides .client-gallery-tile > div:last-child h2 {
+  color:#f9fff1 !important;
+}
+.client-experience .client-page-guides .client-gallery-tile > div:last-child > p {
+  color:#dce9d7 !important;
+}
+.client-experience .client-page-guides .client-gallery-tile > div:last-child > div:last-child {
+  color:#e2ff9f !important;
+  border-color:rgba(221,255,174,.25) !important;
+}
+.client-experience .client-page-guides .client-neo-search input {
+  border:1px solid #b9d4b1 !important;
+  background-color:#fff !important;
+  box-shadow:inset 0 2px 6px rgba(54,87,49,.08) !important;
+}
+.client-experience .client-page-guides .client-neo-search button {
+  box-shadow:0 5px 10px rgba(25,52,28,.1),inset 0 1px rgba(255,255,255,.33);
+}
+.client-experience .client-page-guides .client-gallery-tile:active {transform:translateY(1px);}
+
+/* Guide detail: photo stays on white; the text pane is the raised dark surface.
+   Exercise viewer, buttons, linked variants and videos remain functional. */
+.client-experience .client-page-guide-detail .client-guide-feature {
+  border:1px solid rgba(159,204,140,.43) !important;
+  border-radius:31px;
+  background:#fffdf9;
+  box-shadow:0 28px 39px -14px rgba(25,47,29,.3),0 7px 0 -2px rgba(29,56,32,.14),
+             inset 0 2px rgba(255,255,255,.84) !important;
+}
+.client-experience .client-page-guide-detail .client-guide-side {
+  color:#f8fceb;
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(182,242,96,.31),transparent 72%),
+    linear-gradient(145deg,#354b39,#19291e 83%) !important;
+}
+.client-experience .client-page-guide-detail .client-guide-side > h1 {color:#fbffef !important;}
+.client-experience .client-page-guide-detail .client-guide-side > p:first-child {color:#d7ff94 !important;}
+.client-experience .client-page-guide-detail .client-guide-side > p:nth-child(3) {color:#e0edd9 !important;}
+.client-experience .client-page-guide-detail .client-guide-side > p:last-child {
+  color:#1b3a27 !important;
+  background:#e6f3dd !important;
+  box-shadow:inset 0 2px 4px rgba(20,55,20,.08),0 6px 12px rgba(0,0,0,.12);
+}
+.client-experience .client-page-guide-detail .client-guide-info {
+  color:#193426 !important;
+  border:1px solid rgba(184,227,159,.56);
+  background:linear-gradient(145deg,#f9fff2,#dcecd6) !important;
+  box-shadow:0 9px 13px rgba(0,0,0,.2),inset 0 2px rgba(255,255,255,.9),
+             inset 0 -3px 6px rgba(27,68,28,.08);
+}
+.client-experience .client-page-guide-detail .client-guide-info p {color:#24402f !important;}
+.client-experience .client-page-guide-detail .client-guide-prescription {
+  background:radial-gradient(ellipse at 95% 0%,rgba(195,237,144,.39),transparent 53%),
+             linear-gradient(155deg,#f5fcf0,#e4f0e0) !important;
+}
+.client-experience .client-page-guide-detail .client-guide-prescription article {
+  border:1px solid rgba(174,206,161,.5);
+  box-shadow:0 12px 20px rgba(42,72,39,.13),inset 0 2px rgba(255,255,255,.85);
+}
+
+/* Nutrition: elevated dark planning summary and data-preserving meals/habits. */
+.client-experience .client-page-nutrition .client-nutrition-feature {
+  color:#f9ffef !important;
+  border:1px solid rgba(218,255,162,.45) !important;
+  background:
+    radial-gradient(ellipse at 96% 0%,rgba(185,248,111,.31),transparent 55%),
+    linear-gradient(145deg,#3a5240,#18281e) !important;
+  box-shadow:0 26px 39px rgba(22,46,25,.26),0 5px 0 rgba(21,48,26,.16),
+             inset 0 2px rgba(247,255,219,.36),inset 0 -6px 11px rgba(0,0,0,.23) !important;
+}
+.client-experience .client-page-nutrition .client-nutrition-feature :is(h2,h3,strong) {
+  color:#faffee !important;
+}
+.client-experience .client-page-nutrition .client-nutrition-habits {
+  padding-block:1.5rem;
+}
+.client-experience .client-page-nutrition .client-nutrition-habits [data-slot="card"] {
+  border-color:rgba(147,193,137,.45);
+}
+
+/* Appointment and payment cards: preserve all status badges and controls. */
+.client-experience .client-page-appointments [data-slot="card"],
+.client-experience .client-page-payments [data-slot="card"] {
+  min-width:0;
+}
+.client-experience .client-page-appointments :is([data-slot="card"],.client-neo-panel) {
+  overflow-wrap:anywhere;
+}
+.client-experience .client-page-payments [data-slot="card"] > [data-slot="card-content"] > div:first-child {
+  min-width:0;
+}
+.client-experience .client-page-payments [data-slot="card"]:not(.client-metric-card) {
+  background-color:#fafff7;
+}
+
+/* Training's actual day selector, prescribed exercises, session history and
+   recording controls now share the same depth as the homepage widgets. */
+.client-experience .client-home .client-day-card[aria-pressed="false"] {
+  color:#f4ffed !important;
+  border:1px solid rgba(217,255,161,.41) !important;
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(183,241,105,.29),transparent 70%),
+    linear-gradient(145deg,#3a503c,#19271f) !important;
+  box-shadow:0 14px 20px rgba(24,44,26,.23),0 4px 0 -2px rgba(26,51,29,.22),
+             inset 0 2px rgba(244,255,213,.32),inset 0 -4px 8px rgba(0,0,0,.22);
+}
+.client-experience .client-home .client-day-card[aria-pressed="false"] > span {
+  color:#f4ffed !important;
+}
+.client-experience .client-home .client-day-card[aria-pressed="false"] > span:first-child {
+  color:#e4ffad !important;
+}
+.client-experience .client-home .client-day-card[aria-pressed="false"] > span:last-child {
+  color:#caddc2 !important;
+}
+.client-experience .client-home .client-training-summary,
+.client-experience .client-home .client-workout-panel,
+.client-experience .client-home .client-training-history {
+  border:1px solid rgba(158,195,144,.45) !important;
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(209,246,157,.29),transparent 58%),
+    linear-gradient(145deg,#fafff6,#edf6eb) !important;
+  box-shadow:0 19px 30px -12px rgba(26,49,31,.23),0 5px 0 -2px rgba(29,51,31,.14),
+             inset 0 2px 1px rgba(255,255,255,.91),inset 0 -4px 8px rgba(41,81,42,.08);
+}
+.client-experience .client-home .client-workout-panel {
+  border-radius:27px;
+}
+.client-experience .client-home .client-workout-status {
+  border:1px solid #b4d4a5 !important;
+  background:linear-gradient(125deg,rgba(243,254,229,.97),rgba(211,237,193,.97)) !important;
+  box-shadow:0 18px 27px rgba(31,61,33,.2),inset 0 2px rgba(255,255,255,.87) !important;
+}
+.client-experience .client-home .client-training-history [aria-expanded="true"] {
+  border-color:#b9ef77 !important;
+}
+@media (max-width:640px) {
+  .client-experience .client-premium-page > div > .client-page-hero {border-radius:26px !important;}
+  .client-experience .client-premium-page .client-metric-card {border-radius:20px !important;}
+  .client-experience .client-page-guide-detail .client-guide-feature {border-radius:25px !important;}
+  .client-experience .client-page-guides .client-gallery-tile {border-radius:25px !important;}
+}
+@media (prefers-reduced-motion: reduce) {
+  .client-experience .client-page-guides .client-gallery-tile {transition:none;}
+}
