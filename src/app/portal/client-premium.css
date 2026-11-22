@@ -444,3 +444,133 @@
 @media (prefers-reduced-motion: reduce) {
   .client-experience .client-page-guides .client-gallery-tile {transition:none;}
 }
+
+
+/* --------------------------------------------------------------
+   Contrast hotfix — 2026-11-22
+   The site's global html,body,main color uses !important with a light
+   foreground. Restore readable foregrounds on light client surfaces,
+   retaining original dark cards and role-specific status badges.
+   -------------------------------------------------------------- */
+.client-experience main.client-premium-page {
+  color: #203428 !important;
+}
+.client-experience .client-premium-page > div > :is(section,div):not(.client-page-hero) {
+  color: #203428;
+}
+
+/* Payments: plan titles and descriptive information sit on a pale card. */
+.client-experience .client-page-payments [data-slot="card"]:not(.client-metric-card) {
+  color: #1c3023 !important;
+}
+.client-experience .client-page-payments [data-slot="card"]:not(.client-metric-card) :is(h2,h3) {
+  color: #203629 !important;
+}
+.client-experience .client-page-payments [data-slot="card"]:not(.client-metric-card) [data-slot="card-content"] > div > div :is(p,span):not([data-slot="badge"]) {
+  color: inherit;
+}
+.client-experience .client-page-payments .client-metric-card {
+  color: #f7faef !important;
+}
+.client-experience .client-page-payments .client-metric-card [data-slot="card-content"] > div:first-child {
+  background: rgba(226,255,186,.18) !important;
+  color: #d9ff98 !important;
+  border: 1px solid rgba(225,255,175,.26);
+  box-shadow: 0 5px 12px rgba(0,0,0,.16), inset 0 1px rgba(255,255,255,.18);
+}
+.client-experience .client-page-payments .client-metric-card :is(h2,h3,p,span) {
+  color: #f7faee !important;
+}
+
+/* Guides: the series counter has a light surface and needs dark letters. */
+.client-experience .client-page-guides .client-gallery-tile > div:last-child .flex.flex-wrap > span:nth-child(2) {
+  color: #203629 !important;
+  background: #edf3e7 !important;
+  border: 1px solid #c4d8bc;
+  box-shadow: inset 0 1px rgba(255,255,255,.9), 0 3px 7px rgba(7,20,10,.2);
+}
+.client-experience .client-page-guides .client-gallery-tile > div:last-child .flex.flex-wrap > span:first-child {
+  color: #21432e !important;
+  background: #e3f4d4 !important;
+}
+.client-experience .client-page-guides .client-gallery-tile > div:last-child .flex.flex-wrap > span:nth-child(3) {
+  color: #7a321f !important;
+  background: #ffefe6 !important;
+}
+.client-experience .client-page-guides .client-gallery-tile > div:last-child > div:last-child {
+  color: #deff97 !important;
+}
+.client-experience .client-page-guides .client-neo-search :is(h2,h3,p) {
+  color: #24392c;
+}
+
+/* Nutrition: pale recommendations, menus and habits use dark text;
+   the existing dark summary, progress meters and colored action buttons stay. */
+.client-experience .client-page-nutrition .client-neo-panel,
+.client-experience .client-page-nutrition .client-nutrition-habits,
+.client-experience .client-page-nutrition [data-slot="card"]:not(.client-metric-card):not(.client-nutrition-feature) {
+  color: #22392b !important;
+}
+.client-experience .client-page-nutrition .client-neo-panel :is(h2,h3),
+.client-experience .client-page-nutrition [data-slot="card"]:not(.client-metric-card):not(.client-nutrition-feature) :is(h2,h3) {
+  color: #203729 !important;
+}
+.client-experience .client-page-nutrition .client-nutrition-habits > div:first-child p,
+.client-experience .client-page-nutrition .client-nutrition-habits [data-slot="card"] p {
+  color: #455d4c;
+}
+.client-experience .client-page-nutrition .client-nutrition-feature,
+.client-experience .client-page-nutrition .client-metric-card {
+  color: #f7faee !important;
+}
+/* Navigation buttons on the dark nutrition header were inheriting its light
+   text although their own backgrounds are nearly white. */
+.client-experience .client-page-nutrition .client-page-hero a[data-slot="button"] {
+  color: #24442f !important;
+  background: #eef7e9 !important;
+  border-color: #b2d5a6 !important;
+  box-shadow: 0 7px 14px rgba(0,0,0,.25), inset 0 1px rgba(255,255,255,.85);
+}
+.client-experience .client-page-nutrition .client-page-hero a[data-slot="button"]:hover {
+  color: #183725 !important;
+  background: #d9edcc !important;
+}
+.client-experience .client-page-nutrition .client-page-hero a[data-slot="button"] svg {
+  color: #24442f !important;
+}
+/* Same readable navigation treatment in the progress header. */
+.client-experience .client-page-progress .client-page-hero a[data-slot="button"] {
+  color: #f6fbea !important;
+  background: #344d38 !important;
+  border: 1px solid #91bd7b !important;
+  box-shadow: 0 5px 12px rgba(0,0,0,.25);
+}
+.client-experience .client-page-progress .client-page-hero a[data-slot="button"]:hover {
+  background: #426143 !important;
+}
+
+/* Privacy uses the original page style: this selector is outside the
+   .client-experience theme and corrects ONLY the global white foreground
+   on its pre-existing pale background and cards. No component is changed. */
+.client-privacy-legacy main {
+  background: #f7f4ee !important;
+  color: #202724 !important;
+}
+.client-privacy-legacy main [data-slot="card"] {
+  color: #21352a !important;
+}
+.client-privacy-legacy main [data-slot="card"] :is(h2,h3) {
+  color: #21352a !important;
+}
+.client-privacy-legacy main [data-slot="card"] p {
+  color: #4b5e53;
+}
+.client-privacy-legacy main header {
+  color: #f7faee;
+}
+.client-privacy-legacy main header :is(h1,p) {
+  color: inherit;
+}
+.client-privacy-legacy main header > p:first-child {
+  color: #d8bb7a;
+}
